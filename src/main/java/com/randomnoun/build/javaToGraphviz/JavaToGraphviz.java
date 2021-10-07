@@ -55,9 +55,9 @@ import com.steadystate.css.parser.SACParserCSS3;
  * @see https://www.programcreek.com/2011/01/a-complete-standalone-example-of-astparser/
  *
  */
-public class JavaToGraphviz4 {
+public class JavaToGraphviz {
 
-    Logger logger = Logger.getLogger(JavaToGraphviz4.class);
+    Logger logger = Logger.getLogger(JavaToGraphviz.class);
     
 	
 	public void test(InputStream is) throws Exception {
@@ -1134,12 +1134,12 @@ public class JavaToGraphviz4 {
 	public static void main(String args[]) throws Exception {
 	    Log4jCliConfiguration lcc = new Log4jCliConfiguration();
 	    lcc.init("[JavaToGraphviz]", null);
-	    Logger logger = Logger.getLogger(JavaToGraphviz4.class);
+	    Logger logger = Logger.getLogger(JavaToGraphviz.class);
 
         // InputStream is = JavaToGraphviz4.class.getResourceAsStream("/test.java");
-	    InputStream is = JavaToGraphviz4.class.getResourceAsStream("/Statements.java");
+	    InputStream is = JavaToGraphviz.class.getResourceAsStream("/Statements.java");
 
-		JavaToGraphviz4 javaToGraphviz = new JavaToGraphviz4();
+		JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
 		javaToGraphviz.test(is);
 		is.close();
 	}
