@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -191,8 +192,32 @@ public class JavaToGraphviz {
                 }
             }
         }
-
     }
+    
+    public static class LexicalScope {
+        // within this scope, the node that a 'continue' will continue to
+        DagNode continueNode;
+        
+        // a collection of edges from 'break' nodes 
+        List<ExitEdge> breakEdges;
+        
+        // a collection of edges from 'return' nodes
+        List<ExitEdge> returnEdges;
+        
+        
+        
+        public LexicalScope() {
+            continueNode = null;
+            breakEdges = new ArrayList<ExitEdge>();
+            returnEdges = new ArrayList<ExitEdge>();
+        }
+        
+        public LexicalScope startScope() {
+            LexicalScope next = new LexicalScope();
+            return next;
+        }
+    }
+    
     
     /** Adds the edges for a DagNode into the Dag, and returns the edges leading out of that DagNode
      * (which may now be labelled)
@@ -225,11 +250,14 @@ public class JavaToGraphviz {
             return addWhileEdges(dag, node, breakEdges, continueNode);
         } else if (node.type.equals("Continue")) {
             return addContinueEdges(dag, node, breakEdges, continueNode);
+        } else if (node.type.equals("Do")) {
+            return addDoEdges(dag, node, breakEdges, continueNode);
+
             
         // @TODO
         // x Break
         // x Continue
-        // Do
+        // x Do
         // x EnhancedFor
         // x For
         // Return
@@ -427,13 +455,48 @@ public class JavaToGraphviz {
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
         DagNode repeatingBlock = whileNode.children.get(0);
-        dag.addEdge(whileNode, repeatingBlock);
+        DagEdge se = dag.addEdge(whileNode, repeatingBlock);
+        se.label = "Y";
         
         List<ExitEdge> whileBreakEdges = new ArrayList<>();
         List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, whileBreakEdges, whileNode); // new continue node
         for (ExitEdge e : repeatingBlockPrevNodes) {
-            dag.addBackEdge(e.n1, whileNode, "while"); 
+            dag.addBackEdge(e.n1, whileNode, "while");
         }
+        
+        List<ExitEdge> prevNodes = new ArrayList<>(); // the entire while
+        prevNodes.addAll(repeatingBlockPrevNodes);
+        prevNodes.addAll(whileBreakEdges);
+        
+        // add an edge from the top of the while as well, as it's possible the repeatingBlock may never execute
+        ExitEdge e = new ExitEdge();
+        e.n1 = whileNode;
+        e.label = "N";
+        
+        return prevNodes;
+           
+    }
+    
+    private List<ExitEdge> addDoEdges(Dag dag, DagNode doNode, List<ExitEdge> _breakEdges, DagNode _continueNode) {
+        // draw the edges
+        DoStatement ds;
+        
+        if (doNode.children.size() != 1) {
+            throw new IllegalStateException("expected 1 child; found " + doNode.children.size());
+        }
+        // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
+        // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
+        DagNode repeatingBlock = doNode.children.get(0);
+        dag.addEdge(doNode, repeatingBlock);
+        
+        List<ExitEdge> whileBreakEdges = new ArrayList<>();
+        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, whileBreakEdges, doNode); // new continue node
+        for (ExitEdge e : repeatingBlockPrevNodes) {
+            dag.addBackEdge(e.n1, doNode, "do"); 
+        }
+        
+        // @TODO while condition is at the end so could create a node for the evaluation of that as well
+        
         
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire switch
         prevNodes.addAll(repeatingBlockPrevNodes);
@@ -441,6 +504,7 @@ public class JavaToGraphviz {
         return prevNodes;
            
     }
+    
 
            
     
