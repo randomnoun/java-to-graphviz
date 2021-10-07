@@ -1,0 +1,150 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+    <parent>
+		<artifactId>parent-pom</artifactId>
+		<groupId>com.randomnoun.build</groupId>
+		<version>1.23</version>
+	</parent>
+	
+    <groupId>com.randomnoun.build</groupId>
+    <artifactId>java-to-graphviz</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Java to Graphviz</name>
+    <description>Transforms java source code into graphviz diagrams</description>
+  
+    <url>https://randomnoun.github.io/java-to-graphviz/</url>
+	<inceptionYear>2021-09-27</inceptionYear>
+	
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- 
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-1.2-api</artifactId>
+        </dependency>
+         -->
+
+        <dependency>
+			<groupId>com.randomnoun.common</groupId>
+			<artifactId>common-public</artifactId>
+			<version>1.0.6</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-1.2-api</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>
+        <dependency>
+			<groupId>com.randomnoun.common</groupId>
+			<artifactId>log4j-one</artifactId>
+			<version>0.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.14.0</version>
+        </dependency>
+		<dependency>
+            <groupId>com.randomnoun.common</groupId>
+            <artifactId>log4j-one-bridge</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
+        <dependency>
+	      <groupId>org.eclipse.jdt</groupId>
+	      <artifactId>org.eclipse.jdt.core</artifactId>
+	      <version>3.20.0</version><!--  think this is pretty old these days -->
+	    </dependency>
+
+		<dependency>
+		  <groupId>net.sourceforge.cssparser</groupId>
+		  <artifactId>cssparser</artifactId>
+		  <version>0.9.29</version>
+		</dependency>
+	
+	</dependencies>
+
+	<!--  these are on github now. except for the bits on gitlab. -->
+	<scm>
+		<connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</connection>
+		<developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</developerConnection>
+		<url>http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz</url>
+  	    <tag>java-to-graphviz-1.0.12</tag>
+    </scm>
+	
+	<build>
+		<finalName>java-to-graphviz</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<attach>true</attach>
+					<descriptors>
+						<descriptor>src/assembly/dist.xml</descriptor>
+					</descriptors>
+					<tarLongFileMode>posix</tarLongFileMode>
+				</configuration>
+				<executions>
+					<execution>
+				        <id>dist-assembly</id>  <!-- this is used for inheritance merges (?) -->
+				        <phase>package</phase>
+				        <goals>
+				            <goal>single</goal>
+				        </goals>
+			        </execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.3</version>
+					<configuration>
+						<source>${jdk.version}</source>
+						<target>${jdk.version}</target>
+						<!--  so it turns out that /etc/mavenrc was wrong. sheesh. -->
+						<fork>true</fork>
+						<forceJavacCompilerUse>true</forceJavacCompilerUse>
+						<encoding>UTF-8</encoding>
+						<verbose>true</verbose>
+						<!--  allow linking against rt.jar (for sun internal classes) -->
+						<compilerArgs>
+							<arg>-XDignore.symbol.file</arg>
+						</compilerArgs>
+					</configuration>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+	</build>
+	
+	<distributionManagement>
+		<site>
+        	<id>gh-pages</id>
+        	<name>java-to-graphviz Website</name>
+	        <url>git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git?gh-pages#</url>
+    	</site>
+	</distributionManagement>
+	
+	
+	<properties>
+		<jdk.version>11</jdk.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<graalvm.version>20.3.0</graalvm.version>
+        <compiler.dir>${project.build.directory}/compiler</compiler.dir>
+	</properties>
+  
+</project>
