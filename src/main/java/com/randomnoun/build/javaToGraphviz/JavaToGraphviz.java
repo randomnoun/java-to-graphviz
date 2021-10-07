@@ -21,12 +21,15 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.SwitchCase;
@@ -48,6 +51,9 @@ import com.steadystate.css.parser.SACParserCSS3;
 
 // so the next bit is going to be styling
 // and supporting more types of statements
+// and user-defined subgraphs
+// and then integrating with jacoco
+// and AOP 
 
 /** Convert an AST tree of a java class ( CompilationUnit, created by the eclipse ASTParser )
  * into a graphviz diagram ( Dag )
@@ -90,13 +96,51 @@ public class JavaToGraphviz {
         cu.accept(dv);
         Dag dag = dv.getDag();
         DagNode block = dag.nodes.get(0);
-        if (!block.type.equals("Block")) {
-            throw new IllegalStateException("first node must be a block; found " + block.type);
+        while (!block.type.equals("Block")) {
+            // hmm guess we want the first block
+            // throw new IllegalStateException("first node must be a block; found " + block.type);
+            block = block.children.get(0);
         }
-        addBlockEdges(dag, block, null, null);
+        
+        LexicalScope lexicalScope = new LexicalScope(); 
+        List<ExitEdge> ee = addBlockEdges(dag, block, lexicalScope);
+        
+        // add a node which all the return edges return to
+        int endOfMethodLine = cu.getLineNumber(block.astNode.getStartPosition() + block.astNode.getLength());
+        DagNode rn = new DagNode();
+        rn.keepNode = true; // always keep comments
+        rn.type = "return";
+        rn.line = endOfMethodLine;
+        rn.name = dag.getUniqueName("m_" + endOfMethodLine);
+        rn.label = "return";
+        rn.astNode = null;
+        dag.addNode(rn);
+        
+        for (ExitEdge e : lexicalScope.returnEdges) {
+            e.n2 = rn;
+            dag.addEdge(e);
+        }
+        
+        // and everything that was thrown connects to this node as well
+        for (ExitEdge e : lexicalScope.throwEdges) {
+            e.n2 = rn;
+            dag.addEdge(e);
+        }
+        
+        // could possibly draw a line from every single node to this node for OOMs etc
+        
+        // and everything flowing out of the first block connects to this node as well
+        for (ExitEdge e : ee) {
+            e.n2 = rn;
+            dag.addEdge(e);
+        }
+        
+        
+        
+        
         block.keepNode = true;
         setLastKeepNode(dag, block, block);
-        removeNodes(dag, block); // peephole node removal.
+        // removeNodes(dag, block); // peephole node removal.
         
         
         inlineStyles(dag, styleSheet);
@@ -135,12 +179,21 @@ public class JavaToGraphviz {
     public CSSStyleSheet getStyleSheet(List<CommentText> comments) throws IOException {
         String css = "";
         for (CommentText c : comments) {
-            String t = c.text;
-            if (t.startsWith("gv.style:")) {
-                // remove outer braces
-                css = css + t;
+            // String t = c.text;
+            if (c instanceof GvDirectiveComment) {
+                // remove non-standard css comments
+                String[] ss = ((GvDirectiveComment) c).style.split("\n");
+                for (int i=0; i<ss.length; i++) {
+                    String s = ss[i];
+                    if (s.contains("//")) {
+                        s = s.substring(0, s.indexOf("//"));
+                    }
+                    css += (i==0 ? "" : "\n") + s;
+                }
             }
         }
+        logger.info("here's the css: " + css);
+        
         // pre-process the // comments out of the block comments, which isn't standard CSS
         
         CSSOMParser parser = new CSSOMParser(new SACParserCSS3());
@@ -157,8 +210,10 @@ public class JavaToGraphviz {
     
     List<DagNode> selectDagNodes(Dag dag, String cssSelector) {
         List<DagNode> result = new ArrayList<>();
+        // only .selectors for now
+        String clazz = cssSelector.substring(1);
         for (DagNode n : dag.nodes) {
-            if (n.classes.contains(cssSelector)) {
+            if (n.classes != null && n.classes.contains(clazz)) {
                 result.add(n);
             }
         }
@@ -178,8 +233,9 @@ public class JavaToGraphviz {
                 CSSStyleRule styleRule = (CSSStyleRule) item;
                 String cssSelector = styleRule.getSelectorText(); // if I'm coding this myself, class only 
                 // Elements elements = document.select(cssSelector);
+                logger.info("applying rules to " + cssSelector);
                 List<DagNode> nodes = selectDagNodes(dag, cssSelector);
-                
+                logger.info(nodes.size() + " nodes found");
                 for (int i = 0; i < nodes.size(); i++) {
                     DagNode node = nodes.get(i);
                     Map<String, String> gvAttributes = node.gvAttributes;
@@ -198,24 +254,69 @@ public class JavaToGraphviz {
         // within this scope, the node that a 'continue' will continue to
         DagNode continueNode;
         
-        // a collection of edges from 'break' nodes 
+        // a collection of edges from 'break' statements 
         List<ExitEdge> breakEdges;
         
-        // a collection of edges from 'return' nodes
+        // a collection of edges from 'return' statements
         List<ExitEdge> returnEdges;
+
+        // a collection of edges from 'throw' statements
+        // for now I'm going to treat these identically to returnEdges
+        // but if we can get the exception type hierarchy out of this thing then
+        // we could channel them into a subgraph or something
+        List<ExitEdge> throwEdges;
+
+        // break/continue targets
+        // so it's at this point that I think I should store the exitEdges on the nodes
+        // rather than here
+        // Map<String, DagNode> labeledStatements;
+        
+        // OR MAYBE
+        Map<String, LexicalScope> labeledScopes;
         
         
-        
+        // new method scope
         public LexicalScope() {
             continueNode = null;
-            breakEdges = new ArrayList<ExitEdge>();
+            breakEdges = null;
             returnEdges = new ArrayList<ExitEdge>();
+            throwEdges = new ArrayList<ExitEdge>();
+            // I'm assuming the same label name can never be nested within a method
+            // suppose it could if you had anonymous classes in this thing. yeesh. anonymous classes.
+            // let's ignore that for now.
+            labeledScopes = new HashMap<String, LexicalScope>();
         }
         
-        public LexicalScope startScope() {
+        // scope that bounds statements that can break/continue
+        // e.g. for, while, do
+        public LexicalScope newBreakContinueScope(DagNode n) {
             LexicalScope next = new LexicalScope();
+            next.breakEdges = new ArrayList<>();
+            next.continueNode = n;
+            next.returnEdges = this.returnEdges;
+            next.throwEdges = this.throwEdges;
+            next.labeledScopes = this.labeledScopes;
+            
+            // if this DagNode is labelled, add this scope to the labeledScopes map
+            // @TODO remove these from the scope when the scope closes. If that's the right verb. wraps up. 
+            if (n.javaLabel != null) {
+                labeledScopes.put(n.javaLabel, next);
+            }
             return next;
         }
+
+        // scope that bounds statements that can break
+        // e.g. switch
+        public LexicalScope newBreakScope() {
+            LexicalScope next = new LexicalScope();
+            next.breakEdges = new ArrayList<>();
+            next.continueNode = this.continueNode;
+            next.returnEdges = this.returnEdges;
+            next.throwEdges = this.throwEdges;
+            next.labeledScopes = this.labeledScopes;
+            return next;
+        }
+
     }
     
     
@@ -228,31 +329,37 @@ public class JavaToGraphviz {
      * @param continueNode if a 'continue' is encountered, the node to continue to
      * @return
      */
-	private List<ExitEdge> addEdges(Dag dag, DagNode node, List<ExitEdge> breakEdges, DagNode continueNode) {
+	private List<ExitEdge> addEdges(Dag dag, DagNode node, LexicalScope scope) {
 	    if (node.type.equals("Block")) {
-	        return addBlockEdges(dag, node, breakEdges, continueNode);
+	        return addBlockEdges(dag, node, scope);
 	    } else if (node.type.equals("If")) {
-	        return addIfEdges(dag, node, breakEdges, continueNode);
+	        return addIfEdges(dag, node, scope);
         } else if (node.type.equals("Try")) {
-            return addTryEdges(dag, node, breakEdges, continueNode);
+            return addTryEdges(dag, node, scope);
         } else if (node.type.equals("For")) {
-            return addForEdges(dag, node, breakEdges, continueNode);
+            return addForEdges(dag, node, scope);
         } else if (node.type.equals("EnhancedFor")) {
-            return addEnhancedForEdges(dag, node, breakEdges, continueNode);
+            return addEnhancedForEdges(dag, node, scope);
         } else if (node.type.equals("Switch")) {
-            return addSwitchEdges(dag, node, breakEdges, continueNode);
+            return addSwitchEdges(dag, node, scope);
         } else if (node.type.equals("SwitchCase")) {
             // hmm. these should be handled in addSwitchEdges
             throw new IllegalStateException("SwitchCase encountered outside Switch");
         } else if (node.type.equals("Break")) {
-            return addBreakEdges(dag, node, breakEdges, continueNode);
+            return addBreakEdges(dag, node, scope);
         } else if (node.type.equals("While")) {
-            return addWhileEdges(dag, node, breakEdges, continueNode);
+            return addWhileEdges(dag, node, scope);
         } else if (node.type.equals("Continue")) {
-            return addContinueEdges(dag, node, breakEdges, continueNode);
+            return addContinueEdges(dag, node, scope);
         } else if (node.type.equals("Do")) {
-            return addDoEdges(dag, node, breakEdges, continueNode);
-
+            return addDoEdges(dag, node, scope);
+        } else if (node.type.equals("Return")) {
+            return addReturnEdges(dag, node, scope);
+        } else if (node.type.equals("Throw")) {
+            return addThrowEdges(dag, node, scope);
+        } else if (node.type.equals("Labeled")) {
+            return addLabeledStatementEdges(dag, node, scope);
+            
             
         // @TODO
         // x Break
@@ -260,11 +367,14 @@ public class JavaToGraphviz {
         // x Do
         // x EnhancedFor
         // x For
-        // Return
+        // x Return
         // x SwitchCase
         // x Switch
-        // Throw
-        // While
+        // x Throw
+        // x While
+        // LabelledStatements
+        // try/catch
+        // synchronized
         
         // goto will be considered tedious if I have to do that. ho ho ho.
             
@@ -272,7 +382,6 @@ public class JavaToGraphviz {
           node.type.equals("ConstructorInvocation") ||
           node.type.equals("EmptyStatement") ||
           node.type.equals("Expression") ||
-          node.type.equals("LabeledStatement") ||
           node.type.equals("SuperConstructorInvocation") ||
           node.type.equals("Synchronized") || // could be same as Block really
           node.type.equals("TypeDeclaration") ||
@@ -294,7 +403,7 @@ public class JavaToGraphviz {
 	
 	// draw lines from each statement to each other
 	// exit node is the last statement
-	private List<ExitEdge> addBlockEdges(Dag dag, DagNode block, List<ExitEdge> breakEdges, DagNode continueNode) {
+	private List<ExitEdge> addBlockEdges(Dag dag, DagNode block, LexicalScope scope) {
         // draw the edges from the block
         
 	    ExitEdge start = new ExitEdge();
@@ -307,7 +416,7 @@ public class JavaToGraphviz {
 	                e.n2 = c;
 	                dag.addEdge(e);
 	            }
-	            prevNodes = addEdges(dag, c, breakEdges, continueNode);
+	            prevNodes = addEdges(dag, c, scope);
 	        } else {
 	            throw new IllegalStateException("I don't think this ever happens");
 	            // maybe on the very first block ?
@@ -322,39 +431,118 @@ public class JavaToGraphviz {
 	
 	// a break will add an edge to breakEdges only 
 	// (and returns an empty list as we won't have a normal exit edge)
-	private List<ExitEdge> addBreakEdges(Dag dag, DagNode breakNode, List<ExitEdge> breakEdges, DagNode continueNode) {
-	    if (breakEdges == null) { 
+	// @TODO labelled break
+	private List<ExitEdge> addBreakEdges(Dag dag, DagNode breakNode, LexicalScope scope) {
+	    // BreakStatement b;
+	    if (scope.breakEdges == null) { 
 	        throw new IllegalStateException("break encountered outside of breakable section");
 	    }
-        ExitEdge e = new ExitEdge();
+        BreakStatement bs = (BreakStatement) breakNode.astNode;
+        String label = bs.getLabel() == null ? null : bs.getLabel().toString(); 
+
+        LexicalScope namedScope = scope;
+        if (label!=null) {
+            namedScope = scope.labeledScopes.get(label);
+            if (namedScope == null) { 
+                throw new IllegalStateException("no label '" + label + "' in lexical scope");
+            }
+        }
+        
+	    ExitEdge e = new ExitEdge();
         e.n1 = breakNode;
+        e.label = "break" + (label==null ? "" : " " + label);
         e.gvAttributes.put("color", "red");
-        breakEdges.add(e);
+        scope.breakEdges.add(e);
         
         return Collections.emptyList();
     }
 
 	// a break will add an edge back to the continueNode only 
     // (and returns an empty list as we won't have a normal exit edge)
-    private List<ExitEdge> addContinueEdges(Dag dag, DagNode continueStatementNode, List<ExitEdge> breakEdges, DagNode continueNode) {
-        if (continueNode == null) { 
+	// @TODO labelled continue
+    private List<ExitEdge> addContinueEdges(Dag dag, DagNode continueStatementNode, LexicalScope scope) {
+        if (scope.continueNode == null) { 
             throw new IllegalStateException("continue encountered outside of continuable section");
         }
-        DagEdge e = dag.addBackEdge(continueStatementNode, continueNode, "continue");
+        ContinueStatement cs = (ContinueStatement) continueStatementNode.astNode;
+        String label = cs.getLabel() == null ? null : cs.getLabel().toString(); 
+
+        LexicalScope namedScope = scope;
+        if (label!=null) {
+            namedScope = scope.labeledScopes.get(label);
+            if (namedScope == null) { 
+                throw new IllegalStateException("no label '" + label + "' in lexical scope");
+            }
+        }
+        
+        DagEdge e;
+        e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, "continue" + (label==null ? "" : " " + label));
         e.gvAttributes.put("color", "red");
         return Collections.emptyList();
     }
 
+    private List<ExitEdge> addLabeledStatementEdges(Dag dag, DagNode labeledStatementNode, LexicalScope scope) {
+        // there's no edges but remember this statement in the lexical scope
+        // or maybe this should create a new lexical scope. maybe it should.
+        // so we can break/continue to it
+        
+        // so could draw this with branches leading back up to the for node from each exit node of repeating block
+        // or branches down from each exit node to an artifical block at the bottom, with a branch up from that.
+        if (labeledStatementNode.children.size() != 1) {
+            throw new IllegalStateException("expected 1 child; found " + labeledStatementNode.children.size());
+        }
+
+        DagNode c = labeledStatementNode.children.get(0);
+        dag.addEdge(labeledStatementNode, c);
+
+        LabeledStatement ls = (LabeledStatement) labeledStatementNode.astNode;
+        String label = ls.getLabel() == null ? null : ls.getLabel().toString();
+        c.javaLabel = label;
+        
+        List<ExitEdge> lsPrevNodes = addEdges(dag, c, scope);
+        
+        List<ExitEdge> prevNodes = new ArrayList<ExitEdge>();
+        prevNodes.addAll(lsPrevNodes); // Y branch
+        
+        // break/continue edges here ?
+        return prevNodes;
+    }
+
+    
+    
+    // a return will add an edge to returnEdges only 
+    // (and returns an empty list as we won't have a normal exit edge)
+    private List<ExitEdge> addReturnEdges(Dag dag, DagNode breakNode, LexicalScope scope) {
+        ExitEdge e = new ExitEdge();
+        e.label = "return";
+        e.n1 = breakNode;
+        e.gvAttributes.put("color", "blue");
+        scope.returnEdges.add(e);
+        return Collections.emptyList();
+    }
+
+    // a throw will add an edge to throwEdges only 
+    // (and returns an empty list as we won't have a normal exit edge)
+    private List<ExitEdge> addThrowEdges(Dag dag, DagNode breakNode, LexicalScope scope) {
+        ExitEdge e = new ExitEdge();
+        e.label = "throw";
+        e.n1 = breakNode;
+        e.gvAttributes.put("color", "purple");
+        scope.returnEdges.add(e);
+        return Collections.emptyList();
+    }
+
+
     
 	// draw branches from this block to then/else blocks
 	// exit nodes are combined exit nodes of both branches
-	private List<ExitEdge> addIfEdges(Dag dag, DagNode block, List<ExitEdge> breakEdges, DagNode continueNode) {
+	private List<ExitEdge> addIfEdges(Dag dag, DagNode block, LexicalScope scope) {
         // draw the edges
 	    List<ExitEdge> prevNodes = new ArrayList<>();
 	    if (block.children.size() == 1) {
 	        DagNode c = block.children.get(0);
             dag.addEdge(block, c, "Y");
-            List<ExitEdge> branchPrevNodes = addEdges(dag, c, breakEdges, continueNode);
+            List<ExitEdge> branchPrevNodes = addEdges(dag, c, scope);
             ExitEdge e = new ExitEdge();
             e.n1 = block;
             e.label = "N";
@@ -367,8 +555,8 @@ public class JavaToGraphviz {
 	        DagNode c2 = block.children.get(1);
             dag.addEdge(block, c1, "Y");
             dag.addEdge(block, c2, "N");
-            List<ExitEdge> branch1PrevNodes = addEdges(dag, c1, breakEdges, continueNode);
-            List<ExitEdge> branch2PrevNodes = addEdges(dag, c2, breakEdges, continueNode);
+            List<ExitEdge> branch1PrevNodes = addEdges(dag, c1, scope);
+            List<ExitEdge> branch2PrevNodes = addEdges(dag, c2, scope);
             prevNodes.addAll(branch1PrevNodes);
             prevNodes.addAll(branch2PrevNodes);
             
@@ -381,7 +569,7 @@ public class JavaToGraphviz {
 	
 	// draw branches into and out of try body
 	// TODO: catch block
-    private List<ExitEdge> addTryEdges(Dag dag, DagNode tryNode, List<ExitEdge> breakEdges, DagNode continueNode) {
+    private List<ExitEdge> addTryEdges(Dag dag, DagNode tryNode, LexicalScope scope) {
         // draw the edges
         TryStatement ts;
         DagNode body = null;
@@ -400,13 +588,14 @@ public class JavaToGraphviz {
         }
         
         dag.addEdge(tryNode,  body);
-        List<ExitEdge> bodyPrevNodes = addEdges(dag, body, breakEdges, continueNode);
+        List<ExitEdge> bodyPrevNodes = addEdges(dag, body, scope);
         return bodyPrevNodes;
         // return prevNodes;
     }
     
     // draw branches into and out of for body
-    private List<ExitEdge> addForEdges(Dag dag, DagNode forNode, List<ExitEdge> breakEdges, DagNode _continueNode) {
+    // List<ExitEdge> breakEdges, DagNode _continueNode
+    private List<ExitEdge> addForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
         ForStatement fs;
         // so could draw this with branches leading back up to the for node from each exit node of repeating block
@@ -418,15 +607,20 @@ public class JavaToGraphviz {
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
         DagNode repeatingBlock = forNode.children.get(0);
         dag.addEdge(forNode, repeatingBlock);
-        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, breakEdges, forNode);
+        LexicalScope newScope = scope.newBreakContinueScope(forNode);
+        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope);
         for (ExitEdge e : repeatingBlockPrevNodes) {
             dag.addBackEdge(e.n1, forNode, "for"); 
         }
-        return repeatingBlockPrevNodes;
+        
+        List<ExitEdge> prevNodes = new ArrayList<>(); // the entire for
+        prevNodes.addAll(repeatingBlockPrevNodes);
+        prevNodes.addAll(scope.breakEdges);
+        return prevNodes;
     }
 
     // draw branches into and out of extended for body
-    private List<ExitEdge> addEnhancedForEdges(Dag dag, DagNode forNode, List<ExitEdge> breakEdges, DagNode _continueNode) {
+    private List<ExitEdge> addEnhancedForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
         EnhancedForStatement fs;
         // so could draw this with branches leading back up to the for node from each exit node of repeating block
@@ -438,14 +632,20 @@ public class JavaToGraphviz {
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
         DagNode repeatingBlock = forNode.children.get(0);
         dag.addEdge(forNode, repeatingBlock);
-        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, breakEdges, forNode);
+        LexicalScope newScope = scope.newBreakContinueScope(forNode);
+        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope);
         for (ExitEdge e : repeatingBlockPrevNodes) {
             dag.addBackEdge(e.n1, forNode, "for"); 
         }
+
+        List<ExitEdge> prevNodes = new ArrayList<>(); // the entire for
+        prevNodes.addAll(repeatingBlockPrevNodes);
+        prevNodes.addAll(scope.breakEdges);
+
         return repeatingBlockPrevNodes;
     }
     
-    private List<ExitEdge> addWhileEdges(Dag dag, DagNode whileNode, List<ExitEdge> _breakEdges, DagNode _continueNode) {
+    private List<ExitEdge> addWhileEdges(Dag dag, DagNode whileNode, LexicalScope scope) {
         // draw the edges
         WhileStatement ws;
         
@@ -458,15 +658,16 @@ public class JavaToGraphviz {
         DagEdge se = dag.addEdge(whileNode, repeatingBlock);
         se.label = "Y";
         
-        List<ExitEdge> whileBreakEdges = new ArrayList<>();
-        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, whileBreakEdges, whileNode); // new continue node
+        // List<ExitEdge> whileBreakEdges = new ArrayList<>();
+        LexicalScope newScope = scope.newBreakContinueScope(whileNode);
+        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope); // new continue node
         for (ExitEdge e : repeatingBlockPrevNodes) {
             dag.addBackEdge(e.n1, whileNode, "while");
         }
         
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire while
         prevNodes.addAll(repeatingBlockPrevNodes);
-        prevNodes.addAll(whileBreakEdges);
+        prevNodes.addAll(newScope.breakEdges);
         
         // add an edge from the top of the while as well, as it's possible the repeatingBlock may never execute
         ExitEdge e = new ExitEdge();
@@ -477,7 +678,7 @@ public class JavaToGraphviz {
            
     }
     
-    private List<ExitEdge> addDoEdges(Dag dag, DagNode doNode, List<ExitEdge> _breakEdges, DagNode _continueNode) {
+    private List<ExitEdge> addDoEdges(Dag dag, DagNode doNode, LexicalScope scope) {
         // draw the edges
         DoStatement ds;
         
@@ -489,8 +690,9 @@ public class JavaToGraphviz {
         DagNode repeatingBlock = doNode.children.get(0);
         dag.addEdge(doNode, repeatingBlock);
         
-        List<ExitEdge> whileBreakEdges = new ArrayList<>();
-        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, whileBreakEdges, doNode); // new continue node
+        // List<ExitEdge> doBreakEdges = new ArrayList<>();
+        LexicalScope newScope = scope.newBreakContinueScope(doNode); // @XXX continueNode here should be the expression at the end 
+        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope); // new continue node
         for (ExitEdge e : repeatingBlockPrevNodes) {
             dag.addBackEdge(e.n1, doNode, "do"); 
         }
@@ -500,7 +702,7 @@ public class JavaToGraphviz {
         
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire switch
         prevNodes.addAll(repeatingBlockPrevNodes);
-        prevNodes.addAll(whileBreakEdges);
+        prevNodes.addAll(newScope.breakEdges);
         return prevNodes;
            
     }
@@ -510,8 +712,8 @@ public class JavaToGraphviz {
     
     // ye olde switch, not whatever they're doing in java 16 these days
     // maybe I'm thinking of javascript.
-    
-    private List<ExitEdge> addSwitchEdges(Dag dag, DagNode switchNode, List<ExitEdge> _breakEdges, DagNode continueNode) {
+    // List<ExitEdge> _breakEdges, DagNode continueNode
+    private List<ExitEdge> addSwitchEdges(Dag dag, DagNode switchNode, LexicalScope scope) {
      // draw the edges
         SwitchStatement ss;
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
@@ -533,12 +735,17 @@ public class JavaToGraphviz {
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire switch
         
         List<ExitEdge> casePrevNodes = new ArrayList<>(); // a single case in the switch
-        List<ExitEdge> caseBreakEdges = new ArrayList<>();
+        // List<ExitEdge> caseBreakEdges = new ArrayList<>();
+        
+        // this starts a new 'break' scope but 'continue's continue to do whatever continues did before.
+        // OR DO THEY.
+        LexicalScope newScope = null; // scope.newBreakScope();
+        
         boolean hasDefaultCase = false;
         for (DagNode c : switchNode.children) {
             if (c.type.equals("SwitchCase")) {
                 // close off last case
-                prevNodes.addAll(caseBreakEdges);
+                prevNodes.addAll(scope.breakEdges);
                 
                 // start a new one
                 dag.addEdge(switchNode, c, "case"); // case expression
@@ -547,7 +754,10 @@ public class JavaToGraphviz {
                     dag.addEdge(e);
                 }
                 casePrevNodes = new ArrayList<>();
-                caseBreakEdges = new ArrayList<>();
+                // caseBreakEdges = new ArrayList<>();
+                // scope.breakEdges.clear();
+                newScope = scope.newBreakScope();
+                
                 
                 hasDefaultCase = ((SwitchCase) c.astNode).getExpression() == null;               
                 
@@ -564,12 +774,12 @@ public class JavaToGraphviz {
                     e.n2 = c;
                     dag.addEdge(e);
                 }
-                casePrevNodes = addEdges(dag, c, caseBreakEdges, continueNode);
+                casePrevNodes = addEdges(dag, c, newScope);
             }
         }
         
         // edges out of the final case are also edges out of the switch
-        prevNodes.addAll(caseBreakEdges);
+        prevNodes.addAll(newScope.breakEdges);
         prevNodes.addAll(casePrevNodes);
         
         // if there was no 'default' case, then also include an edge from the switchNode
@@ -783,6 +993,9 @@ public class JavaToGraphviz {
         // probably do this right at the end as gv.literal affects how we parse it
         // Pattern valPattern = Pattern.compile("(([a-zA-Z]+)\\s*([^;]*);\\s*)*"); // things;separated;by;semicolons;
         
+        Pattern gvClassPattern = Pattern.compile("^gv(\\.[a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
+        Pattern gvNextClassPattern = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
+        
         List<CommentText> comments = new ArrayList<>();
         for (Comment c : (List<Comment>) cu.getCommentList()) {
             // comment.accept(cv);
@@ -792,68 +1005,67 @@ public class JavaToGraphviz {
             if (c.isBlockComment()) {
                 if (text.startsWith("/*") && text.endsWith("*/")) {
                     text = text.substring(2, text.length() - 2).trim();
-
-                    if (text.startsWith("gv:style:")) {
-                        String s = text.substring(9).trim();
-                        if (s.startsWith("{") && s.endsWith("}")) {
-                            s = s.substring(1, s.length() - 1).trim();
-                            // here be the css
-                            // remove inline comments
-                            
-                        } else {
-                            throw new IllegalStateException("gv:style does not start with '{' and end with '}':  '" + text + "'");
-                        }
-                    }
-                    
-                    // hrm.
-                    // thinking using classes to define styles is a bit odd
-                    // so maybe 
-                    //   gv:style: { styles } 
-                    // instead of
-                    //   gv.style: { styles }
-                    // which should simplify this a bit
-
-                        
                 } else {
                     throw new IllegalStateException("Block comment does not start with '/*' and end with '*/':  '" + text + "'");
                 }
             }
-
             if (c.isLineComment()) {
                 if (text.startsWith("//")) {
                     text = text.substring(2).trim();
-                    if (text.startsWith("gv:")) {
-                        text = text.substring(3).trim();
-                        // c.getAlternateRoot() is the CompilationUnit for all of these comments
-                        // which isn't all that useful really
-                        
-                        
-
-                        Pattern gvPattern = Pattern.compile("gv(\\.[a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
-                        Pattern gvPattern2 = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
-                        Matcher fgm = gvPattern.matcher(text);
-                        List<String> classes = new ArrayList<>();
-                        if (fgm.find()) {
-                            classes.add(fgm.group(1));
-                            int pos = fgm.end(1);
-                            Matcher gm = gvPattern2.matcher(fgm.group(0));
-                            while (gm.find(pos)) {
-                                classes.add(gm.group(1));
-                                pos = gm.end(1);
-                            }
-                            text = text.substring(fgm.end());
-                            
-                            System.out.println("classes " + classes + " in " + text);
-                        }
-                        
-                        comments.add(new CommentText(c, cu.getLineNumber(start), text));
-                    }
-                    
                 } else {
                     throw new IllegalStateException("Line comment does not start with '//': '" + text + "'");
                 }
             }
             
+
+            if (text.startsWith("gv-style:")) {
+                String s = text.substring(9).trim();
+                if (s.startsWith("{") && s.endsWith("}")) {
+                    s = s.substring(1, s.length() - 1).trim();
+                    // here be the css
+                    // remove inline comments
+                    // logger.info("maybe here ? " +  s);
+                    comments.add(new GvDirectiveComment(c, cu.getLineNumber(start), text, s));
+                    
+                } else {
+                    throw new IllegalStateException("gv:style does not start with '{' and end with '}':  '" + text + "'");
+                }
+               
+            } else {
+                    // text = text.substring(3).trim();
+                    // c.getAlternateRoot() is the CompilationUnit for all of these comments
+                    // which isn't all that useful really
+                
+                Matcher fgm = gvClassPattern.matcher(text);
+                List<String> classes = new ArrayList<>();
+                if (fgm.find()) {
+                    // logger.info("groupCount " + fgm.groupCount());
+                    classes.add(fgm.group(1));
+                    int pos = fgm.end(1);
+                    Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
+                    logger.info(pos);
+                    while (pos!=-1 && gm.find(pos)) {
+                        classes.add(gm.group(1));
+                        pos = gm.end(1);
+                        logger.info(pos);
+                    }
+                    text = text.substring(fgm.end());
+                    
+                    // System.out.println("classes " + classes + " in " + text); 
+                    
+                    comments.add(new GvComment(c, cu.getLineNumber(start), classes, text));
+                    
+                }
+                
+            }            
+            // hrm.
+            // thinking using classes to define styles is a bit odd
+            // so maybe 
+            //   gv:style: { styles } 
+            // instead of
+            //   gv.style: { styles }
+            // which should simplify this a bit
+
             
         }
         return comments;
@@ -865,6 +1077,7 @@ public class JavaToGraphviz {
     static class CommentText {
 	    Comment comment;
 	    int line;
+	    
 	    String text;
 	    
 	    public CommentText(Comment c, int line, String text) {
@@ -873,7 +1086,26 @@ public class JavaToGraphviz {
 	        this.text = text;
 	    }
 	}
-	
+
+    // well I'm certainly not going to regret this
+    static class GvDirectiveComment extends CommentText {
+        String style;
+        public GvDirectiveComment(Comment c, int line, String text, String style) {
+            super(c, line, text);
+            this.style = style;
+        }
+    }
+
+    static class GvComment extends CommentText {
+        List<String> classes;
+        public GvComment(Comment c, int line, List<String> classes, String text) {
+            super(c, line, text);
+            this.classes = classes;
+        }
+    }
+
+    
+    
     /** A directed acyclic graph (DAG), used to generate the graphviz diagram.
      * <p>This is two data-structures in one; it mirrors the eclipse AST in a new datastructure that I 
      * have a bit more control over, and it also acts as the source for the graphviz diagram.
@@ -894,7 +1126,8 @@ public class JavaToGraphviz {
      * 
      * <p>Well, that was the idea, but that's too fiddly to manage, so the DAG is now cyclical.
      * 
-     * @TODO rename everything
+     * <p>Okay so now the dag is only a dag if you don't follow back edges ( edge.back == true )
+     * 
      */
 	static class Dag {
 	    List<DagNode> nodes = new ArrayList<>();
@@ -997,14 +1230,16 @@ public class JavaToGraphviz {
 
 	    // graphviz formatting attributes
 	    Map<String, String> gvAttributes = new HashMap<>();
-	    Set<String> classes;
+	    Set<String> classes = new HashSet<>();
 	    
-	    String type;
+        ASTNode astNode;
+	    String type;      // astNode class, or one of a couple of extra artificial node types (comment, doExpression)
+	    String javaLabel; // if this is a labeledStatement, the name of that label 
 	    int line;
-	    String name;
-	    String label;
 	    
-	    ASTNode astNode;
+	    String name;  // graphviz name
+	    String label; // graphviz label
+	    
 	    
 	    public void addChild(DagNode node) {
 	        children.add(node);
@@ -1020,7 +1255,8 @@ public class JavaToGraphviz {
 	        
 	        return
 	          (dagLoc == null ? "" : dagLoc) + 
-	          name + " [\n" + 
+	          name + " [\n" +
+	          (classes.size() == 0 ? "" : "  /* " + classes + " */\n") +
               "  label = \"" + labelText + "\";\n" + 
 	          a + 
               "];";	        
@@ -1043,9 +1279,9 @@ public class JavaToGraphviz {
                 a += e.getKey() + " = " + e.getValue() + "; ";
             }
 
-	        return n1.name + (n1Port == null ? "" : ":" + n1Port) + 
+	        return n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
 	            " -> " + 
-	            n2.name + (n2Port == null ? "" : ":" + n2Port) + 
+	            n2.name + // (n2Port == null ? "" : ":" + n2Port) + 
 	            (label == null && gvAttributes.size() == 0? "" : " [" +
 	            (label == null ? "" : "label=\"" + labelText + "\"; ") +
 	            a +
@@ -1115,9 +1351,12 @@ public class JavaToGraphviz {
                 dn.name = dag.getUniqueName("c_" + ct.line);
                 dn.label = ct.text;
                 dn.astNode = null;
+                if (ct instanceof GvComment) {
+                    dn.classes.addAll(((GvComment) ct).classes);
+                }
                 
-                dag.addNode(dn);
                 if (pdn!=null) {
+                    dag.addNode(dn);
                     pdn.addChild(dn);
                 } else {
                     logger.warn("null pdn on " + dn.type + " on line " + dn.line);
@@ -1145,12 +1384,15 @@ public class JavaToGraphviz {
                 if (clazz.equals("If")) { lp = "if"; }
                 
                 dn.type = clazz; // "if";
+                dn.label = clazz; // "if";
+                dn.classes.add(Text.toFirstLower(clazz));
+                
                 dn.line = line;
                 dn.name = dag.getUniqueName(lp + "_" + line); // "if_" + line;
-                dn.label = clazz; // "if";
                 dn.parentDagNode = pdn;
                 dn.astNode = node;
                 dn.locationInParent = node.getLocationInParent().getId();
+                
                 dag.addNode(dn);
                 if (pdn!=null) {
                     pdn.addChild(dn);
@@ -1163,6 +1405,9 @@ public class JavaToGraphviz {
                     CommentText ct = comments.get(lastIdx);
                     dn.keepNode = true; // always keep comments
                     dn.label = ct.text;
+                    if (ct instanceof GvComment) {
+                        dn.classes.addAll(((GvComment) ct).classes);
+                    }
                     lastIdx++;
                 }
             }
