@@ -66,7 +66,8 @@ public class JavaToGraphviz {
 
     Logger logger = Logger.getLogger(JavaToGraphviz.class);
     
-	
+// see https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
+    
 	public void test(InputStream is) throws Exception {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		StreamUtil.copyStream(is, baos);
@@ -372,7 +373,7 @@ public class JavaToGraphviz {
         // x Switch
         // x Throw
         // x While
-        // LabelledStatements
+        // x LabelledStatements
         // try/catch
         // synchronized
         
@@ -411,20 +412,11 @@ public class JavaToGraphviz {
 	    List<ExitEdge> prevNodes = Collections.singletonList(start);
 	    
 	    for (DagNode c : block.children) {
-	        if (prevNodes != null) {
-	            for (ExitEdge e : prevNodes) {
-	                e.n2 = c;
-	                dag.addEdge(e);
-	            }
-	            prevNodes = addEdges(dag, c, scope);
-	        } else {
-	            throw new IllegalStateException("I don't think this ever happens");
-	            // maybe on the very first block ?
-	            
-	            // ExitEdge e = new ExitEdge();
-	            // e.n1 = c;
-	            // prevNodes = Collections.singletonList(e);
-	        }
+            for (ExitEdge e : prevNodes) {
+                e.n2 = c;
+                dag.addEdge(e);
+            }
+            prevNodes = addEdges(dag, c, scope);
 	    }
 	    return prevNodes;
     }
@@ -1040,12 +1032,14 @@ public class JavaToGraphviz {
                 List<String> classes = new ArrayList<>();
                 if (fgm.find()) {
                     // logger.info("groupCount " + fgm.groupCount());
-                    classes.add(fgm.group(1));
+                    if (fgm.group(1)!=null) {
+                        classes.add(fgm.group(1).substring(1));
+                    }
                     int pos = fgm.end(1);
                     Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
                     logger.info(pos);
                     while (pos!=-1 && gm.find(pos)) {
-                        classes.add(gm.group(1));
+                        classes.add(gm.group(1).substring(1));
                         pos = gm.end(1);
                         logger.info(pos);
                     }
@@ -1250,13 +1244,16 @@ public class JavaToGraphviz {
 	            (lastKeepNode == null ? "" : ", lkn=" + lastKeepNode.name);
 	        String a = "";
 	        for (Entry<String, String> e : gvAttributes.entrySet()) {
-	            a += e.getKey() + " = " + e.getValue() + "; ";
+	            a += "  " + e.getKey() + " = " + e.getValue() + "; ";
 	        }
 	        
 	        return
 	          (dagLoc == null ? "" : dagLoc) + 
 	          name + " [\n" +
-	          (classes.size() == 0 ? "" : "  /* " + classes + " */\n") +
+	          // (classes.size() == 0 ? "" : "  /* " + classes + " */\n") +
+	          // undocumented 'class' attribute is included in graphviz svg output; see
+	          // https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
+	          (classes.size() == 0 ? "" : "  class = \"" + Text.join(classes,  " ") + "\";\n") + 
               "  label = \"" + labelText + "\";\n" + 
 	          a + 
               "];";	        
@@ -1276,7 +1273,7 @@ public class JavaToGraphviz {
 	        String labelText = label == null ? null : Text.replaceString(label, "\"",  "\\\"");
             String a = "";
             for (Entry<String, String> e : gvAttributes.entrySet()) {
-                a += e.getKey() + " = " + e.getValue() + "; ";
+                a += e.getKey() + " = " + e.getValue() + ";\n";
             }
 
 	        return n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
