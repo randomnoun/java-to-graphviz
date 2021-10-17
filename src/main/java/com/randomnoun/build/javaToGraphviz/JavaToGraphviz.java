@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.LabeledStatement;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.SwitchCase;
@@ -65,27 +68,34 @@ import com.steadystate.css.parser.SACParserCSS3;
 public class JavaToGraphviz {
 
     Logger logger = Logger.getLogger(JavaToGraphviz.class);
+
+    
+    CompilationUnit cu;
+    List<CommentText> comments;
+    CSSStyleSheet styleSheet;
+    Dag dag;
+    int rootNodeIdx;
     
 // see https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
     
-	public void test(InputStream is) throws Exception {
+	public void parse(InputStream is, String charset) throws IOException  {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		StreamUtil.copyStream(is, baos);
 		
-		String src = baos.toString();
+		String src = baos.toString(charset);
 		ASTParser parser = ASTParser.newParser(AST.JLS11); // JLS3
 		parser.setSource(src.toCharArray());
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 
-		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		cu = (CompilationUnit) parser.createAST(null);
 		
 		
 		// https://www.programcreek.com/2013/03/get-internal-comments-by-using-eclipse-jdt-astparser/
 		// hmm this seems like a weird way of doing things. anyway.
 		// CommentVisitor cv = new CommentVisitor(cu, src);
 		
-		List<CommentText> comments = getComments(cu, src);
-		CSSStyleSheet styleSheet = getStyleSheet(comments);
+		comments = getComments(cu, src);
+		styleSheet = getStyleSheet(comments);
 		
 		// Comments have an alternoteRoot which links it back to the compilationUnit AST node
         // turns out some astNodes have a leadingComment
@@ -95,82 +105,86 @@ public class JavaToGraphviz {
 		
 		DagVisitor dv = new DagVisitor(cu, src, comments);
         cu.accept(dv);
-        Dag dag = dv.getDag();
-        DagNode block = dag.nodes.get(0);
-        while (!block.type.equals("Block")) {
-            // hmm guess we want the first block
-            // throw new IllegalStateException("first node must be a block; found " + block.type);
-            block = block.children.get(0);
-        }
+        dag = dv.getDag();
         
-        LexicalScope lexicalScope = new LexicalScope(); 
-        List<ExitEdge> ee = addBlockEdges(dag, block, lexicalScope);
-        
-        // add a node which all the return edges return to
-        int endOfMethodLine = cu.getLineNumber(block.astNode.getStartPosition() + block.astNode.getLength());
-        DagNode rn = new DagNode();
-        rn.keepNode = true; // always keep comments
-        rn.type = "return";
-        rn.line = endOfMethodLine;
-        rn.name = dag.getUniqueName("m_" + endOfMethodLine);
-        rn.label = "return";
-        rn.astNode = null;
-        dag.addNode(rn);
-        
-        for (ExitEdge e : lexicalScope.returnEdges) {
-            e.n2 = rn;
-            dag.addEdge(e);
-        }
-        
-        // and everything that was thrown connects to this node as well
-        for (ExitEdge e : lexicalScope.throwEdges) {
-            e.n2 = rn;
-            dag.addEdge(e);
-        }
-        
-        // could possibly draw a line from every single node to this node for OOMs etc
-        
-        // and everything flowing out of the first block connects to this node as well
-        for (ExitEdge e : ee) {
-            e.n2 = rn;
-            dag.addEdge(e);
-        }
-        
-        
-        
-        
-        block.keepNode = true;
-        setLastKeepNode(dag, block, block);
-        // removeNodes(dag, block); // peephole node removal.
-        
-        
-        inlineStyles(dag, styleSheet);
-        
-        
-        
-        PrintWriter pw = new PrintWriter(System.out);
+        rootNodeIdx = 0;
+	}
+	
+	public boolean writeGraphviz(Writer writer) throws IOException {
+
+	    DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
+	    
+        PrintWriter pw = new PrintWriter(writer);
         pw.println("digraph G {\r\n" +
             "  graph [fontname = \"Handlee\"];\r\n" +
             "  node [fontname = \"Handlee\"; shape=rect; ];\r\n" +
             "  edge [fontname = \"Handlee\"];\r\n" +
             "\r\n" +
             "  bgcolor=transparent;");
-        for (DagNode node : dag.nodes) {
-            // only draw nodes if they have an edge
-            boolean hasEdge = false;
-            for (DagEdge e : dag.edges) {
-                if (e.n1 == node || e.n2 == node) { hasEdge = true; break; }
-            }
-            if (hasEdge) {
-                pw.println(node.toGraphviz());
-            }
-        }
-        for (DagEdge edge : dag.edges) {
-            pw.println(edge.toGraphviz());
-        }
-        pw.println("}");
         
+        if (methodNode.digraph != null) {
+            pw.println("# digraph stuff here");
+        }
+        
+        
+        while (methodNode != null) {
+
+            if (!methodNode.type.equals("MethodDeclaration")) {
+                throw new IllegalStateException("first node must be a MethodDeclaration; found " + methodNode.type);
+                // block = block.children.get(0);
+            }
+            
+            LexicalScope lexicalScope = new LexicalScope();
+            dag.edges = new ArrayList<>();
+            List<ExitEdge> ee = addMethodDeclarationEdges(dag, methodNode, lexicalScope);
+
+            // subgraph starts here
+            pw.println("# method");
+
+            pw.println("subgraph " + methodNode.name + " {");   
+            pw.println("  pencolor=white ; labeljust = \"l\"; label = \"" + methodNode.label + "\"");
+            pw.println("  ranksep = 0.5;");
+            
+            if (methodNode.subgraph != null) {
+                pw.println("# subgraph stuff here");
+            }
+        
+            
+            methodNode.keepNode = false;
+            setLastKeepNode(dag, methodNode, methodNode);
+            removeNodes(dag, methodNode); // peephole node removal.
+            
+            inlineStyles(dag, styleSheet);
+        
+            
+            for (DagNode node : dag.nodes) {
+                // only draw nodes if they have an edge
+                boolean hasEdge = false;
+                for (DagEdge e : dag.edges) {
+                    if (e.n1 == node || e.n2 == node) { hasEdge = true; break; }
+                }
+                if (node != methodNode && hasEdge) {
+                    pw.println(node.toGraphviz());
+                }
+            }
+            for (DagEdge edge : dag.edges) {
+                if (edge.n1 != methodNode) {
+                    pw.println(edge.toGraphviz());
+                }
+            }
+        
+            pw.println("}"); // subgraph
+        
+            rootNodeIdx++;
+            methodNode = rootNodeIdx < dag.rootNodes.size() ? dag.rootNodes.get(rootNodeIdx) : null;
+            if (methodNode != null && methodNode.digraph != null) {
+                methodNode = null;
+            }
+        }
+        pw.println("}"); // digraph
         pw.flush();
+        
+        return (rootNodeIdx < dag.rootNodes.size());
 	}
 
 	// when we construct the DagNodes, automatically add classes based on AST type
@@ -181,9 +195,9 @@ public class JavaToGraphviz {
         String css = "";
         for (CommentText c : comments) {
             // String t = c.text;
-            if (c instanceof GvDirectiveComment) {
+            if (c instanceof GvStyleComment) {
                 // remove non-standard css comments
-                String[] ss = ((GvDirectiveComment) c).style.split("\n");
+                String[] ss = ((GvStyleComment) c).style.split("\n");
                 for (int i=0; i<ss.length; i++) {
                     String s = ss[i];
                     if (s.contains("//")) {
@@ -331,7 +345,9 @@ public class JavaToGraphviz {
      * @return
      */
 	private List<ExitEdge> addEdges(Dag dag, DagNode node, LexicalScope scope) {
-	    if (node.type.equals("Block")) {
+	    if (node.type.equals("MethodDeclaration")) {
+	        return addMethodDeclarationEdges(dag, node, scope);
+	    } else if (node.type.equals("Block")) {
 	        return addBlockEdges(dag, node, scope);
 	    } else if (node.type.equals("If")) {
 	        return addIfEdges(dag, node, scope);
@@ -344,7 +360,7 @@ public class JavaToGraphviz {
         } else if (node.type.equals("Switch")) {
             return addSwitchEdges(dag, node, scope);
         } else if (node.type.equals("SwitchCase")) {
-            // hmm. these should be handled in addSwitchEdges
+            // these should be handled in addSwitchEdges
             throw new IllegalStateException("SwitchCase encountered outside Switch");
         } else if (node.type.equals("Break")) {
             return addBreakEdges(dag, node, scope);
@@ -421,6 +437,59 @@ public class JavaToGraphviz {
 	    return prevNodes;
     }
 	
+	// draw lines from each statement to each other
+    // exit node is the last statement
+    private List<ExitEdge> addMethodDeclarationEdges(Dag dag, DagNode method, LexicalScope scope) {
+        if (method.children.size() != 1) {
+            throw new IllegalStateException("expected 1 child; found " + method.children.size());
+        }
+        MethodDeclaration md = (MethodDeclaration) method.astNode;
+        method.label = "method " + md.getName();
+        
+        DagNode methodBlock = method.children.get(0);
+        dag.addEdge(method, methodBlock);
+        
+        LexicalScope lexicalScope = new LexicalScope(); 
+        List<ExitEdge> ee = addBlockEdges(dag, methodBlock, lexicalScope);
+        
+        // add a node which all the return edges return to
+        int endOfMethodLine = cu.getLineNumber(methodBlock.astNode.getStartPosition() + methodBlock.astNode.getLength());
+        DagNode rn = new DagNode();
+        rn.keepNode = true; // always keep comments
+        rn.type = "return";
+        rn.line = endOfMethodLine;
+        rn.name = dag.getUniqueName("m_" + endOfMethodLine);
+        rn.label = "return";
+        rn.astNode = null;
+        dag.addNode(rn);
+        
+        for (ExitEdge e : lexicalScope.returnEdges) {
+            e.n2 = rn;
+            dag.addEdge(e);
+        }
+        
+        // and everything that was thrown connects to this node as well
+        for (ExitEdge e : lexicalScope.throwEdges) {
+            e.n2 = rn;
+            dag.addEdge(e);
+        }
+        
+        // could possibly draw a line from every single node to this node for OOMs etc
+        
+        // and everything flowing out of the first block connects to this node as well
+        for (ExitEdge e : ee) {
+            e.n2 = rn;
+            dag.addEdge(e);
+        }
+        
+        // there's no exit edges out of a method
+        // ExitEdge e = new ExitEdge();
+        // e.label = "afterTheReturn";
+        // e.n1 = rn;
+        return Collections.emptyList();
+        
+    }
+    
 	// a break will add an edge to breakEdges only 
 	// (and returns an empty list as we won't have a normal exit edge)
 	// @TODO labelled break
@@ -1017,12 +1086,20 @@ public class JavaToGraphviz {
                     // here be the css
                     // remove inline comments
                     // logger.info("maybe here ? " +  s);
-                    comments.add(new GvDirectiveComment(c, cu.getLineNumber(start), text, s));
+                    comments.add(new GvStyleComment(c, cu.getLineNumber(start), text, s));
                     
                 } else {
-                    throw new IllegalStateException("gv:style does not start with '{' and end with '}':  '" + text + "'");
+                    throw new IllegalStateException("gv-style does not start with '{' and end with '}':  '" + text + "'");
                 }
-               
+
+            } else if (text.startsWith("gv-digraph:")) {
+                String s = text.substring(11).trim();
+                comments.add(new GvDigraphComment(c, cu.getLineNumber(start), s));
+
+            } else if (text.startsWith("gv-subgraph:")) {
+                String s = text.substring(11).trim();
+                comments.add(new GvSubgraphComment(c, cu.getLineNumber(start), s));
+
             } else {
                     // text = text.substring(3).trim();
                     // c.getAlternateRoot() is the CompilationUnit for all of these comments
@@ -1081,15 +1158,29 @@ public class JavaToGraphviz {
 	    }
 	}
 
-    // well I'm certainly not going to regret this
-    static class GvDirectiveComment extends CommentText {
+    static class GvStyleComment extends CommentText {
         String style;
-        public GvDirectiveComment(Comment c, int line, String text, String style) {
+        public GvStyleComment(Comment c, int line, String text, String style) {
             super(c, line, text);
             this.style = style;
         }
     }
 
+    static class GvDigraphComment extends CommentText {
+        public GvDigraphComment(Comment c, int line, String text) {
+            super(c, line, text);
+        }
+    }
+
+    
+    static class GvSubgraphComment extends CommentText {
+        public GvSubgraphComment(Comment c, int line, String text) {
+            super(c, line, text);
+        }
+    }
+
+    
+    
     static class GvComment extends CommentText {
         List<String> classes;
         public GvComment(Comment c, int line, List<String> classes, String text) {
@@ -1125,6 +1216,7 @@ public class JavaToGraphviz {
      */
 	static class Dag {
 	    List<DagNode> nodes = new ArrayList<>();
+	    List<DagNode> rootNodes = new ArrayList<>(); // subset of nodes which start each Dag tree
 	    List<DagEdge> edges = new ArrayList<>();
 	    Set<String> names = new HashSet<String>();
 	    Logger logger = Logger.getLogger(Dag.class);
@@ -1133,6 +1225,9 @@ public class JavaToGraphviz {
 	    public void addNode(DagNode n) {
 	        nodes.add(n);
 	        astToDagNode.put(n.astNode, n);
+	    }
+	    public void addRootNode(DagNode n) {
+	        rootNodes.add(n);
 	    }
         public boolean hasEdge(DagNode n1, DagNode n2) {
             for (DagEdge e : edges) {
@@ -1211,10 +1306,12 @@ public class JavaToGraphviz {
 	    
 	}
 	static class DagNode {
+	    
+	    String digraph;
+	    String subgraph;
 	    DagNode parentDagNode;
 	    List<DagNode> children = new ArrayList<>();
 	    
-	    String dagLoc;
 	    String locationInParent; 
 	    
 	    boolean keepNode = false;
@@ -1240,23 +1337,22 @@ public class JavaToGraphviz {
 	    }
 	    
 	    public String toGraphviz() {
-	        String labelText = line + ": " + Text.replaceString(label, "\"",  "\\\"") +
-	            (lastKeepNode == null ? "" : ", lkn=" + lastKeepNode.name);
+	        String labelText = /*line + ": " +*/ Text.replaceString(label, "\"",  "\\\"") /* +
+	            (lastKeepNode == null ? "" : ", lkn=" + lastKeepNode.name)*/ ; 
 	        String a = "";
 	        for (Entry<String, String> e : gvAttributes.entrySet()) {
-	            a += "  " + e.getKey() + " = " + e.getValue() + "; ";
+	            a += "    " + e.getKey() + " = " + e.getValue() + "; ";
 	        }
 	        
 	        return
-	          (dagLoc == null ? "" : dagLoc) + 
-	          name + " [\n" +
+	          "  " + name + " [\n" +
 	          // (classes.size() == 0 ? "" : "  /* " + classes + " */\n") +
 	          // undocumented 'class' attribute is included in graphviz svg output; see
 	          // https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
-	          (classes.size() == 0 ? "" : "  class = \"" + Text.join(classes,  " ") + "\";\n") + 
-              "  label = \"" + labelText + "\";\n" + 
+	          (classes.size() == 0 ? "" : "    class = \"" + Text.join(classes,  " ") + "\";\n") + 
+              "    label = \"" + labelText + "\";\n" + 
 	          a + 
-              "];";	        
+              "  ];";	        
 	    }
 	}
 	
@@ -1273,14 +1369,14 @@ public class JavaToGraphviz {
 	        String labelText = label == null ? null : Text.replaceString(label, "\"",  "\\\"");
             String a = "";
             for (Entry<String, String> e : gvAttributes.entrySet()) {
-                a += e.getKey() + " = " + e.getValue() + ";\n";
+                a += "    " + e.getKey() + " = " + e.getValue() + ";\n";
             }
 
-	        return n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
+	        return "  " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
 	            " -> " + 
 	            n2.name + // (n2Port == null ? "" : ":" + n2Port) + 
-	            (label == null && gvAttributes.size() == 0? "" : " [" +
-	            (label == null ? "" : "label=\"" + labelText + "\"; ") +
+	            (label == null && gvAttributes.size() == 0? "" : " [\n" +
+	            (label == null ? "" : "    label=\"" + labelText + "\"; ") +
 	            a +
 	           "]") + ";";
         }
@@ -1326,23 +1422,38 @@ public class JavaToGraphviz {
             return dag;
         }
         
-        /** Comments don't appear in the eclipse AST in the right place, so we call this periodically
-         * to add in any comments that should have appeared in the Dag by now. 
-         * <p>These comment nodes will be added to the previousDagNode's list of children. 
-         * 
-         * @param pdn previous DagNode
-         * @param line
-         */
+        void processCommentsToMethodNode(DagNode mn, int line) {
+            // DagNode lastNode = null;
+            while (lastIdx < comments.size() && comments.get(lastIdx).line < line) {
+                CommentText ct = comments.get(lastIdx);
+                /*
+                DagNode dn = new DagNode();
+                dn.keepNode = true; // always keep comments
+                dn.type = "comment";
+                dn.line = ct.line;
+                dn.name = dag.getUniqueName("c_" + ct.line);
+                dn.label = ct.text;
+                dn.astNode = null;
+                */
+                if (ct instanceof GvComment) {
+                    mn.classes.addAll(((GvComment) ct).classes);
+                    mn.label = ct.text; // last comment wins
+                } else if (ct instanceof GvDigraphComment) {
+                    mn.digraph = ct.text;
+                } else if (ct instanceof GvSubgraphComment) {
+                    mn.subgraph = ct.text;
+                }
+                lastIdx ++; 
+            }
+        }
+        
         void createCommentNodesToLine(DagNode pdn, int line) {
             // DagNode lastNode = null;
             while (lastIdx < comments.size() && comments.get(lastIdx).line < line) {
                 CommentText ct = comments.get(lastIdx);
                 
-                String dagLoc = "";
-                
                 DagNode dn = new DagNode();
                 dn.keepNode = true; // always keep comments
-                dn.dagLoc = dagLoc;
                 dn.type = "comment";
                 dn.line = ct.line;
                 dn.name = dag.getUniqueName("c_" + ct.line);
@@ -1350,17 +1461,24 @@ public class JavaToGraphviz {
                 dn.astNode = null;
                 if (ct instanceof GvComment) {
                     dn.classes.addAll(((GvComment) ct).classes);
+                } else if (ct instanceof GvDigraphComment) {
+                    dn.digraph = ct.text;
+                } else if (ct instanceof GvSubgraphComment) {
+                    dn.subgraph = ct.text;
                 }
                 
                 if (pdn!=null) {
                     dag.addNode(dn);
                     pdn.addChild(dn);
                 } else {
-                    logger.warn("null pdn on " + dn.type + " on line " + dn.line);
+                    throw new IllegalStateException("null pdn in createCommentNodesToLine");
+                    // logger.warn("null pdn on " + dn.type + " on line " + dn.line);
                 }
                 lastIdx ++; 
             }
         }
+        
+        
         
         public boolean preVisit2(ASTNode node) {
             DagNode pdn = getClosestDagNode(node);
@@ -1368,9 +1486,8 @@ public class JavaToGraphviz {
             int line = cu.getLineNumber(node.getStartPosition());
             // writeCommentsToLine(line);
 
-            if (node instanceof Statement) {
-                
-                createCommentNodesToLine(pdn, line);
+            if (node instanceof MethodDeclaration ||
+                node instanceof Statement) {
                 
                 DagNode dn = new DagNode();
                 String clazz = Text.getLastComponent(node.getClass().getName());
@@ -1379,6 +1496,7 @@ public class JavaToGraphviz {
                 }
                 String lp = "s"; // linePrefix
                 if (clazz.equals("If")) { lp = "if"; }
+                else if (clazz.equals("MethodDeclaration")) { lp = "cluster"; }
                 
                 dn.type = clazz; // "if";
                 dn.label = clazz; // "if";
@@ -1389,6 +1507,14 @@ public class JavaToGraphviz {
                 dn.parentDagNode = pdn;
                 dn.astNode = node;
                 dn.locationInParent = node.getLocationInParent().getId();
+
+                if (node instanceof MethodDeclaration) {
+                    // comments get assigned to this node
+                    processCommentsToMethodNode(dn, line);
+                } else {
+                    // comments have their own nodes
+                    createCommentNodesToLine(pdn, line);                    
+                }
                 
                 dag.addNode(dn);
                 if (pdn!=null) {
@@ -1396,14 +1522,21 @@ public class JavaToGraphviz {
                 } else {
                     // logger.warn("null pdn on " + node);
                     logger.warn("preVisit: null pdn on " + dn.type + " on line " + dn.line);
+                    // each method is it's own diagram
+                    dag.addRootNode(dn);
                 }
                 
                 if (lastIdx < comments.size() && comments.get(lastIdx).line == line) {
                     CommentText ct = comments.get(lastIdx);
                     dn.keepNode = true; // always keep comments
-                    dn.label = ct.text;
+                    
                     if (ct instanceof GvComment) {
+                        dn.label = ct.text;
                         dn.classes.addAll(((GvComment) ct).classes);
+                    } else if (ct instanceof GvDigraphComment) {
+                        dn.digraph = ct.text;
+                    } else if (ct instanceof GvSubgraphComment) {
+                        dn.subgraph = ct.text;
                     }
                     lastIdx++;
                 }
@@ -1444,10 +1577,19 @@ public class JavaToGraphviz {
 
         // InputStream is = JavaToGraphviz4.class.getResourceAsStream("/test.java");
 	    InputStream is = JavaToGraphviz.class.getResourceAsStream("/Statements.java");
-
+	    // Writer os = new PrintWriter(System.out);
+	    
 		JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
-		javaToGraphviz.test(is);
-		is.close();
+		javaToGraphviz.parse(is, "UTF-8");
+        is.close();
+
+		boolean hasNext;
+        do {
+            StringWriter sw = new StringWriter();
+            hasNext = javaToGraphviz.writeGraphviz(sw);
+            System.out.println(sw.toString());
+            if (hasNext) { System.out.println("==========================="); }
+        } while (hasNext);
 	}
 	
 	// yeah ok
