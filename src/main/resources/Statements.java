@@ -1,8 +1,23 @@
 package com.jacobistrategies.web.struts;
 
 public class AuthenticateInterceptorGVOLD extends AbstractInterceptor {
+    // $NON-NLS$ you say
 
-
+    /* gv-style: {
+       // css doesn't normally allow // comments but we do here
+       // statement classes
+       .if {  
+           shape : diamond; 
+           // gv-wordwrap: 10; 
+       } 
+       // custom classes
+       .state { fontname : "Courier New"; style: filled; }
+       .clearSession { color : red; style:filled; fillcolor:pink; }
+       .newSession { color : green; style:filled; fillcolor:palegreen; }
+       .literal { gv-literal: true }
+       }
+    */
+    
 
     /*
     @Override
@@ -89,7 +104,7 @@ public class AuthenticateInterceptorGVOLD extends AbstractInterceptor {
     }
     */
     
-    
+    /*
     public void whileStatement() {
         // gv: start of method
         something();
@@ -107,5 +122,59 @@ public class AuthenticateInterceptorGVOLD extends AbstractInterceptor {
         }
         somethingElse();
     }
+    */
+
+    /*
+    public void doStatement() {
+        // gv: start of method
+        something();
+        int thing;
+        do {
+            something();  
+            goto really;
+            
+            if (skipCondition) {
+                something(); //
+                continue; // gv: continue
+            } else if (breakCondition) {
+                something(); //
+                break; // gv: end
+            } else if (throwCondition) {
+                throw new something(); // gv: throw
+
+            } else if (returnCondition) {
+                return;
+            }
+            something(); // 
+        } while (condition);
+        
+        somethingElse();
+    }*/
+    
+    
+    public void labels() {
+        // gv: start of method
+        something();
+        
+        doLabel: do {
+            something();
+            
+            whileLabel: while (wc) {
+                something(); // 
+                
+                if (rc) { // gv.specialIf: OR IS IT
+                    something(); //
+                    break doLabel;
+                } else if (breakCondition) {
+                    somethingElse();
+                    break whileLabel;
+                }
+            }
+            something(); // 
+        } while (condition);
+        
+        somethingElse();
+    }
+    
 	   
 }

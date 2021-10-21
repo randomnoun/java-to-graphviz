@@ -40,6 +40,10 @@ public class SwitchStatement {
         RIGHT,
         RIGHT_2
     }
+
+    // if I need a bit more grist for the unit tests, there's 
+    // a listicle on the interwebs about songs with lists in them,
+    // which I find so depressing, I won't link to it here.
     
     public void chorus() {
         
@@ -97,8 +101,10 @@ public class SwitchStatement {
             case BIRTHDAY_PARTY:
             case CHEESECAKE:
             case JELLYBEAN:
-            case BOOM:
                 result = "nostalgic childhood memory";
+
+            case BOOM:
+                result = "the end of nostalgic childhood memories";
                 
             case YOU_SYMBIOTIC:
             case PATRIOTIC:
@@ -112,6 +118,7 @@ public class SwitchStatement {
             default:
                chorus();
         }
+        System.out.println("time I spent some time alone");
     }
 
     
