@@ -1,6 +1,8 @@
 package com.randomnoun.build.javaToGraphviz;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -35,6 +37,7 @@ import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -69,21 +72,87 @@ public class JavaToGraphviz {
 
     Logger logger = Logger.getLogger(JavaToGraphviz.class);
 
-    
     CompilationUnit cu;
     List<CommentText> comments;
     CSSStyleSheet styleSheet;
     Dag dag;
     int rootNodeIdx;
     
+    // options
+    boolean removeNode = false;
+    int astParserLevel = JLS11;
+    boolean isDebugLabel = false;
+    boolean includeThrowEdges = true;
+    boolean includeThrowNodes = true;
+    
+    // non-deprecated AST constants. 
+    // there's an eclipse ticket to create an alternative non-deprecated interface for these which isn't complete yet.
+    
+    /** Java Language Specification, Second Edition (JLS2); <= J2SE 1.4 */
+    @SuppressWarnings("deprecation")
+    public static final int JLS2 = AST.JLS2; // 2
+
+    /** Java LanguageSpecification, Third Edition (JLS3); <= J2SE 5 (aka JDK 1.5) */
+    @SuppressWarnings("deprecation")
+    public static final int JLS3 = AST.JLS3; // 3
+    
+    /** Java Language Specification, Java SE 7 Edition (JLS7) as specified by JSR336; Java SE 7 (aka JDK 1.7). */ 
+    @SuppressWarnings("deprecation")
+    public static final int JLS4 = AST.JLS4; // 4
+    
+    /** Java Language Specification, Java SE 8 Edition (JLS8) as specified by JSR337; Java SE 8 (aka JDK 1.8). */
+    @SuppressWarnings("deprecation")
+    public static final int JLS8 = AST.JLS8; // 8;
+
+    /** Java Language Specification, Java SE 9 Edition (JLS9); Java SE 9 (aka JDK 9) */
+    @SuppressWarnings("deprecation")
+    public static final int JLS9 = AST.JLS9; // 9;
+
+    /** Java Language Specification, Java SE 10 Edition (JLS10). Java SE 10 (aka JDK 10). */
+    @SuppressWarnings("deprecation")
+    public static final int JLS10 = AST.JLS10; // 10;
+
+    /** Java Language Specification, Java SE 11 Edition (JLS11). Java SE 11 (aka JDK 11). */
+    @SuppressWarnings("deprecation")
+    public static final int JLS11 = AST.JLS11; // 11
+    
+    /** Java Language Specification, Java SE 12 Edition (JLS12). Java SE 12 (aka JDK 12). */
+    @SuppressWarnings("deprecation")
+    public static final int JLS12 = AST.JLS12; // 12;
+    
+    /** Java Language Specification, Java SE 13 Edition (JLS13). Java SE 13 (aka JDK 13). */
+    public static final int JLS13 = AST.JLS13; // 13;
+    
 // see https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
+    
+    // depending on how many of these I end up with, maybe bundle these into an options object
+    // should be gv styles as well, probably
+    public void setRemoveNode(boolean removeNode) {
+        this.removeNode = removeNode;
+    }
+    
+    public void setDebugLabel(boolean isDebugLabel) {
+        this.isDebugLabel = isDebugLabel;
+    }
+    
+    public void setAstParserLevel(int astParserLevel) {
+        this.astParserLevel = astParserLevel;
+    }
+    
+    public void setIncludeThrowNodes(boolean includeThrowNodes) {
+        this.includeThrowNodes = includeThrowNodes;
+    }
+    
+    public void setIncludeThrowEdges(boolean includeThrowEdges) {
+        this.includeThrowEdges = includeThrowEdges;
+    }
     
 	public void parse(InputStream is, String charset) throws IOException  {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		StreamUtil.copyStream(is, baos);
 		
 		String src = baos.toString(charset);
-		ASTParser parser = ASTParser.newParser(AST.JLS11); // JLS3
+		ASTParser parser = ASTParser.newParser(astParserLevel); 
 		parser.setSource(src.toCharArray());
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 
@@ -103,7 +172,7 @@ public class JavaToGraphviz {
 
 		// probably need to construct a DAG now don't I
 		
-		DagVisitor dv = new DagVisitor(cu, src, comments);
+		DagVisitor dv = new DagVisitor(cu, src, comments, includeThrowNodes);
         cu.accept(dv);
         dag = dv.getDag();
         
@@ -111,7 +180,7 @@ public class JavaToGraphviz {
 	}
 	
 	public boolean writeGraphviz(Writer writer) throws IOException {
-
+	    
 	    DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
 	    
         PrintWriter pw = new PrintWriter(writer);
@@ -129,51 +198,57 @@ public class JavaToGraphviz {
         
         while (methodNode != null) {
 
-            if (!methodNode.type.equals("MethodDeclaration")) {
-                throw new IllegalStateException("first node must be a MethodDeclaration; found " + methodNode.type);
-                // block = block.children.get(0);
-            }
-            
-            LexicalScope lexicalScope = new LexicalScope();
-            dag.edges = new ArrayList<>();
-            List<ExitEdge> ee = addMethodDeclarationEdges(dag, methodNode, lexicalScope);
-
-            // subgraph starts here
-            pw.println("# method");
-
-            pw.println("subgraph " + methodNode.name + " {");   
-            pw.println("  pencolor=white ; labeljust = \"l\"; label = \"" + methodNode.label + "\"");
-            pw.println("  ranksep = 0.5;");
-            
-            if (methodNode.subgraph != null) {
-                pw.println("# subgraph stuff here");
-            }
-        
-            
-            methodNode.keepNode = false;
-            setLastKeepNode(dag, methodNode, methodNode);
-            removeNodes(dag, methodNode); // peephole node removal.
-            
-            inlineStyles(dag, styleSheet);
-        
-            
-            for (DagNode node : dag.nodes) {
-                // only draw nodes if they have an edge
-                boolean hasEdge = false;
-                for (DagEdge e : dag.edges) {
-                    if (e.n1 == node || e.n2 == node) { hasEdge = true; break; }
+            if (methodNode.type.equals("Block")) {
+                // getting these for the enum declarations in SwitchStatement test; skip for now
+            } else {
+                if (!methodNode.type.equals("MethodDeclaration")) {
+                    throw new IllegalStateException("first node must be a MethodDeclaration; found " + methodNode.type);
+                    // block = block.children.get(0);
                 }
-                if (node != methodNode && hasEdge) {
-                    pw.println(node.toGraphviz());
+                
+                LexicalScope lexicalScope = new LexicalScope();
+                dag.edges = new ArrayList<>();
+                List<ExitEdge> ee = addMethodDeclarationEdges(dag, methodNode, lexicalScope);
+    
+                // subgraph starts here
+                pw.println("# method");
+    
+                pw.println("subgraph " + methodNode.name + " {");   
+                pw.println("  pencolor=white ; labeljust = \"l\"; label = \"" + methodNode.label + "\"");
+                pw.println("  ranksep = 0.5;");
+                
+                if (methodNode.subgraph != null) {
+                    pw.println("# subgraph stuff here");
                 }
-            }
-            for (DagEdge edge : dag.edges) {
-                if (edge.n1 != methodNode) {
-                    pw.println(edge.toGraphviz());
+            
+                
+                methodNode.keepNode = false;
+                setLastKeepNode(dag, methodNode, methodNode);
+                if (removeNode) {
+                    removeNodes(dag, methodNode); // peephole node removal.
                 }
+                
+                inlineStyles(dag, styleSheet);
+            
+                
+                for (DagNode node : dag.nodes) {
+                    // only draw nodes if they have an edge
+                    boolean hasEdge = false;
+                    for (DagEdge e : dag.edges) {
+                        if (e.n1 == node || e.n2 == node) { hasEdge = true; break; }
+                    }
+                    if (node != methodNode && hasEdge) {
+                        pw.println(node.toGraphviz(isDebugLabel));
+                    }
+                }
+                for (DagEdge edge : dag.edges) {
+                    if (edge.n1 != methodNode) {
+                        pw.println(edge.toGraphviz());
+                    }
+                }
+            
+                pw.println("}"); // subgraph
             }
-        
-            pw.println("}"); // subgraph
         
             rootNodeIdx++;
             methodNode = rootNodeIdx < dag.rootNodes.size() ? dag.rootNodes.get(rootNodeIdx) : null;
@@ -222,7 +297,29 @@ public class JavaToGraphviz {
         // stylesheetImpl.importImports(true); // recursive = true
         return stylesheetImpl;
     }
+
+    // probably need to do the whole nine yards on selectors, which would be better done by cut & pasting this:
+    // https://github.com/vilterp/StylesheetApplier/blob/master/src/StylesheetApplier.java
+    // which handles css specificity, and uses jsoup to handle the CSS selectors
+    // which is possibly overkill but I'd rather not reinvent the wheel.
+
+    // or maybe https://github.com/chrsan/css-selectors
+    // actually that looks much nicer for working with non-HTML trees
+    // but will mean rewriting those specificity rules
+    // which are pretty hideous these days; see https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity
     
+    // seems like jsoup is more likely to be up-to-date
+    // okay jsoup it is
+    
+    
+    /** Return a list of DagNodes that match the supplied cssSelector.
+     * 
+     * The only supported selectors at the moment are in the form ".className"
+     * 
+     * @param dag
+     * @param cssSelector
+     * @return
+     */
     List<DagNode> selectDagNodes(Dag dag, String cssSelector) {
         List<DagNode> result = new ArrayList<>();
         // only .selectors for now
@@ -234,8 +331,6 @@ public class JavaToGraphviz {
         }
         return result;
     }
-    
-    
 
 	// from http://stackoverflow.com/questions/4521557/automatically-convert-style-sheets-to-inline-style
     public void inlineStyles(Dag dag, CSSStyleSheet stylesheet) throws IOException {
@@ -293,7 +388,7 @@ public class JavaToGraphviz {
         // new method scope
         public LexicalScope() {
             continueNode = null;
-            breakEdges = null;
+            breakEdges = new ArrayList<ExitEdge>();
             returnEdges = new ArrayList<ExitEdge>();
             throwEdges = new ArrayList<ExitEdge>();
             // I'm assuming the same label name can never be nested within a method
@@ -469,9 +564,11 @@ public class JavaToGraphviz {
         }
         
         // and everything that was thrown connects to this node as well
-        for (ExitEdge e : lexicalScope.throwEdges) {
-            e.n2 = rn;
-            dag.addEdge(e);
+        if (includeThrowEdges) { 
+            for (ExitEdge e : lexicalScope.throwEdges) {
+                e.n2 = rn;
+                dag.addEdge(e);
+            }
         }
         
         // could possibly draw a line from every single node to this node for OOMs etc
@@ -589,7 +686,7 @@ public class JavaToGraphviz {
         e.label = "throw";
         e.n1 = breakNode;
         e.gvAttributes.put("color", "purple");
-        scope.returnEdges.add(e);
+        scope.throwEdges.add(e);
         return Collections.emptyList();
     }
 
@@ -806,10 +903,15 @@ public class JavaToGraphviz {
         for (DagNode c : switchNode.children) {
             if (c.type.equals("SwitchCase")) {
                 // close off last case
-                prevNodes.addAll(scope.breakEdges);
-                
+                if (newScope != null) {
+                    prevNodes.addAll(newScope.breakEdges);
+                }
+
+                // pretty sure default needs to be the last case but maybe not
+                boolean isDefaultCase = ((SwitchCase) c.astNode).getExpression() == null;               
+
                 // start a new one
-                dag.addEdge(switchNode, c, "case"); // case expression
+                dag.addEdge(switchNode, c, isDefaultCase ? "default" : "case"); // case expression
                 for (ExitEdge e : casePrevNodes) { // fall-through edges. maybe these should be red instead of the break edges
                     e.n2 = c;
                     dag.addEdge(e);
@@ -819,8 +921,8 @@ public class JavaToGraphviz {
                 // scope.breakEdges.clear();
                 newScope = scope.newBreakScope();
                 
+                hasDefaultCase = hasDefaultCase || isDefaultCase; 
                 
-                hasDefaultCase = ((SwitchCase) c.astNode).getExpression() == null;               
                 
                 ExitEdge e = new ExitEdge();
                 e.n1 = c;
@@ -911,7 +1013,7 @@ public class JavaToGraphviz {
     }
 
     private void removeNodes(Dag dag, DagNode node) {
-        removeNodes(dag, node, false);
+        removeNodes(dag, node, false); // , new HashSet<DagNode>()
     }
 
     // @TODO if the incoming keepNodes are different but share a common ancestor, could 
@@ -947,11 +1049,19 @@ public class JavaToGraphviz {
      * @param node
      * @param mergeEdges
      */
-	private void removeNodes(Dag dag, DagNode node, boolean mergeEdges) {
+	private void removeNodes(Dag dag, DagNode node, boolean mergeEdges) { // Set<DagNode> seenNodes
 	    
         List<DagEdge> inEdges = node.inEdges;
         List<DagEdge> outEdges = node.outEdges;
         Set<DagNode> redoNodes = new HashSet<>();
+    
+        /*
+        if (seenNodes.contains(node)) {
+            logger.error("loop detected: seen node " + node.name);
+            return;
+        } 
+        seenNodes.add(node);
+        */
         
         if (mergeEdges && inEdges.size() > 0) {
             
@@ -964,7 +1074,7 @@ public class JavaToGraphviz {
                     DagNode inEdge1KeepNode = inEdge1.n1.lastKeepNode;
                     DagNode inEdge2KeepNode = inEdge2.n1.lastKeepNode;
                     if (inEdge1KeepNode == inEdge2KeepNode && inEdge1KeepNode != null) {
-                        // logger.info("on node " + node.name + ", merged edges back to " + inEdge1KeepNode.name + ", i=" + i + ", j=" + j);
+                        logger.info("on node " + node.name + ", merged edges back to " + inEdge1KeepNode.name + ", i=" + i + ", j=" + j);
                         DagEdge newEdge = new DagEdge();
                         newEdge.n1 = inEdge1KeepNode;
                         newEdge.n2 = node;
@@ -1011,9 +1121,10 @@ public class JavaToGraphviz {
                 dag.addEdge(newEdge);
             }
             
-            // logger.info("removed node " + node.name);
+            logger.info("removed node " + node.name);
             dag.nodes.remove(node);
-            removeNodes(dag, newEdge.n2, mergeEdges);
+            // start from n1 again as removing this node may make it possible to remove the parent node
+            removeNodes(dag, newEdge.n1, mergeEdges); // seenNodes
         
         } else if (true) { // mergeEdges
             
@@ -1039,6 +1150,7 @@ public class JavaToGraphviz {
         
         // if we've merged edges, may need to shorten paths again from the keepNodes
         for (DagNode redo : redoNodes) {
+            logger.info("redoing " + node.name);
             removeNodes(dag, redo, false); // false = shorten only
         }
 	    
@@ -1336,9 +1448,10 @@ public class JavaToGraphviz {
 	        children.add(node);
 	    }
 	    
-	    public String toGraphviz() {
-	        String labelText = /*line + ": " +*/ Text.replaceString(label, "\"",  "\\\"") /* +
-	            (lastKeepNode == null ? "" : ", lkn=" + lastKeepNode.name)*/ ; 
+	    public String toGraphviz(boolean isDebugLabel) {
+	        String labelText = 
+	            (isDebugLabel ? line + ": " : "") + Text.replaceString(label, "\"",  "\\\"") +
+	            (isDebugLabel && lastKeepNode != null ? ", lkn=" + lastKeepNode.name : ""); 
 	        String a = "";
 	        for (Entry<String, String> e : gvAttributes.entrySet()) {
 	            a += "    " + e.getKey() + " = " + e.getValue() + "; ";
@@ -1409,12 +1522,14 @@ public class JavaToGraphviz {
         List<CommentText> comments;
         CompilationUnit cu;
         String src;
+        boolean includeThrowNode;
         
-        public DagVisitor(CompilationUnit cu, String src, List<CommentText> comments) {
+        public DagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode) {
             super(true);
             this.cu = cu;
             this.comments = comments;
             this.src = src;
+            this.includeThrowNode = includeThrowNode;
             dag = new Dag();
         }
         
@@ -1487,7 +1602,8 @@ public class JavaToGraphviz {
             // writeCommentsToLine(line);
 
             if (node instanceof MethodDeclaration ||
-                node instanceof Statement) {
+                (node instanceof Statement &&
+                (includeThrowNode || !(node instanceof ThrowStatement)) )) {
                 
                 DagNode dn = new DagNode();
                 String clazz = Text.getLastComponent(node.getClass().getName());
@@ -1576,10 +1692,17 @@ public class JavaToGraphviz {
 	    Logger logger = Logger.getLogger(JavaToGraphviz.class);
 
         // InputStream is = JavaToGraphviz4.class.getResourceAsStream("/test.java");
-	    InputStream is = JavaToGraphviz.class.getResourceAsStream("/Statements.java");
-	    // Writer os = new PrintWriter(System.out);
+	    // InputStream is = JavaToGraphviz.class.getResourceAsStream("/Statements.java");
+
+	    String className = "com.example.input.SwitchStatement2";
+        File f = new File("src/test/java/" + Text.replaceString(className,  ".",  "/") + ".java");
+        FileInputStream is = new FileInputStream(f);
 	    
 		JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
+		javaToGraphviz.setDebugLabel(true);
+		javaToGraphviz.setRemoveNode(true);
+		javaToGraphviz.setIncludeThrowEdges(false); // collapse throw edges
+		javaToGraphviz.setIncludeThrowNodes(false); // collapse throw nodes
 		javaToGraphviz.parse(is, "UTF-8");
         is.close();
 
