@@ -36,11 +36,16 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.select.NodeTraversor;
+import org.jsoup.select.NodeVisitor;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSRule;
 import org.w3c.dom.css.CSSRuleList;
@@ -48,6 +53,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSStyleRule;
 import org.w3c.dom.css.CSSStyleSheet;
 
+import com.randomnoun.build.javaToGraphviz.StylesheetApplier.ExceptionErrorHandler;
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
@@ -211,14 +217,14 @@ public class JavaToGraphviz {
                 List<ExitEdge> ee = addMethodDeclarationEdges(dag, methodNode, lexicalScope);
     
                 // subgraph starts here
-                pw.println("# method");
+                pw.println("  # method");
     
-                pw.println("subgraph " + methodNode.name + " {");   
-                pw.println("  pencolor=white ; labeljust = \"l\"; label = \"" + methodNode.label + "\"");
-                pw.println("  ranksep = 0.5;");
+                pw.println("  subgraph " + methodNode.name + " {");   
+                pw.println("    pencolor=white ; labeljust = \"l\"; label = \"" + methodNode.label + "\"");
+                pw.println("    ranksep = 0.5;");
                 
                 if (methodNode.subgraph != null) {
-                    pw.println("# subgraph stuff here");
+                    pw.println("  # subgraph stuff here");
                 }
             
                 
@@ -332,17 +338,90 @@ public class JavaToGraphviz {
         return result;
     }
 
-	// from http://stackoverflow.com/questions/4521557/automatically-convert-style-sheets-to-inline-style
+	
     public void inlineStyles(Dag dag, CSSStyleSheet stylesheet) throws IOException {
 
+        Document document = Document.createShell("");
+        Element bodyEl = document.getElementsByTag("body").get(0);
+        for (int i = 0; i < dag.nodes.size(); i++) {
+            DagNode node = dag.nodes.get(i);
+            node.gvStyles = new HashMap<>(); // clear applied styles
+            
+            DagElement child = new DagElement(node, node.gvAttributes); // Tag.valueOf(tagName, NodeUtils.parser(this).settings()), baseUri()
+            child.attr("id", node.name);
+            // this is probably overkill as well
+            // named edges, for [inEdge~="something"] rules
+            // child.addr("inEdge", something);
+            // child.addr("outEdge", something);
+            // named nodes, for [inNode~="something"] rules
+            // child.addr("inNode", something);
+            // child.addr("outNode", something);
+            
+            // TODO set inline styles, classes, in/out edge attributes
+            
+            bodyEl.appendChild(child);
+            
+            // maybe we should have edge nodes in here as well. Why not. Why not indeed.
+        }
+        
+        logger.info("doc b4 " + document.toString());
+        
+        StylesheetApplier applier = new StylesheetApplier(document, stylesheet);
+        applier.apply();
+        
+        logger.info("doc is " + document.toString());
+        
+        // TODO copy the applied styles back into the DagNodes
+        // factor in elements' style attributes
+        
+        final CSSOMParser inlineParser = new CSSOMParser();
+        inlineParser.setErrorHandler( new ExceptionErrorHandler() );
+        
+        NodeTraversor.traverse( new NodeVisitor() {
+            @Override
+            public void head( Node node, int depth ) {
+                if ( node instanceof DagElement && node.hasAttr( "style" ) ) {
+                    // parse the CSS into a CSSStyleDeclaration
+                    InputSource input = new InputSource( new StringReader( node.attr( "style" ) ) );
+                    CSSStyleDeclaration declaration = null;
+                    try {
+                        declaration = inlineParser.parseStyleDeclaration( input );
+                    } catch ( IOException e ) {
+                        // again, this should never happen, cuz we're just reading from a string
+                        e.printStackTrace();
+                    }
+                    // node.removeAttr( "style" );
+                    // elementMatches.put( ((Element) node), new InlineStyleApplication( declaration ) );
+                    DagNode dagNode = ((DagElement) node).dagNode;
+                    for (int i=0; i<declaration.getLength(); i++) {
+                        String prop = declaration.item(i);
+                        logger.info("setting " + dagNode.name + " prop " + prop + " to " + declaration.getPropertyValue(prop));
+                        dagNode.gvStyles.put(prop,  declaration.getPropertyValue(prop));
+                        
+                        /*
+                        if (prop.startsWith("gv-")) {
+                            String newProp = prop.substring(3);
+                            logger.info("setting prop " + newProp + " to " + declaration.getPropertyValue(prop));
+                            dagNode.gvAttributes.put(newProp,  declaration.getPropertyValue(prop));
+                        }
+                        */
+                    }
+                }
+            }
+
+            @Override
+            public void tail( Node node, int depth ) {}
+        }, document.body() );
+
+        // naive CSS rule applier
+        // based on http://stackoverflow.com/questions/4521557/automatically-convert-style-sheets-to-inline-style
+        /*
         CSSRuleList ruleList = stylesheet.getCssRules();
-        // Map<DagNode, Map<String, String>> allElementsStyles = new HashMap<Element, Map<String, String>>();
         for (int ruleIndex = 0; ruleIndex < ruleList.getLength(); ruleIndex++) {
             CSSRule item = ruleList.item(ruleIndex);
             if (item instanceof CSSStyleRule) {
                 CSSStyleRule styleRule = (CSSStyleRule) item;
                 String cssSelector = styleRule.getSelectorText(); // if I'm coding this myself, class only 
-                // Elements elements = document.select(cssSelector);
                 logger.info("applying rules to " + cssSelector);
                 List<DagNode> nodes = selectDagNodes(dag, cssSelector);
                 logger.info(nodes.size() + " nodes found");
@@ -358,8 +437,12 @@ public class JavaToGraphviz {
                 }
             }
         }
+        */
     }
     
+    // a lexical scope corresponds to some boundary in the AST that we want to demarcate somehow.
+    // Scopes can be nested; a nested scope may inherit a subset of the parent scope's fields depending 
+    // on the type of scope.
     public static class LexicalScope {
         // within this scope, the node that a 'continue' will continue to
         DagNode continueNode;
@@ -1435,6 +1518,10 @@ public class JavaToGraphviz {
 	    Map<String, String> gvAttributes = new HashMap<>();
 	    Set<String> classes = new HashSet<>();
 	    
+	    // styles after css rules have been applied
+	    // clear this after every diagram is generated
+	    Map<String, String> gvStyles = new HashMap<>();
+	    
         ASTNode astNode;
 	    String type;      // astNode class, or one of a couple of extra artificial node types (comment, doExpression)
 	    String javaLabel; // if this is a labeledStatement, the name of that label 
@@ -1443,29 +1530,57 @@ public class JavaToGraphviz {
 	    String name;  // graphviz name
 	    String label; // graphviz label
 	    
-	    
 	    public void addChild(DagNode node) {
 	        children.add(node);
 	    }
 	    
+	    public String wrapLabel(String label) {
+	        String wordwrapString = gvStyles.get("gv-wordwrap");
+	        String result = "";
+	        if (wordwrapString == null) {
+	            result = label.trim();
+	        } else {
+	            long wordwrap = Long.parseLong(wordwrapString);
+	            // convert \ns back to newlines, maybe. 
+	            String[] words = label.trim().split("\\s+");
+	            
+	            boolean firstWord = true;
+	            int lineLen = 0;
+	            for (int i = 0 ; i < words.length; i++) {
+	                String word = words[i];
+	                if (lineLen + word.length() > wordwrap && !firstWord) {
+	                    result += "\\n" + word; 
+	                    lineLen = word.length();
+	                } else {
+	                    result += " " + word;
+	                    lineLen += word.length();
+	                }
+	                firstWord = false;
+	            }
+	        }
+	        return Text.replaceString(result, "\"",  "\\\"");
+	    }
+	    
 	    public String toGraphviz(boolean isDebugLabel) {
 	        String labelText = 
-	            (isDebugLabel ? line + ": " : "") + Text.replaceString(label, "\"",  "\\\"") +
+	            (isDebugLabel ? line + ": " : "") + wrapLabel(label) +
 	            (isDebugLabel && lastKeepNode != null ? ", lkn=" + lastKeepNode.name : ""); 
 	        String a = "";
-	        for (Entry<String, String> e : gvAttributes.entrySet()) {
-	            a += "    " + e.getKey() + " = " + e.getValue() + "; ";
+	        for (Entry<String, String> e : gvStyles.entrySet()) {
+	            if (!e.getKey().startsWith("gv-")) {  // gv-wordwrap
+	                a += "      " + e.getKey() + " = " + e.getValue() + ";\n";
+	            }
 	        }
 	        
 	        return
-	          "  " + name + " [\n" +
+	          "    " + name + " [\n" +
 	          // (classes.size() == 0 ? "" : "  /* " + classes + " */\n") +
 	          // undocumented 'class' attribute is included in graphviz svg output; see
 	          // https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
-	          (classes.size() == 0 ? "" : "    class = \"" + Text.join(classes,  " ") + "\";\n") + 
-              "    label = \"" + labelText + "\";\n" + 
+	          (classes.size() == 0 ? "" : "      class = \"" + Text.join(classes,  " ") + "\";\n") + 
+              "      label = \"" + labelText + "\";\n" + 
 	          a + 
-              "  ];";	        
+              "    ];";	        
 	    }
 	}
 	
@@ -1482,16 +1597,17 @@ public class JavaToGraphviz {
 	        String labelText = label == null ? null : Text.replaceString(label, "\"",  "\\\"");
             String a = "";
             for (Entry<String, String> e : gvAttributes.entrySet()) {
-                a += "    " + e.getKey() + " = " + e.getValue() + ";\n";
+                a += "      " + e.getKey() + " = " + e.getValue() + ";\n";
             }
 
-	        return "  " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
+	        return "    " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
 	            " -> " + 
 	            n2.name + // (n2Port == null ? "" : ":" + n2Port) + 
-	            (label == null && gvAttributes.size() == 0? "" : " [\n" +
-	            (label == null ? "" : "    label=\"" + labelText + "\"; ") +
-	            a +
-	           "]") + ";";
+	            (label == null && gvAttributes.size() == 0? "" : 
+	                " [\n" +
+	                (label == null ? "" : "      label=\"" + labelText + "\";\n") +
+	                a +
+	                "    ]") + ";";
         }
 	}
 	
