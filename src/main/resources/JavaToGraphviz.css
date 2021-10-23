@@ -47,9 +47,23 @@ graphEdge {
     fontname: "Handlee"
 }
 
-.if {  
+/* ok let's have some label formats as well */
+/* node { gv-labelFormat : "${nodeType}"; } */
+
+node {
+	gv-idFormat: "s_${lineNumber}";
+	gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; 
+}
+node.if {
+	gv-idFormat: "if_${lineNumber}";
+    gv-wordwrap: 20;
     shape : diamond; 
-    gv-wordwrap: 20; 
+}
+node.comment {
+    gv-idFormat: "c_${lineNumber}";
+}
+node.method.end {
+    gv-idFormat: "m_${lineNumber}";
 }
 
 
@@ -68,12 +82,7 @@ edge.back.do { gv-labelFormat: "do"; }
 
 
 
-/* ok let's have some label formats as well */
-/* node { gv-labelFormat : "${nodeType}"; } */
 
-node {
-	gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; 
-}
 
 
 edge.if.true { gv-labelFormat: "Y"; }

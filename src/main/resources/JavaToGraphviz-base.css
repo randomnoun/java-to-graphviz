@@ -1,4 +1,5 @@
 /* JavaToGraphviz-base.css: minimal builtin CSS */
 node {
+	gv-idFormat: "s_${lineNumber}";
 	gv-labelFormat: "${nodeType}"; 
 }

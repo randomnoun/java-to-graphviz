@@ -442,7 +442,25 @@ public class JavaToGraphviz {
         // set the labels from the gv-labelFormat
         for (int i = 0; i < dag.nodes.size(); i++) {
             DagNode node = dag.nodes.get(i);
+            String idFormat = node.gvStyles.get("gv-idFormat");
             String labelFormat = node.gvStyles.get("gv-labelFormat");
+            
+            // @TODO: id can refer to label, or label can refer to id, but not both
+            // boolean idFirst = true; 
+            
+            
+            if (node.name == null && idFormat != null) {
+                if (idFormat.startsWith("\"") && idFormat.endsWith("\"")) {
+                    idFormat = idFormat.substring(1, idFormat.length() - 1);
+                } else {
+                    throw new IllegalArgumentException("invalid gv-idFormat '" + idFormat + "'; expected double-quoted string");
+                }
+                Map<String, String> vars = new HashMap<>();
+                vars.put("lineNumber", String.valueOf(node.line));
+                vars.put("nodeType", node.type);
+                vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
+                node.name = dag.getUniqueName(Text.substitutePlaceholders(vars, idFormat));
+            }
             if (node.label == null && labelFormat != null) {
                 if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
                     labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
@@ -661,12 +679,17 @@ public class JavaToGraphviz {
         List<ExitEdge> ee = addBlockEdges(dag, methodBlock, lexicalScope);
         
         // add a node which all the return edges return to
+        // this is an artificial node so maybe only construct it based on some gv declaration earlier on ?
+        // (whereas all the other nodes are about as concrete as anything else in IT)
+        
         int endOfMethodLine = cu.getLineNumber(methodBlock.astNode.getStartPosition() + methodBlock.astNode.getLength());
         DagNode rn = new DagNode();
         rn.keepNode = true; // always keep comments
-        rn.type = "return";
+        rn.type = "return"; // label this 'end' if it's a void method ?
         rn.line = endOfMethodLine;
-        rn.name = dag.getUniqueName("m_" + endOfMethodLine);
+        // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
+        rn.classes.add("method");
+        rn.classes.add("end");
         rn.label = "return";
         rn.astNode = null;
         dag.addNode(rn);
@@ -1816,7 +1839,8 @@ public class JavaToGraphviz {
                 dn.keepNode = true; // always keep comments
                 dn.type = "comment";
                 dn.line = ct.line;
-                dn.name = dag.getUniqueName("c_" + ct.line);
+                // dn.name = dag.getUniqueName("c_" + ct.line);
+                dn.classes.add("comment");
                 dn.label = ct.text;
                 dn.astNode = null;
                 if (ct instanceof GvComment) {
@@ -1865,7 +1889,8 @@ public class JavaToGraphviz {
                 dn.classes.add(Text.toFirstLower(clazz));
                 
                 dn.line = line;
-                dn.name = dag.getUniqueName(lp + "_" + line); // "if_" + line;
+                //dn.name = dag.getUniqueName(lp + "_" + line); // "if_" + line;
+                dn.name = null;
                 dn.parentDagNode = pdn;
                 dn.astNode = node;
                 dn.locationInParent = node.getLocationInParent().getId();
