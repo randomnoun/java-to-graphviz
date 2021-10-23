@@ -84,7 +84,7 @@ public class RestrictedCssStyleSheetImpl extends CSSStyleSheetImpl {
                             CSSRule rule = restrictedImportedCss.getCssRules().item(j);
                             ((CSSRuleListImpl) wrapped.getCssRules()).insert(rule, i + j);    
                         }
-                        i = i + restrictedImportedCss.getCssRules().getLength();
+                        i = i + restrictedImportedCss.getCssRules().getLength() - 1;
                     
                     } else {
                         logger.warn("Missing style reference '" + href + "'");
