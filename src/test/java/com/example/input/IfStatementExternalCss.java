@@ -3,17 +3,10 @@ package com.example.input;
 /** for loop test cases
  * 
  */
-public class IfStatement {
+public class IfStatementExternalCss {
 
     /* gv-style: {
-    // css doesn't normally allow // comments but we do here
-    // statement classes
-    .if {  
-        shape : diamond; 
-        gv-wordwrap: 20; 
-    } 
-    // custom classes
-    .state { fontname : "Courier New"; style: filled; }
+       @import "JavaToGraphviz.css";   // OK so let's say we try the classpath first, and then the filesystem, relative to the project root. IF it's a URL we fetch that.
     }
     */
 

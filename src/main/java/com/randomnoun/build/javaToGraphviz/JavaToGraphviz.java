@@ -296,12 +296,16 @@ public class JavaToGraphviz {
         InputSource source = new InputSource(new StringReader(css));
         CSSStyleSheet stylesheet = parser.parseStyleSheet(source, null, null);
         
-        CSSStyleSheetImpl stylesheetImpl = (CSSStyleSheetImpl) stylesheet; 
+        CSSStyleSheetImpl stylesheetImpl = (CSSStyleSheetImpl) stylesheet;
+        RestrictedCssStyleSheetImpl restrictedStylesheetImpl = new RestrictedCssStyleSheetImpl(stylesheetImpl); 
         // probably need to wrap this in something which overrides importImports
         // public void importImports(final boolean recursive) throws DOMException {
         // or provide my own URI handler and set a weird base URI 
         // stylesheetImpl.importImports(true); // recursive = true
-        return stylesheetImpl;
+        restrictedStylesheetImpl.importImports(true);
+        logger.info("CSS rules: " + restrictedStylesheetImpl.getCssText());
+        
+        return restrictedStylesheetImpl;
     }
 
     // probably need to do the whole nine yards on selectors, which would be better done by cut & pasting this:
@@ -325,7 +329,7 @@ public class JavaToGraphviz {
      * @param dag
      * @param cssSelector
      * @return
-     */
+     *
     List<DagNode> selectDagNodes(Dag dag, String cssSelector) {
         List<DagNode> result = new ArrayList<>();
         // only .selectors for now
@@ -337,6 +341,7 @@ public class JavaToGraphviz {
         }
         return result;
     }
+    */
 
 	
     public void inlineStyles(Dag dag, CSSStyleSheet stylesheet) throws IOException {
@@ -692,7 +697,7 @@ public class JavaToGraphviz {
 	    ExitEdge e = new ExitEdge();
         e.n1 = breakNode;
         e.label = "break" + (label==null ? "" : " " + label);
-        e.gvAttributes.put("color", "red");
+        e.gvAttributes.put("color", "red"); // @TODO replace all these with classes
         scope.breakEdges.add(e);
         
         return Collections.emptyList();
