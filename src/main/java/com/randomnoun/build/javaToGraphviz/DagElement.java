@@ -18,11 +18,14 @@ public class DagElement extends Element {
     
     public DagElement(DagNode dagNode, Map<String, String> attributes) {
         super("node");
+        this.attr("id", dagNode.name);
+        this.attr("label", dagNode.label);
         attributes.entrySet().stream().forEach(e -> { 
             // this.attributes().add(e.getKey(), e.getValue());
             // 'style' attribute is used in CSS to store actual styles. guess we don't need to do that, do we.
-            this.attr("gv-" + e.getKey(), e.getValue());
-        }); 
+            this.attr(e.getKey(), e.getValue());
+        });
+        
         if (!dagNode.classes.isEmpty()) {
             this.attr("class", Text.join(dagNode.classes, " "));
         }
@@ -47,7 +50,7 @@ public class DagElement extends Element {
             this.attr("gv-" + e.getKey(), e.getValue());
         }); 
         if (!dagEdge.classes.isEmpty()) {
-            this.attr("class", Text.join(dagNode.classes, " "));
+            this.attr("class", Text.join(dagEdge.classes, " "));
         }
 
         this.dagEdge = dagEdge;
