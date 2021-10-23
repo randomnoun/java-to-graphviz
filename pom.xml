@@ -72,6 +72,18 @@
 		  <version>0.9.29</version>
 		</dependency>
 	
+		<dependency>
+		  <!-- jsoup HTML parser library @ https://jsoup.org/ -->
+		  <groupId>org.jsoup</groupId>
+		  <artifactId>jsoup</artifactId>
+		  <version>1.14.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>31.0.1-jre</version>
+		</dependency>
+
 	</dependencies>
 
 	<!--  these are on github now. except for the bits on gitlab. -->
