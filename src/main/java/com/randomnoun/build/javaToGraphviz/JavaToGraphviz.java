@@ -446,33 +446,40 @@ public class JavaToGraphviz {
             String labelFormat = node.gvStyles.get("gv-labelFormat");
             
             // @TODO: id can refer to label, or label can refer to id, but not both
-            // boolean idFirst = true; 
-            
-            
-            if (node.name == null && idFormat != null) {
-                if (idFormat.startsWith("\"") && idFormat.endsWith("\"")) {
-                    idFormat = idFormat.substring(1, idFormat.length() - 1);
-                } else {
-                    throw new IllegalArgumentException("invalid gv-idFormat '" + idFormat + "'; expected double-quoted string");
-                }
-                Map<String, String> vars = new HashMap<>();
-                vars.put("lineNumber", String.valueOf(node.line));
-                vars.put("nodeType", node.type);
-                vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
-                node.name = dag.getUniqueName(Text.substitutePlaceholders(vars, idFormat));
+            boolean idFirst = true; 
+            if (idFormat.contains("${label}") && labelFormat.contains("${id}")) {
+                throw new IllegalArgumentException("circular dependency between gv-idFormat '" + idFormat + "' and gv-labelFormat '" + labelFormat + "'");
+            } else {
+                idFirst = !labelFormat.contains("${id}");
             }
-            if (node.label == null && labelFormat != null) {
-                if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
-                    labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
-                } else {
-                    throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
+            
+            for (int j=0; j<2; j++) {
+                if ((( j==0 ) == idFirst)  && (node.name == null && idFormat != null)) {
+                    if (idFormat.startsWith("\"") && idFormat.endsWith("\"")) {
+                        idFormat = idFormat.substring(1, idFormat.length() - 1);
+                    } else {
+                        throw new IllegalArgumentException("invalid gv-idFormat '" + idFormat + "'; expected double-quoted string");
+                    }
+                    Map<String, String> vars = new HashMap<>();
+                    vars.put("lineNumber", String.valueOf(node.line));
+                    vars.put("nodeType", node.type);
+                    vars.put("label", node.label == null ? "NOLABEL" : node.label );
+                    vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
+                    node.name = dag.getUniqueName(Text.substitutePlaceholders(vars, idFormat));
                 }
-                Map<String, String> vars = new HashMap<>();
-                vars.put("lineNumber", String.valueOf(node.line));
-                vars.put("nodeType", node.type);
-                vars.put("id",  node.name);
-                vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
-                node.label = Text.substitutePlaceholders(vars, labelFormat);
+                if ((( j==1 ) == idFirst) && (node.label == null && labelFormat != null)) {
+                    if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
+                        labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
+                    } else {
+                        throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
+                    }
+                    Map<String, String> vars = new HashMap<>();
+                    vars.put("lineNumber", String.valueOf(node.line));
+                    vars.put("nodeType", node.type);
+                    vars.put("id",  node.name == null ? "NOID" : node.name);
+                    vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
+                    node.label = Text.substitutePlaceholders(vars, labelFormat).trim();
+                }
             }
         }
         for (int i = 0; i < dag.edges.size(); i++) {
@@ -487,7 +494,8 @@ public class JavaToGraphviz {
                 Map<String, String> vars = new HashMap<>();
                 vars.put("startNodeId", edge.n1.name);
                 vars.put("endNodeId", edge.n2.name);
-                edge.label = Text.substitutePlaceholders(vars, labelFormat);
+                vars.put("breakLabel", edge.gvAttributes.get("breakLabel") == null ? "" : edge.gvAttributes.get("breakLabel")); 
+                edge.label = Text.substitutePlaceholders(vars, labelFormat).trim();
             }
 
         }
@@ -690,7 +698,7 @@ public class JavaToGraphviz {
         // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
         rn.classes.add("method");
         rn.classes.add("end");
-        rn.label = "return";
+        // rn.label = "return";
         rn.astNode = null;
         dag.addNode(rn);
         
@@ -743,9 +751,12 @@ public class JavaToGraphviz {
         
 	    ExitEdge e = new ExitEdge();
         e.n1 = breakNode;
-        e.label = "break" + (label==null ? "" : " " + label);
+        // e.label = "break" + (label==null ? "" : " " + label);
+        // TODO use styles and formats
+        
         // e.gvAttributes.put("color", "red"); // @TODO replace all these with classes
         e.classes.add("break");
+        e.gvAttributes.put("breakLabel", label == null ? "" : label);
         scope.breakEdges.add(e);
         
         return Collections.emptyList();
@@ -770,9 +781,10 @@ public class JavaToGraphviz {
         }
         
         DagEdge e;
-        e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, "continue" + (label==null ? "" : " " + label));
+        e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, null); // "continue" + (label==null ? "" : " " + label)
         // e.gvAttributes.put("color", "red");
         e.classes.add("continue");
+        e.gvAttributes.put("continueLabel", (label==null ? "" : " " + label));
         return Collections.emptyList();
     }
 
@@ -809,7 +821,7 @@ public class JavaToGraphviz {
     // (and returns an empty list as we won't have a normal exit edge)
     private List<ExitEdge> addReturnEdges(Dag dag, DagNode breakNode, LexicalScope scope) {
         ExitEdge e = new ExitEdge();
-        e.label = "return";
+        // e.label = "return";
         e.n1 = breakNode;
         // e.gvAttributes.put("color", "blue");
         e.classes.add("return");
@@ -821,7 +833,7 @@ public class JavaToGraphviz {
     // (and returns an empty list as we won't have a normal exit edge)
     private List<ExitEdge> addThrowEdges(Dag dag, DagNode breakNode, LexicalScope scope) {
         ExitEdge e = new ExitEdge();
-        e.label = "throw";
+        // e.label = "throw";
         e.n1 = breakNode;
         // e.gvAttributes.put("color", "purple");
         e.classes.add("throw");

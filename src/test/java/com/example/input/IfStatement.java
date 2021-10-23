@@ -13,7 +13,7 @@ public class IfStatement {
         gv-wordwrap: 20; 
     } 
     // custom classes
-    .state { fontname : "Courier New"; style: filled; }
+    .state { fontname : "Courier New"; style: filled; gv-idFormat: "${label}";  }
     }
     */
 

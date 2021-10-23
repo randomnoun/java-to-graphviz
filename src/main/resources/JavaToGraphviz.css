@@ -9,7 +9,8 @@ That DOM looks like this
 
 <html>
   <body>
-    <!-- CSS properties are converted to graphviz attributes. 
+    <!-- CSS properties are converted to graphviz attributes by applying the CSS rules, and then extracting the calculated styles.
+      In this DOM,
       'id' is used for the node name, so we can refer to it as #id in the CSS rules
       'label' is special HTML attribute for the 'label' graphviz attribute; use [label="xxxx"] in CSS rules
       'class' contains classes created by the AST ( 'if', 'expression' ) + some others created by the DAG ( 'break', 'continue' edges )
@@ -20,14 +21,21 @@ That DOM looks like this
       'outEdgeIds' contains IDs of out edges
       'outNodeIds' contains IDs of the nodes connected to those edges
     -->
-    <digraph>
+    <graph>
+        
+        <!-- the calculated CSS properties for graphNode gets applied to the default graphviz node attributes -->
+        <graphNode style="shape: rect;"></graphNode>
+        <!-- same for graphEdge -->
+        <graphEdge style="shape: rect;"></graphEdge>
+        
 	    <subgraph>
+	        <!-- the calculated CSS properties for a node gets applied to that specific node in the graphviz diagram -->
 		    <node id="id" label="label" style="shape: rect;"></node> 
 		    
 		    <!-- same for edges -->
 		    <edge id="id" label="label" style="shape: rect;"></node>
 		</subgraph>
-    </digraph>		    
+    </graph>		    
   </body>
 </body>
 */
@@ -64,15 +72,16 @@ node.comment {
 }
 node.method.end {
     gv-idFormat: "m_${lineNumber}";
+    gv-labelFormat: "return";
 }
 
 
 /* edge styles */
 
-edge.break { color: red; }
-edge.continue { color: red; }
-edge.return { color: blue; }
-edge.throw { color: purple; }
+edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }
+edge.continue { color: red; gv-labelFormat: "continue ${continueLabel}"; }
+edge.return { color: blue; gv-labelFormat: "return"; }
+edge.throw { color: purple; gv-labelFormat: "throw"; }
 
 edge.back { style: dashed; }
 edge.back.for { gv-labelFormat: "for"; }
