@@ -1,0 +1,90 @@
+/* JavaToGraphviz.css
+
+Righteo here's the default CSS then.
+
+When we're generating the GV diagram, we create a completely separate DOM just for the purpose of styling the diagram.
+Because I'm using jsoup to do the CSS selectors, it's a HTML DOM.
+ 
+That DOM looks like this
+
+<html>
+  <body>
+    <!-- CSS properties are converted to graphviz attributes. 
+      'id' is used for the node name, so we can refer to it as #id in the CSS rules
+      'label' is special HTML attribute for the 'label' graphviz attribute; use [label="xxxx"] in CSS rules
+      'class' contains classes created by the AST ( 'if', 'expression' ) + some others created by the DAG ( 'break', 'continue' edges )
+        will make a list of those somewhere.
+        
+      'inEdgeIds' contains IDs of in edges
+      'inNodeIds' contains IDs of the nodes connected to those edges; use [inEdges~="abc"] to select a node with a particular inEdge
+      'outEdgeIds' contains IDs of out edges
+      'outNodeIds' contains IDs of the nodes connected to those edges
+    -->
+    <digraph>
+	    <subgraph>
+		    <node id="id" label="label" style="shape: rect;"></node> 
+		    
+		    <!-- same for edges -->
+		    <edge id="id" label="label" style="shape: rect;"></node>
+		</subgraph>
+    </digraph>		    
+  </body>
+</body>
+*/
+/* sketchviz defaults */
+digraph {
+	fontname: "Handlee";
+	bgcolor: transparent;
+}
+node {
+    fontname: "Handlee";
+    shape : rect; 
+}
+edge {
+    fontname: "Handlee"
+}
+.if {  
+    shape : diamond; 
+    gv-wordwrap: 20; 
+}
+
+
+/* edge styles */
+
+edge.break { color: red; }
+edge.continue { color: red; }
+edge.return { color: blue; }
+edge.throw { color: purple; }
+
+edge.back { style: dashed; }
+edge.back.for { gv-labelFormat: "for"; }
+edge.back.enhancedFor { gv-labelFormat: "for"; }
+edge.back.while { gv-labelFormat: "while"; }
+edge.back.do { gv-labelFormat: "do"; }
+
+
+
+/* ok let's have some label formats as well */
+/* node { gv-labelFormat : "${nodeType}"; } */
+
+node {
+	gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; 
+}
+
+
+edge.if.true { gv-labelFormat: "Y"; }
+edge.if.false { gv-labelFormat: "N"; }
+
+edge.while.true { gv-labelFormat: "Y"; }
+edge.while.false { gv-labelFormat: "N"; }
+
+edge.do.start { } /* into repeating block */
+
+edge.case { gv-labelFormat: "case"; }
+edge.case.default { gv-labelFormat: "default"; }
+edge.switch.fallthrough { } /* fall through from case block to next case */
+edge.switch.false { } /* no case conditions match, and no default present */
+
+
+
+

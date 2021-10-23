@@ -1,0 +1,4 @@
+/* JavaToGraphviz-base.css: minimal builtin CSS */
+node {
+	gv-labelFormat: "${nodeType}"; 
+}
