@@ -32,12 +32,12 @@ public class DagElement extends Element {
         this.dagNode = dagNode;
     }
 
-    public DagElement(Dag dag, Map<String, String> attributes) {
-        super("digraph");
+    public DagElement(String tagName, Dag dag, Map<String, String> attributes) {
+        super(tagName);
         attributes.entrySet().stream().forEach(e -> { 
             // this.attributes().add(e.getKey(), e.getValue());
             // 'style' attribute is used in CSS to store actual styles. guess we don't need to do that, do we.
-            this.attr("gv-" + e.getKey(), e.getValue());
+            this.attr(e.getKey(), e.getValue());
         }); 
         this.dag = dag;
     }
@@ -47,7 +47,7 @@ public class DagElement extends Element {
         attributes.entrySet().stream().forEach(e -> { 
             // this.attributes().add(e.getKey(), e.getValue());
             // 'style' attribute is used in CSS to store actual styles. guess we don't need to do that, do we.
-            this.attr("gv-" + e.getKey(), e.getValue());
+            this.attr(e.getKey(), e.getValue());
         }); 
         if (!dagEdge.classes.isEmpty()) {
             this.attr("class", Text.join(dagEdge.classes, " "));

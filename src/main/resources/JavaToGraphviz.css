@@ -32,17 +32,21 @@ That DOM looks like this
 </body>
 */
 /* sketchviz defaults */
-digraph {
+graph {
 	fontname: "Handlee";
 	bgcolor: transparent;
 }
-node {
+/* the styles on graphNode and graphEdge are applied at the graph level, 
+   but styles on node and edge are (repeatedly) applied at the node and edges 
+*/   
+graphNode {
     fontname: "Handlee";
     shape : rect; 
 }
-edge {
+graphEdge {
     fontname: "Handlee"
 }
+
 .if {  
     shape : diamond; 
     gv-wordwrap: 20; 

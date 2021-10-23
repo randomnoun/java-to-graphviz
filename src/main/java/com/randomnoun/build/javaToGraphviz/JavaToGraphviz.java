@@ -342,8 +342,16 @@ public class JavaToGraphviz {
         Element bodyEl = document.getElementsByTag("body").get(0);
         
         dag.gvStyles = new HashMap<>(); // clear applied styles
-        DagElement digraphEl = new DagElement(dag, dag.gvAttributes);
-        bodyEl.appendChild(digraphEl);
+        dag.gvNodeStyles = new HashMap<>(); // clear applied styles
+        dag.gvEdgeStyles = new HashMap<>(); // clear applied styles
+        
+        DagElement graphEl = new DagElement("graph", dag, dag.gvAttributes);
+        bodyEl.appendChild(graphEl);
+        
+        DagElement graphNodeEl = new DagElement("graphNode", dag, dag.gvAttributes);
+        graphEl.appendChild(graphNodeEl);
+        DagElement graphEdgeEl = new DagElement("graphEdge", dag, dag.gvAttributes);
+        graphEl.appendChild(graphEdgeEl);
         
         for (int i = 0; i < dag.nodes.size(); i++) {
             DagNode node = dag.nodes.get(i);
@@ -352,7 +360,7 @@ public class JavaToGraphviz {
             DagElement child = new DagElement(node, node.gvAttributes); // Tag.valueOf(tagName, NodeUtils.parser(this).settings()), baseUri()
             
             // could add attributes for edges and/or connected nodes here
-            digraphEl.appendChild(child);
+            graphEl.appendChild(child);
         }
         for (int i = 0; i < dag.edges.size(); i++) {
             DagEdge edge = dag.edges.get(i);
@@ -360,7 +368,7 @@ public class JavaToGraphviz {
             DagElement child = new DagElement(edge, edge.gvAttributes); // Tag.valueOf(tagName, NodeUtils.parser(this).settings()), baseUri()
             // edges don't have IDs here but could
             // child.attr("id", edge.name);
-            digraphEl.appendChild(child);
+            graphEl.appendChild(child);
         }
         
         logger.info("before styles: " + document.toString());
@@ -384,14 +392,23 @@ public class JavaToGraphviz {
                     } catch ( IOException e ) {
                         throw new IllegalStateException("IOException on string", e);
                     }
+                    String tagName = ((Element) node).tagName();
                     Dag dag = ((DagElement) node).dag;
                     DagNode dagNode = ((DagElement) node).dagNode;
                     DagEdge dagEdge = ((DagElement) node).dagEdge;
                     if (dag != null) {
                         for (int i=0; i<declaration.getLength(); i++) {
                             String prop = declaration.item(i);
-                            logger.info("setting digraph prop " + prop + " to " + declaration.getPropertyValue(prop));
-                            dag.gvStyles.put(prop,  declaration.getPropertyValue(prop));
+                            if (tagName.equals("graph")) {
+                                logger.info("setting graph prop " + prop + " to " + declaration.getPropertyValue(prop));
+                                dag.gvStyles.put(prop,  declaration.getPropertyValue(prop));
+                            } else if (tagName.equals("graphNode")) {
+                                logger.info("setting graphNode prop " + prop + " to " + declaration.getPropertyValue(prop));
+                                dag.gvNodeStyles.put(prop,  declaration.getPropertyValue(prop));
+                            } else if (tagName.equals("graphEdge")) {
+                                logger.info("setting graphEdge prop " + prop + " to " + declaration.getPropertyValue(prop));
+                                dag.gvEdgeStyles.put(prop,  declaration.getPropertyValue(prop));
+                            }
                         }
                     
                     } else if (dagNode != null) {
@@ -1488,6 +1505,8 @@ public class JavaToGraphviz {
         Map<String, String> gvAttributes = new HashMap<>();
         // styles after css rules have been applied
         Map<String, String> gvStyles = new HashMap<>();
+        Map<String, String> gvNodeStyles = new HashMap<>();
+        Map<String, String> gvEdgeStyles = new HashMap<>();
         
 	    
 	    Map<ASTNode, DagNode> astToDagNode = new HashMap<>();
@@ -1496,14 +1515,26 @@ public class JavaToGraphviz {
 	        astToDagNode.put(n.astNode, n);
 	    }
 	    public String toGraphvizHeader() {
-            String a = "";
+            String a = "", na = "", ea = "";
             for (Entry<String, String> e : gvStyles.entrySet()) {
                 if (!e.getKey().startsWith("gv-")) {  // gv-wordwrap
                     a += "  " + e.getKey() + " = " + e.getValue() + ";\n";
                 }
             }
+            for (Entry<String, String> e : gvNodeStyles.entrySet()) {
+                if (!e.getKey().startsWith("gv-")) {  // gv-wordwrap
+                    na += "    " + e.getKey() + " = " + e.getValue() + ";\n";
+                }
+            }
+            for (Entry<String, String> e : gvEdgeStyles.entrySet()) {
+                if (!e.getKey().startsWith("gv-")) {  // gv-wordwrap
+                    ea += "    " + e.getKey() + " = " + e.getValue() + ";\n";
+                }
+            }
             
             return "digraph G {\n" +
+              (na.equals("") ? "" : "  node [\n" + na + "  ]\n") +
+              (ea.equals("") ? "" : "  edge [\n" + ea + "  ]\n") +
               a;
         }
         public String toGraphvizFooter() {
