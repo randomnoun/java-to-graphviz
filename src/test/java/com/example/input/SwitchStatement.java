@@ -44,6 +44,10 @@ public class SwitchStatement {
     // if I need a bit more grist for the unit tests, there's 
     // a listicle on the interwebs about songs with lists in them,
     // which I find so depressing, I won't link to it here.
+
+    // gv-style: { @import "JavaToGraphviz.css"; }
+    
+
     
     public void chorus() {
         
