@@ -40,6 +40,18 @@ And so on.
 
 # Syntax
 
-Well I haven't sorted that out yet.
+---Well I haven't sorted that out yet.---
+
+# Features
+
+So a few things I want to be able to support
+* a single .java source file can contain multiple graphs and subgraphs
+* style rules
+* bit of flexibility when it comes to how the diagram is generated ( node suppression , artificial nodes, that sort of thing )
+* can put literal gv into the diagram
+* comment attribution 
+* few builtin methods/style properties/declarations to make this a bit easier to generate diagrams; e.g. wordwrap, flip logic on if edge labels, probably others
+* seeing I"m going to the trouble of creating a DOM to apply styles maybe dump that as well, &/or the AST tree. apply styles to AST nodes vs dag nodes ?
+* external style refs
 
 
