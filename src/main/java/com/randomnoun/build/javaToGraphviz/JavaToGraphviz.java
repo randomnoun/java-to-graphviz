@@ -188,19 +188,8 @@ public class JavaToGraphviz {
 	public boolean writeGraphviz(Writer writer) throws IOException {
 	    
 	    DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
-	    
         PrintWriter pw = new PrintWriter(writer);
-        pw.println("digraph G {\r\n" +
-            "  graph [fontname = \"Handlee\"];\r\n" +
-            "  node [fontname = \"Handlee\"; shape=rect; ];\r\n" +
-            "  edge [fontname = \"Handlee\"];\r\n" +
-            "\r\n" +
-            "  bgcolor=transparent;");
-        
-        if (methodNode.digraph != null) {
-            pw.println("# digraph stuff here");
-        }
-        
+        boolean emittedDigraph = false;
         
         while (methodNode != null) {
 
@@ -215,7 +204,25 @@ public class JavaToGraphviz {
                 LexicalScope lexicalScope = new LexicalScope();
                 dag.edges = new ArrayList<>();
                 List<ExitEdge> ee = addMethodDeclarationEdges(dag, methodNode, lexicalScope);
+                
+                methodNode.keepNode = false;
+                setLastKeepNode(dag, methodNode, methodNode);
+                if (removeNode) {
+                    removeNodes(dag, methodNode); // peephole node removal.
+                }
+                
+                inlineStyles(dag, styleSheet);
     
+                if (!emittedDigraph) {
+                    pw.println(dag.toGraphvizHeader());
+                    if (methodNode.digraphId != null) {
+                        pw.println("# digraph stuff here");
+                    }
+                    emittedDigraph = true;
+                    
+                }
+                
+
                 // subgraph starts here
                 pw.println("  # method");
     
@@ -228,14 +235,6 @@ public class JavaToGraphviz {
                 }
             
                 
-                methodNode.keepNode = false;
-                setLastKeepNode(dag, methodNode, methodNode);
-                if (removeNode) {
-                    removeNodes(dag, methodNode); // peephole node removal.
-                }
-                
-                inlineStyles(dag, styleSheet);
-            
                 
                 for (DagNode node : dag.nodes) {
                     // only draw nodes if they have an edge
@@ -258,11 +257,14 @@ public class JavaToGraphviz {
         
             rootNodeIdx++;
             methodNode = rootNodeIdx < dag.rootNodes.size() ? dag.rootNodes.get(rootNodeIdx) : null;
-            if (methodNode != null && methodNode.digraph != null) {
+            if (methodNode != null && methodNode.digraphId != null) {
                 methodNode = null;
             }
         }
-        pw.println("}"); // digraph
+        if (emittedDigraph) {
+            pw.println(dag.toGraphvizFooter());
+        }
+        
         pw.flush();
         
         return (rootNodeIdx < dag.rootNodes.size());
@@ -343,11 +345,18 @@ public class JavaToGraphviz {
     }
     */
 
-	
+	// so gv already has some rule propagation, but I didn't realise that when I started this 
+    // so going to continue down this path
+    
     public void inlineStyles(Dag dag, CSSStyleSheet stylesheet) throws IOException {
 
         Document document = Document.createShell("");
         Element bodyEl = document.getElementsByTag("body").get(0);
+        
+        dag.gvStyles = new HashMap<>(); // clear applied styles
+        DagElement digraphEl = new DagElement(dag, dag.gvAttributes);
+        bodyEl.appendChild(digraphEl);
+        
         for (int i = 0; i < dag.nodes.size(); i++) {
             DagNode node = dag.nodes.get(i);
             node.gvStyles = new HashMap<>(); // clear applied styles
@@ -363,11 +372,26 @@ public class JavaToGraphviz {
             // child.addr("outNode", something);
             
             // TODO set inline styles, classes, in/out edge attributes
-            
-            bodyEl.appendChild(child);
-            
-            // maybe we should have edge nodes in here as well. Why not. Why not indeed.
+            digraphEl.appendChild(child);
         }
+        for (int i = 0; i < dag.edges.size(); i++) {
+            DagEdge edge = dag.edges.get(i);
+            edge.gvStyles = new HashMap<>(); // clear applied styles
+            DagElement child = new DagElement(edge, edge.gvAttributes); // Tag.valueOf(tagName, NodeUtils.parser(this).settings()), baseUri()
+            // child.attr("id", edge.name);
+            
+            // this is probably overkill as well
+            // named edges, for [inEdge~="something"] rules
+            // child.addr("inEdge", something);
+            // child.addr("outEdge", something);
+            // named nodes, for [inNode~="something"] rules
+            // child.addr("inNode", something);
+            // child.addr("outNode", something);
+            
+            // TODO set inline styles, classes, in/out edge attributes
+            digraphEl.appendChild(child);
+        }
+        
         
         logger.info("doc b4 " + document.toString());
         
@@ -392,24 +416,40 @@ public class JavaToGraphviz {
                     try {
                         declaration = inlineParser.parseStyleDeclaration( input );
                     } catch ( IOException e ) {
-                        // again, this should never happen, cuz we're just reading from a string
-                        e.printStackTrace();
+                        throw new IllegalStateException("IOException on string", e);
                     }
                     // node.removeAttr( "style" );
                     // elementMatches.put( ((Element) node), new InlineStyleApplication( declaration ) );
+                    Dag dag = ((DagElement) node).dag;
                     DagNode dagNode = ((DagElement) node).dagNode;
-                    for (int i=0; i<declaration.getLength(); i++) {
-                        String prop = declaration.item(i);
-                        logger.info("setting " + dagNode.name + " prop " + prop + " to " + declaration.getPropertyValue(prop));
-                        dagNode.gvStyles.put(prop,  declaration.getPropertyValue(prop));
-                        
-                        /*
-                        if (prop.startsWith("gv-")) {
-                            String newProp = prop.substring(3);
-                            logger.info("setting prop " + newProp + " to " + declaration.getPropertyValue(prop));
-                            dagNode.gvAttributes.put(newProp,  declaration.getPropertyValue(prop));
+                    DagEdge dagEdge = ((DagElement) node).dagEdge;
+                    if (dag != null) {
+                        for (int i=0; i<declaration.getLength(); i++) {
+                            String prop = declaration.item(i);
+                            logger.info("setting digraph prop " + prop + " to " + declaration.getPropertyValue(prop));
+                            dag.gvStyles.put(prop,  declaration.getPropertyValue(prop));
                         }
-                        */
+                    
+                    } else if (dagNode != null) {
+                        for (int i=0; i<declaration.getLength(); i++) {
+                            String prop = declaration.item(i);
+                            logger.info("setting " + dagNode.name + " prop " + prop + " to " + declaration.getPropertyValue(prop));
+                            dagNode.gvStyles.put(prop,  declaration.getPropertyValue(prop));
+                            /*
+                            if (prop.startsWith("gv-")) {
+                                String newProp = prop.substring(3);
+                                logger.info("setting prop " + newProp + " to " + declaration.getPropertyValue(prop));
+                                dagNode.gvAttributes.put(newProp,  declaration.getPropertyValue(prop));
+                            }
+                            */
+                        }
+                    } else if (dagEdge != null) {
+                        for (int i=0; i<declaration.getLength(); i++) {
+                            String prop = declaration.item(i);
+                            logger.info("setting dagEdge prop " + prop + " to " + declaration.getPropertyValue(prop));
+                            dagEdge.gvStyles.put(prop,  declaration.getPropertyValue(prop));
+                        }
+                        
                     }
                 }
             }
@@ -1406,6 +1446,8 @@ public class JavaToGraphviz {
      *     </ul>
      * </ol>
      * 
+     * <p>Each of the DagNodes also has a DOM node for styling, but I'm keeping that separate for now.
+     * 
      * <p>NB: we can make a DAG look like a cyclical graph by reversing the arrows on the diagram, which
      * we might want to do for loops later on. Or I guess we could make it cyclical.
      * 
@@ -1415,18 +1457,48 @@ public class JavaToGraphviz {
      * 
      */
 	static class Dag {
+	    
+	    // a digraph.
+	    // when we're creating clusters we clear the edges each time
+	    // but probably need to start storing clusters in here as we go, seeing I'm going to want nested clusters soon
+	    // nodes are in clusters but edges can span clusters
+	    
+	    
+	    
 	    List<DagNode> nodes = new ArrayList<>();
 	    List<DagNode> rootNodes = new ArrayList<>(); // subset of nodes which start each Dag tree
 	    List<DagEdge> edges = new ArrayList<>();
 	    Set<String> names = new HashSet<String>();
 	    Logger logger = Logger.getLogger(Dag.class);
 	    
+        // graphviz formatting attributes for the digraph
+        Map<String, String> gvAttributes = new HashMap<>();
+        // styles after css rules have been applied
+        Map<String, String> gvStyles = new HashMap<>();
+        
+	    
 	    Map<ASTNode, DagNode> astToDagNode = new HashMap<>();
 	    public void addNode(DagNode n) {
 	        nodes.add(n);
 	        astToDagNode.put(n.astNode, n);
 	    }
-	    public void addRootNode(DagNode n) {
+	    public String toGraphvizHeader() {
+            String a = "";
+            for (Entry<String, String> e : gvStyles.entrySet()) {
+                if (!e.getKey().startsWith("gv-")) {  // gv-wordwrap
+                    a += "  " + e.getKey() + " = " + e.getValue() + ";\n";
+                }
+            }
+            
+            return "digraph G {\n" +
+              a;
+        }
+        public String toGraphvizFooter() {
+            return "}\n";
+        }
+	    
+	    
+        public void addRootNode(DagNode n) {
 	        rootNodes.add(n);
 	    }
         public boolean hasEdge(DagNode n1, DagNode n2) {
@@ -1507,7 +1579,7 @@ public class JavaToGraphviz {
 	}
 	static class DagNode {
 	    
-	    String digraph;
+	    String digraphId;
 	    String subgraph;
 	    DagNode parentDagNode;
 	    List<DagNode> children = new ArrayList<>();
@@ -1596,19 +1668,22 @@ public class JavaToGraphviz {
 	    String n2Port;
 	    String label;
 	    Map<String, String> gvAttributes = new HashMap<>();
+	    Set<String> classes = new HashSet<>();
+	    
+	    Map<String, String> gvStyles = new HashMap<>();
 	    boolean back = false;
 
 	    public String toGraphviz() {
 	        String labelText = label == null ? null : Text.replaceString(label, "\"",  "\\\"");
             String a = "";
-            for (Entry<String, String> e : gvAttributes.entrySet()) {
+            for (Entry<String, String> e : gvStyles.entrySet()) {
                 a += "      " + e.getKey() + " = " + e.getValue() + ";\n";
             }
 
 	        return "    " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
 	            " -> " + 
 	            n2.name + // (n2Port == null ? "" : ":" + n2Port) + 
-	            (label == null && gvAttributes.size() == 0? "" : 
+	            (label == null && gvStyles.size() == 0? "" : 
 	                " [\n" +
 	                (label == null ? "" : "      label=\"" + labelText + "\";\n") +
 	                a +
@@ -1675,7 +1750,7 @@ public class JavaToGraphviz {
                     mn.classes.addAll(((GvComment) ct).classes);
                     mn.label = ct.text; // last comment wins
                 } else if (ct instanceof GvDigraphComment) {
-                    mn.digraph = ct.text;
+                    mn.digraphId = ct.text;
                 } else if (ct instanceof GvSubgraphComment) {
                     mn.subgraph = ct.text;
                 }
@@ -1698,7 +1773,7 @@ public class JavaToGraphviz {
                 if (ct instanceof GvComment) {
                     dn.classes.addAll(((GvComment) ct).classes);
                 } else if (ct instanceof GvDigraphComment) {
-                    dn.digraph = ct.text;
+                    dn.digraphId = ct.text;
                 } else if (ct instanceof GvSubgraphComment) {
                     dn.subgraph = ct.text;
                 }
@@ -1771,7 +1846,7 @@ public class JavaToGraphviz {
                         dn.label = ct.text;
                         dn.classes.addAll(((GvComment) ct).classes);
                     } else if (ct instanceof GvDigraphComment) {
-                        dn.digraph = ct.text;
+                        dn.digraphId = ct.text;
                     } else if (ct instanceof GvSubgraphComment) {
                         dn.subgraph = ct.text;
                     }
