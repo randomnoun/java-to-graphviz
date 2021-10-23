@@ -8,6 +8,8 @@ import java.util.List;
  */
 public class ForStatement {
 
+    // gv-style: { @import "JavaToGraphviz.css"; }
+    
     public void testFor() {
         // gv: start of method 
         for (int i=0; i<12; i++) {

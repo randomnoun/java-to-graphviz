@@ -7,6 +7,7 @@ public class IfStatementExternalCss {
 
     /* gv-style: {
        @import "JavaToGraphviz.css";   // OK so let's say we try the classpath first, and then the filesystem, relative to the project root. IF it's a URL we fetch that.
+       .state { fontname : "Courier New"; style: filled; }
     }
     */
 
@@ -16,7 +17,7 @@ public class IfStatementExternalCss {
         // gv: start of method
         boolean iThink = false;
         if (iThink) { // gv: This is a reasonably long comment to see how wordwrap works
-            System.out.println("I am"); // gv.state: EXISTENCE_CONFIRMED { color: red }
+            System.out.println("I am"); // gv.state: EXISTENCE_CONFIRMED { color: red; }
         }
     }
 
