@@ -27,7 +27,7 @@ public class IfStatementExternalCss {
         if (toBe) {
             System.out.println("that is the question");
         } else if (!toBe) {
-            System.out.println("that is another question");
+            System.out.println("that is another form of the same question");
         }
     }
     

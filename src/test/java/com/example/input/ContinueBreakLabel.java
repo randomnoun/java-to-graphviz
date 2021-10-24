@@ -56,22 +56,39 @@ public class ContinueBreakLabel {
     public void testWhile() {
         boolean mean = false;
         boolean erst = true;
+        boolean worth = false;
+        boolean other = true;
+        boolean between = false;
+        
         boolean cromulent = false;
         System.out.println("don't you mean");
-        grammarNaziInspection: while (erst) {
-            if (erst) {
-                erst = false;
-                mean = true;
-                continue grammarNaziInspection;
-            } else if (mean) {
-                mean = false;
-                erst = true;
-                break;
-            } else if (cromulent) {
-                mean = false;
-                erst = false;
+        doLabel: do {
+            loopLabel: for (int i=0; i<5; i++) {
+                worth = i % 2 == 0;
+                
+                grammarNaziInspection: while (erst) {
+                    if (erst) {
+                        erst = false;
+                        mean = true;
+                        continue grammarNaziInspection;
+                    } else if (worth) {
+                        continue loopLabel;
+                    } else if (other) {
+                        continue doLabel;
+                    } else if (mean) {
+                        mean = false;
+                        erst = true;
+                        break; // case break
+                    } else if (between) {
+                        break doLabel; // label break
+                    } else if (cromulent) {
+                        mean = false;
+                        erst = false;
+                    }
+                }
             }
-        }
+        } while (other);
+        
         if (mean) { System.out.println("meanwhile"); }
         if (erst) { System.out.println("erstwhile"); }
         if (cromulent) { System.out.println("perfectly cromulent"); }

@@ -1,6 +1,6 @@
 package com.example.input;
 
-/** do loop test cases
+/** switch test cases
  * 
  */
 public class SwitchStatement {
