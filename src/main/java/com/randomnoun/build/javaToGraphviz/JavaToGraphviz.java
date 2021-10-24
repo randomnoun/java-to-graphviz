@@ -197,8 +197,57 @@ public class JavaToGraphviz {
 	    
 	    DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
         PrintWriter pw = new PrintWriter(writer);
-        boolean emittedDigraph = false;
+
+        dag.edges = new ArrayList<>();
+        dag.subgraphs = new ArrayList<>();
         
+        while (methodNode != null) {
+            LexicalScope lexicalScope = new LexicalScope();
+            
+            List<ExitEdge> ee = addEdges(dag, methodNode, lexicalScope);
+
+            methodNode.keepNode = false;
+            setLastKeepNode(dag, methodNode, methodNode);
+            if (removeNode) {
+                removeNodes(dag, methodNode); // peephole node removal.
+            }
+            
+            rootNodeIdx++;
+            methodNode = rootNodeIdx < dag.rootNodes.size() ? dag.rootNodes.get(rootNodeIdx) : null;
+            if (methodNode != null && methodNode.digraphId != null) {
+                methodNode = null;
+            }
+        }
+
+        // subgraphs are now defined in the Dag from the stylesheet
+            
+        inlineStyles(dag, styleSheet);
+
+        pw.println(dag.toGraphvizHeader());
+        for (DagNode node : dag.nodes) {
+            // only draw nodes if they have an edge
+            boolean hasEdge = false;
+            for (DagEdge e : dag.edges) {
+                if (e.n1 == node || e.n2 == node) { hasEdge = true; break; }
+            }
+            if (node != methodNode && hasEdge) {
+                pw.println(node.toGraphviz(isDebugLabel));
+            }
+        }
+        for (DagEdge edge : dag.edges) {
+            if (edge.n1 != methodNode) {
+                pw.println(edge.toGraphviz());
+            }
+        }
+
+        // subgraphs
+        for (DagSubgraph sg : dag.subgraphs) {
+            pw.println(sg.toGraphviz(2));
+        }
+        pw.println(dag.toGraphvizFooter());
+        
+        
+        /*
         while (methodNode != null) {
 
             if (methodNode.type.equals("Block")) {
@@ -272,6 +321,10 @@ public class JavaToGraphviz {
         if (emittedDigraph) {
             pw.println(dag.toGraphvizFooter());
         }
+        */
+        
+        
+        
         
         pw.flush();
         
@@ -325,9 +378,6 @@ public class JavaToGraphviz {
     }
 
 
-	// so gv already has some rule propagation, but I didn't realise that when I started this 
-    // so going to continue down this path
-
     /** Apply the rules in the stylesheet to the Dag, and populates the gvStyles 
      * fields on the Dag, DagEdge and DagNode objects.
      * 
@@ -341,9 +391,8 @@ public class JavaToGraphviz {
         Document document = Document.createShell("");
         Element bodyEl = document.getElementsByTag("body").get(0);
         
-        dag.gvStyles = new HashMap<>(); // clear applied styles
-        dag.gvNodeStyles = new HashMap<>(); // clear applied styles
-        dag.gvEdgeStyles = new HashMap<>(); // clear applied styles
+        // construct the initial DOM
+        Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
         
         DagElement graphEl = new DagElement("graph", dag, dag.gvAttributes);
         bodyEl.appendChild(graphEl);
@@ -357,25 +406,257 @@ public class JavaToGraphviz {
             DagNode node = dag.nodes.get(i);
             node.gvStyles = new HashMap<>(); // clear applied styles
             
-            DagElement child = new DagElement(node, node.gvAttributes); // Tag.valueOf(tagName, NodeUtils.parser(this).settings()), baseUri()
-            
+            DagElement child = new DagElement(node, node.gvAttributes);
             // could add attributes for edges and/or connected nodes here
             graphEl.appendChild(child);
+            
+            dagNodesToElements.put(node, child);
         }
         for (int i = 0; i < dag.edges.size(); i++) {
             DagEdge edge = dag.edges.get(i);
             edge.gvStyles = new HashMap<>(); // clear applied styles
-            DagElement child = new DagElement(edge, edge.gvAttributes); // Tag.valueOf(tagName, NodeUtils.parser(this).settings()), baseUri()
+            DagElement child = new DagElement(edge, edge.gvAttributes);
             // edges don't have IDs here but could
             // child.attr("id", edge.name);
             graphEl.appendChild(child);
         }
         
-        logger.info("before styles: " + document.toString());
+        // use the gv-newSubgraph CSS properties to add subgraphs into both the Dag and the DOM
+        List<DagElement> subgraphElements = getSubgraphElementsFromStylesheet(document, stylesheet, dag);
+        
+        // should probably do the idFormat and labelFormat changes here as well
+        // so that we only need 2 CSS passes
+
+        // and construct CSS-defined subgraphs
+        
+        for (int i = 0; i < subgraphElements.size(); i++) {
+            DagElement sgEl = subgraphElements.get(i);
+            DagNode sgNode = sgEl.dagNode;
+            
+            /*
+            DagNode newDagNode = new DagNode();
+            // newDagNode.keepNode = true; // have already performed keepNode processing by the time we get here
+            newDagNode.type = "subgroup";
+            newDagNode.line = sgNode.line; // inherit line number
+            newDagNode.astNode = null;
+            newDagNode.gvAttributes = sgNode.gvAttributes; // inherit method names and other attributes
+            dag.nodes.add(newDagNode);
+            DagElement newSgEl = new DagElement("subgraph", newDagNode, null);
+            */
+            
+            // ah crap. I just realised that for
+            //   node.method > subgraph 
+            // to match, the subgraph element needs to be under the DagElement, instead of the other way around,
+            // which is what this code is doing
+            // on the plus side, that should be a bit simpler to implement.
+            // but we do still want the nodes we're selecting to appear inside the subgraph, so there is that.
+            
+            /*
+            // jsoup DOM doesn't have W3C DOM methods, which is a little annoying
+            Element parentEl = sgEl.parent();
+            int indexInParent = -1;
+            for (int j = 0; j < parentEl.childrenSize(); j++) {
+                if (parentEl.child(j)==sgEl) {
+                    indexInParent = j; break;
+                }
+            }
+            if (indexInParent == -1) { throw new IllegalStateException("child not in parent"); }
+            sgEl.remove();
+            parentEl.insertChildren(indexInParent, newSgEl);
+            // newSgEl.insertChildren(0, sgEl);
+            */
+            
+            // leave the node where it is and put the subgraph under the node
+            // will mean we can only style the subgraph, not the nodes in the subgraph, but that seems good enough for me.
+            // so not nesting subgraphs in the DOM
+            
+            // but will be nesting subgraphs in the Dag
+            DagSubgraph newSg;
+            DagSubgraph sg = dag.dagNodeToSubgraph.get(sgNode);
+            if (sg == null) {
+                newSg = new DagSubgraph(dag, dag);
+                dag.subgraphs.add(newSg);
+            } else {
+                newSg = new DagSubgraph(dag, sg);
+                sg.subgraphs.add(newSg);
+            }
+            newSg.line = sgNode.line;
+            newSg.gvAttributes = new HashMap<>(sgNode.gvAttributes);
+            
+            DagElement newSgEl = new DagElement(newSg, newSg.gvAttributes);
+            sgEl.appendChild(newSgEl);
+
+            
+            moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, sgNode); 
+        }
+        
+        // reapply styles now the DOM contains CSS-defined subgraph elements
+        
+        applyStyles(document, stylesheet, dag);
+        
+        // set the labels from the gv-labelFormat
+        
+        for (int i = 0; i < dag.nodes.size(); i++) {
+            DagNode node = dag.nodes.get(i);
+            setIdLabel(node);
+        }
+        for (int i = 0; i < dag.edges.size(); i++) {
+            DagEdge edge = dag.edges.get(i);
+            setIdLabel(edge);
+        }
+        for (int i=0; i<dag.subgraphs.size(); i++) {
+            setIdLabel(dag.subgraphs.get(i));
+        }
+        
+        // TODO: arguably now that the node IDs have changed, couple reapply a third time in case there are any
+        // ID-specific CSS rules
+        // applyStyles(document, stylesheet, dag);
+    }
+    
+    private void setIdLabel(DagNode node) {
+        String idFormat = node.gvStyles.get("gv-idFormat");
+        String labelFormat = node.gvStyles.get("gv-labelFormat");
+        
+        Map<String, String> vars = new HashMap<>();
+        vars.put("lineNumber", String.valueOf(node.line));
+        vars.put("nodeType", node.type);
+        vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
+        vars.put("className",  node.gvAttributes.get("className") == null ? "" : node.gvAttributes.get("className"));
+        vars.put("methodName",  node.gvAttributes.get("methodName") == null ? "" : node.gvAttributes.get("methodName"));
+        
+        String[] idLabel = getIdLabel(idFormat, labelFormat, node.name, node.label, vars);
+        node.name = idLabel[0];
+        node.label = idLabel[1];
+    }
+
+    private void setIdLabel(DagEdge edge) {
+        String labelFormat = edge.gvStyles.get("gv-labelFormat");
+        if (edge.label == null && labelFormat != null) {
+            if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
+                labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
+            } else {
+                throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
+            }
+            Map<String, String> vars = new HashMap<>();
+            vars.put("startNodeId", edge.n1.name);
+            vars.put("endNodeId", edge.n2.name);
+            vars.put("breakLabel", edge.gvAttributes.get("breakLabel") == null ? "" : edge.gvAttributes.get("breakLabel")); 
+            vars.put("continueLabel", edge.gvAttributes.get("continueLabel") == null ? "" : edge.gvAttributes.get("continueLabel"));
+            edge.label = Text.substitutePlaceholders(vars, labelFormat).trim();
+        }
+    }
+
+    private void setIdLabel(DagSubgraph sg) {
+        String idFormat = sg.gvStyles.get("gv-idFormat");
+        String labelFormat = sg.gvStyles.get("gv-labelFormat");
+        
+        Map<String, String> vars = new HashMap<>();
+        vars.put("lineNumber", String.valueOf(sg.line));
+        //vars.put("nodeType", sg.type);
+        //vars.put("lastKeepNodeId",  sg.lastKeepNode == null ? "" : sg.lastKeepNode.name);
+        vars.put("className",  sg.gvAttributes.get("className") == null ? "" : sg.gvAttributes.get("className"));
+        vars.put("methodName",  sg.gvAttributes.get("methodName") == null ? "" : sg.gvAttributes.get("methodName"));
+        
+        String[] idLabel = getIdLabel(idFormat, labelFormat, sg.name, sg.label, vars);
+        sg.name = idLabel[0];
+        sg.label = idLabel[1];
+        
+        for (int i=0; i<sg.subgraphs.size(); i++) {
+            setIdLabel(sg.subgraphs.get(i));
+        }
+    }
+    
+    private String[] getIdLabel(String idFormat, String labelFormat, String id, String label, Map<String, String> vars) {
+        String[] result = new String[] { id, label };
+        
+        // id can refer to label, or label can refer to id, but not both
+        boolean idFirst = true; 
+        if (idFormat.contains("${label}") && labelFormat.contains("${id}")) {
+            throw new IllegalArgumentException("circular dependency between gv-idFormat '" + idFormat + "' and gv-labelFormat '" + labelFormat + "'");
+        } else if (labelFormat.contains("${label}")) {
+            throw new IllegalArgumentException("circular dependency in gv-labelFormat '" + labelFormat + "'");
+        } else if (idFormat.contains("${id}")) {
+            throw new IllegalArgumentException("circular dependency in gv-idFormat '" + idFormat + "'");
+        } else {
+            idFirst = !labelFormat.contains("${id}");
+        }
+        
+        for (int j=0; j<2; j++) {
+            if ((( j==0 ) == idFirst)  && (id == null && idFormat != null)) {
+                if (idFormat.startsWith("\"") && idFormat.endsWith("\"")) {
+                    idFormat = idFormat.substring(1, idFormat.length() - 1);
+                } else {
+                    throw new IllegalArgumentException("invalid gv-idFormat '" + idFormat + "'; expected double-quoted string");
+                }
+                vars.put("label", label == null ? "NOLABEL" : label );
+                result[0] = dag.getUniqueName(Text.substitutePlaceholders(vars, idFormat));
+            }
+            if ((( j==1 ) == idFirst) && (label == null && labelFormat != null)) {
+                if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
+                    labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
+                } else {
+                    throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
+                }
+                vars.put("id",  id == null ? "NOID" : id);
+                result[1] = Text.substitutePlaceholders(vars, labelFormat).trim();
+            }
+        }
+        return result;
+    }
+    
+    /** Moves a node into a subgraph (and all that nodes children, and it's childrens children, and it's childrens childrens children and so on and so forth.
+     * 
+     * <p>This is only going to work if we don't clear the DagNode.children collection when we're pruning nodes, which conveniently it appears we don't do.
+     *
+     * <p>Will rejig the subgraph hierarchy if a child is already in a subgraph
+     * 
+     * @param sg
+     * @param dag
+     * @param node
+     */
+    public void moveToSubgraph(DagSubgraph sg, DagElement sgEl, Dag dag,  Map<DagNode, DagElement> dagNodesToElements, DagNode node) {
+        sg.nodes.add(node);
+        if (dag.dagNodeToSubgraph.containsKey(node)) {
+            throw new IllegalStateException("subgraph already contains node"); 
+        }
+        dag.dagNodeToSubgraph.put(node, sg);
+
+        /*
+        // for now, leave DOM nodes where they are
+        DagElement el = dagNodesToElements.get(node);
+        if (el == null) { throw new IllegalStateException("no DagElement for node"); } // this is probably going to happen, maybe skip it instead
+        if (el.parent() != null) { el.remove(); }
+        sgEl.appendChild(el);
+        */
+        
+        for (DagNode child : node.children) {
+            // if they're already in a subgraph, that subgraph becomes a subgraph of this subgraph.
+            // this should always be an immediate subgraph as we're traversing this in depth-first order
+            // a node can only be in 1 subgraph at a time.
+            DagSubgraph ssg = dag.dagNodeToSubgraph.get(child);
+            if (ssg != null) {
+                if (ssg.container == sg) {
+                    logger.warn("we're already in the right subgraph");
+                } else {
+                    logger.warn("rejigging subgraphs"); // hoist the rigging
+                    sg.container.getSubgraphs().remove(ssg);
+                    sg.subgraphs.add(ssg);
+                }
+            } else {
+                moveToSubgraph(sg, sgEl, dag, dagNodesToElements, child);
+            }
+        }
+        
+    }
+    
+    
+    private List<DagElement> getSubgraphElementsFromStylesheet(Document document, CSSStyleSheet stylesheet, Dag dag) {
+        logger.info("gsefs before styles: " + document.toString());
         StylesheetApplier applier = new StylesheetApplier(document, stylesheet);
         applier.apply();
-        logger.info("after styles: " + document.toString());
+        logger.info("gsefs after styles: " + document.toString());
 
+        List<DagElement> result = new ArrayList<>();
         
         // copy the calculated styles from the DOM back into the gvStyles field
         final CSSOMParser inlineParser = new CSSOMParser();
@@ -392,10 +673,60 @@ public class JavaToGraphviz {
                     } catch ( IOException e ) {
                         throw new IllegalStateException("IOException on string", e);
                     }
+                    DagElement dagElement = (DagElement) node;
+                    DagNode dagNode = dagElement.dagNode;
+                    if (dagNode != null && declaration.getPropertyValue("gv-newSubgraph").equals("true")) {
+                        result.add(dagElement);
+                    }
+                    
+                    // @TODO idFormat and labelFormat here ?
+                    
+                    // reset styles back for the next round
+                    if (node.hasAttr("original-Style")) {
+                        node.attr("style", node.attr("original-style"));
+                    } else {
+                        node.removeAttr("style");
+                    }
+                }
+            }
+
+            @Override
+            public void tail( Node node, int depth ) {}
+        }, document.body() );
+        return result;
+    }
+    
+    private void applyStyles(Document document, CSSStyleSheet stylesheet, Dag dag) {
+        dag.gvStyles = new HashMap<>(); // clear applied styles
+        dag.gvNodeStyles = new HashMap<>(); // clear applied styles
+        dag.gvEdgeStyles = new HashMap<>(); // clear applied styles
+        
+        logger.info("before styles: " + document.toString());
+        StylesheetApplier applier = new StylesheetApplier(document, stylesheet);
+        applier.apply();
+        logger.info("after styles: " + document.toString());
+
+        // copy the calculated styles from the DOM back into the gvStyles field
+        final CSSOMParser inlineParser = new CSSOMParser();
+        inlineParser.setErrorHandler( new ExceptionErrorHandler() );
+        NodeTraversor.traverse( new NodeVisitor() {
+            @Override
+            public void head( Node node, int depth ) {
+                if ( node instanceof DagElement && node.hasAttr( "style" ) ) {
+                    // parse the CSS into a CSSStyleDeclaration
+                    InputSource input = new InputSource( new StringReader( node.attr( "style" ) ) );
+                    CSSStyleDeclaration declaration = null;
+                    try {
+                        declaration = inlineParser.parseStyleDeclaration( input );
+                    } catch ( IOException e ) {
+                        throw new IllegalStateException("IOException on string", e);
+                    }
+                    DagElement dagElement = (DagElement) node;
                     String tagName = ((Element) node).tagName();
-                    Dag dag = ((DagElement) node).dag;
-                    DagNode dagNode = ((DagElement) node).dagNode;
-                    DagEdge dagEdge = ((DagElement) node).dagEdge;
+                    Dag dag = dagElement.dag;
+                    DagNode dagNode = dagElement.dagNode;
+                    DagEdge dagEdge = dagElement.dagEdge;
+                    DagSubgraph dagSubgraph = dagElement.dagSubgraph;
                     if (dag != null) {
                         for (int i=0; i<declaration.getLength(); i++) {
                             String prop = declaration.item(i);
@@ -431,6 +762,12 @@ public class JavaToGraphviz {
                             dagEdge.gvStyles.put(prop,  declaration.getPropertyValue(prop));
                         }
                         
+                    } else if (dagSubgraph != null) {
+                        for (int i=0; i<declaration.getLength(); i++) {
+                            String prop = declaration.item(i);
+                            logger.info("setting sg " + dagSubgraph.name + " prop " + prop + " to " + declaration.getPropertyValue(prop));
+                            dagSubgraph.gvStyles.put(prop,  declaration.getPropertyValue(prop));
+                        }
                     }
                 }
             }
@@ -438,70 +775,10 @@ public class JavaToGraphviz {
             @Override
             public void tail( Node node, int depth ) {}
         }, document.body() );
-
-        // set the labels from the gv-labelFormat
-        for (int i = 0; i < dag.nodes.size(); i++) {
-            DagNode node = dag.nodes.get(i);
-            String idFormat = node.gvStyles.get("gv-idFormat");
-            String labelFormat = node.gvStyles.get("gv-labelFormat");
-            
-            // @TODO: id can refer to label, or label can refer to id, but not both
-            boolean idFirst = true; 
-            if (idFormat.contains("${label}") && labelFormat.contains("${id}")) {
-                throw new IllegalArgumentException("circular dependency between gv-idFormat '" + idFormat + "' and gv-labelFormat '" + labelFormat + "'");
-            } else {
-                idFirst = !labelFormat.contains("${id}");
-            }
-            
-            for (int j=0; j<2; j++) {
-                if ((( j==0 ) == idFirst)  && (node.name == null && idFormat != null)) {
-                    if (idFormat.startsWith("\"") && idFormat.endsWith("\"")) {
-                        idFormat = idFormat.substring(1, idFormat.length() - 1);
-                    } else {
-                        throw new IllegalArgumentException("invalid gv-idFormat '" + idFormat + "'; expected double-quoted string");
-                    }
-                    Map<String, String> vars = new HashMap<>();
-                    vars.put("lineNumber", String.valueOf(node.line));
-                    vars.put("nodeType", node.type);
-                    vars.put("label", node.label == null ? "NOLABEL" : node.label );
-                    vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
-                    node.name = dag.getUniqueName(Text.substitutePlaceholders(vars, idFormat));
-                }
-                if ((( j==1 ) == idFirst) && (node.label == null && labelFormat != null)) {
-                    if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
-                        labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
-                    } else {
-                        throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
-                    }
-                    Map<String, String> vars = new HashMap<>();
-                    vars.put("lineNumber", String.valueOf(node.line));
-                    vars.put("nodeType", node.type);
-                    vars.put("id",  node.name == null ? "NOID" : node.name);
-                    vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
-                    node.label = Text.substitutePlaceholders(vars, labelFormat).trim();
-                }
-            }
-        }
-        for (int i = 0; i < dag.edges.size(); i++) {
-            DagEdge edge = dag.edges.get(i);
-            String labelFormat = edge.gvStyles.get("gv-labelFormat");
-            if (edge.label == null && labelFormat != null) {
-                if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
-                    labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
-                } else {
-                    throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
-                }
-                Map<String, String> vars = new HashMap<>();
-                vars.put("startNodeId", edge.n1.name);
-                vars.put("endNodeId", edge.n2.name);
-                vars.put("breakLabel", edge.gvAttributes.get("breakLabel") == null ? "" : edge.gvAttributes.get("breakLabel")); 
-                vars.put("continueLabel", edge.gvAttributes.get("continueLabel") == null ? "" : edge.gvAttributes.get("continueLabel"));
-                edge.label = Text.substitutePlaceholders(vars, labelFormat).trim();
-            }
-
-        }
         
     }
+
+   
     
     // a lexical scope corresponds to some boundary in the AST that we want to demarcate somehow.
     // Scopes can be nested; a nested scope may inherit a subset of the parent scope's fields depending 
@@ -556,7 +833,7 @@ public class JavaToGraphviz {
         }
 
         // scope that bounds statements that can break
-        // e.g. switch
+        // e.g. case within a switch
         public LexicalScope newBreakScope() {
             LexicalScope next = new LexicalScope();
             next.breakEdges = new ArrayList<>();
@@ -566,6 +843,25 @@ public class JavaToGraphviz {
             next.labeledScopes = this.labeledScopes;
             return next;
         }
+        
+        // scope for user-defined subgraphs, does not affect nodes and edges.
+        // going to allow these around most grouping nodes, although I was hoping to do that when we apply CSS rules
+        // which won't be possible if I'm doing this within blocks as well.
+        // OK so maybe I allow subgraphs to be defined both within comments (constructed when the Dag is being constructed)
+        // or via classes (constructed when the styles are being applied)
+        // easy peasy.
+        // am I going to allow unbalanced subgraphs ( subgraph boundaries that don't line up with AST boundaries ) ? probably not.
+        
+        public LexicalScope newSubgraphScope() {
+            LexicalScope next = new LexicalScope();
+            next.breakEdges = this.breakEdges;
+            next.continueNode = this.continueNode;
+            next.returnEdges = this.returnEdges;
+            next.throwEdges = this.throwEdges;
+            next.labeledScopes = this.labeledScopes;
+            return next;
+        }
+        
 
     }
     
@@ -679,7 +975,8 @@ public class JavaToGraphviz {
             throw new IllegalStateException("expected 1 child; found " + method.children.size());
         }
         MethodDeclaration md = (MethodDeclaration) method.astNode;
-        method.label = "method " + md.getName();
+        // method.label = "method " + md.getName();
+        method.gvAttributes.put("methodName",  md.getName().toString());
         
         DagNode methodBlock = method.children.get(0);
         dag.addEdge(method, methodBlock);
@@ -909,7 +1206,6 @@ public class JavaToGraphviz {
     }
     
     // draw branches into and out of for body
-    // List<ExitEdge> breakEdges, DagNode _continueNode
     private List<ExitEdge> addForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
         ForStatement fs;
@@ -1179,10 +1475,10 @@ public class JavaToGraphviz {
             // prevNode may have already been removed
             if (!prevNode.keepNode) { // dag.nodes.contains(prevNode) && 
                 // logger.info("removing node " + prevNode.name + " with " + prevNode.inEdges.size() + " inEdges");
+                // removes it from the dag but not from DagNode.children; maybe it should
                 dag.nodes.remove(prevNode);
                 for (DagEdge prevEdge : new ArrayList<DagEdge>(prevNode.inEdges)) { // may be modified whilst iterating ?
                     if (dag.edges.contains(prevEdge)) { // prevNode.inEdges
-                        
                         pruneEdges(dag, prevEdge, fromNode, keepNode);
                     }
                 }
@@ -1289,6 +1585,8 @@ public class JavaToGraphviz {
             newEdge.n1 = inEdge.n1;
             newEdge.n2 = outEdge.n2;
             newEdge.label = inEdge.label;
+            newEdge.back = inEdge.back || outEdge.back;
+            if (newEdge.back) { newEdge.classes.add("back"); } 
             
             // if either edge was colored (break edges), the merged edge is as well
             String color = inEdge.gvAttributes.get("color") == null ? outEdge.gvAttributes.get("color") : inEdge.gvAttributes.get("color");
@@ -1302,7 +1600,7 @@ public class JavaToGraphviz {
                 dag.addEdge(newEdge);
             }
             
-            logger.info("removed node " + node.name);
+            logger.info("removed node " + node.type + ", " + node.line + ", " + node.name);
             dag.nodes.remove(node);
             // start from n1 again as removing this node may make it possible to remove the parent node
             removeNodes(dag, newEdge.n1, mergeEdges); // seenNodes
@@ -1313,10 +1611,12 @@ public class JavaToGraphviz {
             
             // logger.warn(node.outEdges.size() + " outEdges from node " + node.name);
             for (DagEdge e : new ArrayList<DagEdge>(node.outEdges)) {
+                // logger.info("outEdges from " + node.type + ":" + node.line);
                 if (dag.edges.contains(e)) {
                     if (dag.nodes.contains(e.n2)) { 
                         if (!e.back) {
                             // don't follow back edges
+                            // logger.info("checking " + e.n1.type + ":" + e.n1.line + " -> " + e.n2.type + ":" + e.n2.line + ", " + e.n2.name);
                             removeNodes(dag, e.n2);
                         }
                     } else {
@@ -1522,7 +1822,7 @@ public class JavaToGraphviz {
      * <p>Okay so now the dag is only a dag if you don't follow back edges ( edge.back == true )
      * 
      */
-	static class Dag {
+	static class Dag implements SubgraphHolder {
 	    
 	    // a digraph.
 	    // when we're creating clusters we clear the edges each time
@@ -1549,8 +1849,14 @@ public class JavaToGraphviz {
         
         // NB all nodes and edges are defined in the structures above, these subgraphs *only* hold the subset of those 
         // nodes that are in those subgraphs.
+        Map<DagNode, DagSubgraph> dagNodeToSubgraph = new HashMap<>(); // convenience map for finding nodes already in subgraphs
         List<DagSubgraph> subgraphs = new ArrayList<>();
         
+        @Override
+        public List<DagSubgraph> getSubgraphs() {
+            return subgraphs;
+        }
+
 	    
 	    public void addNode(DagNode n) {
 	        nodes.add(n);
@@ -1670,6 +1976,12 @@ public class JavaToGraphviz {
             return n + "_" + idx;
         }
 	}
+	
+	static interface SubgraphHolder {
+	    public List<DagSubgraph> getSubgraphs();
+	}
+
+	   
 	static class DagNode {
 	    
 	    String digraphId;
@@ -1691,7 +2003,7 @@ public class JavaToGraphviz {
 	    // styles after css rules have been applied
 	    // clear this after every diagram is generated
 	    Map<String, String> gvStyles = new HashMap<>();
-	    
+        
         ASTNode astNode;
 	    String type;      // astNode class, or one of a couple of extra artificial node types (comment, doExpression)
 	    String javaLabel; // if this is a labeledStatement, the name of that label 
@@ -1744,15 +2056,16 @@ public class JavaToGraphviz {
 	        }
 	        
 	        return
-	          "    " + name + " [\n" +
+	          "  " + name + " [\n" +
 	          // (classes.size() == 0 ? "" : "  /* " + classes + " */\n") +
 	          // undocumented 'class' attribute is included in graphviz svg output; see
 	          // https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
-	          (classes.size() == 0 ? "" : "      class = \"" + Text.join(classes,  " ") + "\";\n") + 
-              "      label = \"" + labelText + "\";\n" + 
+	          (classes.size() == 0 ? "" : "    class = \"" + Text.join(classes,  " ") + "\";\n") + 
+              "    label = \"" + labelText + "\";\n" + 
 	          a + 
-              "    ];";	        
-	    }
+              "  ];";	        
+	    }        
+
 	}
 	
 	static class DagEdge {
@@ -1772,46 +2085,100 @@ public class JavaToGraphviz {
             String a = "";
             for (Entry<String, String> e : gvStyles.entrySet()) {
                 if (!e.getKey().startsWith("gv-")) {  
-                    a += "      " + e.getKey() + " = " + e.getValue() + ";\n";
+                    a += "    " + e.getKey() + " = " + e.getValue() + ";\n";
                 }
             }
 
-	        return "    " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
+	        return "  " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
 	            " -> " + 
 	            n2.name + // (n2Port == null ? "" : ":" + n2Port) + 
 	            (label == null && gvStyles.size() == 0? "" : 
 	                " [\n" +
-	                (label == null ? "" : "      label=\"" + labelText + "\";\n") +
+	                (label == null ? "" : "    label=\"" + labelText + "\";\n") +
 	                a +
-	                "    ]") + ";";
+	                "  ]") + ";";
         }
 	}
+
+    // an edge whose second node isn't known yet
+    static class ExitEdge extends DagEdge {
+        
+    }
+    
+	
     // in this data model, a subgraph is just used to group nodes together
     // (those nodes must already exist at the Dag level)
-    static class DagSubgraph {
-        Dag dag;
+    static class DagSubgraph implements SubgraphHolder {
+        Dag dag; // top-level dag
+        SubgraphHolder container;
+        
+        String name;  // graphviz name
+        String label; // graphviz label
+        int line;
         
         // graphviz formatting attributes for the digraph
         Map<String, String> gvAttributes = new HashMap<>();
+        Set<String> classes = new HashSet<>();
+        
         // styles after css rules have been applied
         Map<String, String> gvStyles = new HashMap<>();
         Map<String, String> gvNodeStyles = new HashMap<>();
         Map<String, String> gvEdgeStyles = new HashMap<>();
 
+        // nodes that are in this subgraph only (not subsubgraphs)
         List<DagNode> nodes = new ArrayList<>();
+
+        // subsubgraphs
+        List<DagSubgraph> subgraphs = new ArrayList<>();
         
-        public DagSubgraph(Dag dag) {
+        public DagSubgraph(Dag dag, SubgraphHolder container) {
             this.dag = dag;
+            this.container = container;
+        }
+
+        public String toGraphviz(int indent) {
+            var s = "";
+            for (int i=0; i<indent; i++) { s += " "; }
+            String labelText = label == null ? null : Text.replaceString(label, "\"",  "\\\"");
+            
+            String a = "";
+            for (Entry<String, String> e : gvStyles.entrySet()) {
+                if (!e.getKey().startsWith("gv-")) {  
+                    a += s + "  " + e.getKey() + " = " + e.getValue() + ";\n";
+                }
+            }
+            
+            String result = s + "subgraph " + name + " {\n" +
+              (label == null ? "" : s + "  label=\"" + labelText + "\";\n") +
+              a;
+            result += s + " ";
+            for (DagNode dn : nodes) {
+                // only draw nodes if they have an edge
+                boolean hasEdge = false;
+                for (DagEdge e : dag.edges) {
+                    if (e.n1 == dn || e.n2 == dn) { hasEdge = true; break; }
+                }
+                if (hasEdge) {
+                    result += " " + dn.name + ";";
+                }
+            }
+            result += "\n";
+            for (DagSubgraph sg : subgraphs) {
+                result += sg.toGraphviz(indent + 2);
+            }
+            result += s + "}\n";
+            return result;
+        }
+
+        @Override
+        public List<DagSubgraph> getSubgraphs() {
+            return subgraphs;
         }
         
     }
 
     
 	
-	// an edge whose second node isn't known yet
-	static class ExitEdge extends DagEdge {
-	    
-	}
 	
 	/** An ASTVisitor that constructs the Dag
 	 * 
@@ -1924,9 +2291,9 @@ public class JavaToGraphviz {
                 if (clazz.endsWith("Statement")) {
                     clazz = clazz.substring(0, clazz.length() - 9);
                 }
-                String lp = "s"; // linePrefix
-                if (clazz.equals("If")) { lp = "if"; }
-                else if (clazz.equals("MethodDeclaration")) { lp = "cluster"; }
+                // String lp = "s"; // linePrefix
+                // if (clazz.equals("If")) { lp = "if"; }
+                // else if (clazz.equals("MethodDeclaration")) { lp = "cluster"; }
                 
                 dn.type = clazz; // "if";
                 // dn.label = clazz; // "if"; 

@@ -39,7 +39,10 @@ That DOM looks like this
   </body>
 </body>
 */
-/* sketchviz defaults */
+/* sketchviz defaults
+   the properties in these CSS rules are graphviz attribute names, not CSS property names.
+   there's also a handful of internal properties which are used during the diagram generation process; those are prefixed with "gv-"
+ */
 graph {
 	fontname: "Handlee";
 	bgcolor: transparent;
@@ -60,7 +63,8 @@ graphEdge {
 
 node {
 	gv-idFormat: "s_${lineNumber}";
-	gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; 
+	/* gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; */
+	gv-labelFormat: "${lineNumber}: ${nodeType}"; 
 }
 node.if {
 	gv-idFormat: "if_${lineNumber}";
@@ -74,6 +78,21 @@ node.method.end {
     gv-idFormat: "m_${lineNumber}";
     gv-labelFormat: "return";
 }
+
+node.methodDeclaration { gv-newSubgraph: true; }
+
+/* through the magic of multiple CSS passes, the gv-newSubgraph rules above will construct a subgraph
+   element which can also be styled in CSS. This only happens once.
+*/
+node.methodDeclaration > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_m_${lineNumber}";
+  gv-labelFormat : "method ${methodName}";
+  pencolor : white; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
+
 
 
 /* edge styles */
