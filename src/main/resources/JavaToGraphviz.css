@@ -81,7 +81,7 @@ node.method.end {
 
 node.methodDeclaration { gv-newSubgraph: true; }
 
-/* through the magic of multiple CSS passes, the gv-newSubgraph rules above will construct a subgraph
+/* through the magic of multiple CSS passes, the gv-newSubgraph rule above will construct a subgraph
    element which can also be styled in CSS. This only happens once.
 */
 node.methodDeclaration > subgraph {
@@ -89,9 +89,22 @@ node.methodDeclaration > subgraph {
   gv-idFormat : "cluster_m_${lineNumber}";
   gv-labelFormat : "method ${methodName}";
   pencolor : white; 
-  labeljust : "l"; 
+  labeljust : "l";
+
+  /* the ranksep here is an attempt to remove whitespace in the subgraph. 
+     turns out this attribute is disregarded if there are any edge labels in the subgraph. which is a bit annoying. 
+     xlabels don't add extra ranking whitespace, but the labels look a bit crap. */ 
   ranksep : 0.5;
 }
+
+/* in retrospect I reckon the methodDeclaration node should be *inside* the subgraph, which
+would make the CSS rule something like
+  subgraph:has(> .methodDeclaration) { ... }
+instead, assuming jsoup's selector impl supports that.
+maybe it should be a gv-newOuterSubgraph: true
+or something 
+*/
+
 
 /*
 node.try { gv-newSubgraph: true; }
@@ -159,7 +172,7 @@ edge.return { color: blue; gv-labelFormat: "return"; }
    as labelling the throws really throws out the cluster layout
    boom tish.
 */ 
-edge.throw { color: purple;  }
+edge.throw { color: maroon;  } /* go the broncos */
 
 edge.back { style: dashed; }
 edge.back.for { gv-labelFormat: "for"; }

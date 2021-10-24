@@ -245,87 +245,6 @@ public class JavaToGraphviz {
             pw.println(sg.toGraphviz(2));
         }
         pw.println(dag.toGraphvizFooter());
-        
-        
-        /*
-        while (methodNode != null) {
-
-            if (methodNode.type.equals("Block")) {
-                // getting these for the enum declarations in SwitchStatement test; skip for now
-            } else {
-                if (!methodNode.type.equals("MethodDeclaration")) {
-                    throw new IllegalStateException("first node must be a MethodDeclaration; found " + methodNode.type);
-                    // block = block.children.get(0);
-                }
-                
-                LexicalScope lexicalScope = new LexicalScope();
-                dag.edges = new ArrayList<>();
-                List<ExitEdge> ee = addMethodDeclarationEdges(dag, methodNode, lexicalScope);
-                
-                methodNode.keepNode = false;
-                setLastKeepNode(dag, methodNode, methodNode);
-                if (removeNode) {
-                    removeNodes(dag, methodNode); // peephole node removal.
-                }
-                
-                inlineStyles(dag, styleSheet);
-    
-                if (!emittedDigraph) {
-                    pw.println(dag.toGraphvizHeader());
-                    if (methodNode.digraphId != null) {
-                        pw.println("# digraph stuff here");
-                    }
-                    emittedDigraph = true;
-                    
-                }
-                
-
-                // subgraph starts here
-                pw.println("  # method");
-    
-                pw.println("  subgraph " + methodNode.name + " {");   
-                pw.println("    pencolor=white ; labeljust = \"l\"; label = \"" + methodNode.label + "\"");
-                pw.println("    ranksep = 0.5;");
-                
-                if (methodNode.subgraph != null) {
-                    pw.println("  # subgraph stuff here");
-                }
-            
-                
-                
-                for (DagNode node : dag.nodes) {
-                    // only draw nodes if they have an edge
-                    boolean hasEdge = false;
-                    for (DagEdge e : dag.edges) {
-                        if (e.n1 == node || e.n2 == node) { hasEdge = true; break; }
-                    }
-                    if (node != methodNode && hasEdge) {
-                        pw.println(node.toGraphviz(isDebugLabel));
-                    }
-                }
-                for (DagEdge edge : dag.edges) {
-                    if (edge.n1 != methodNode) {
-                        pw.println(edge.toGraphviz());
-                    }
-                }
-            
-                pw.println("  }"); // subgraph
-            }
-        
-            rootNodeIdx++;
-            methodNode = rootNodeIdx < dag.rootNodes.size() ? dag.rootNodes.get(rootNodeIdx) : null;
-            if (methodNode != null && methodNode.digraphId != null) {
-                methodNode = null;
-            }
-        }
-        if (emittedDigraph) {
-            pw.println(dag.toGraphvizFooter());
-        }
-        */
-        
-        
-        
-        
         pw.flush();
         
         return (rootNodeIdx < dag.rootNodes.size());
@@ -433,43 +352,10 @@ public class JavaToGraphviz {
             DagElement sgEl = subgraphElements.get(i);
             DagNode sgNode = sgEl.dagNode;
             
-            /*
-            DagNode newDagNode = new DagNode();
-            // newDagNode.keepNode = true; // have already performed keepNode processing by the time we get here
-            newDagNode.type = "subgroup";
-            newDagNode.line = sgNode.line; // inherit line number
-            newDagNode.astNode = null;
-            newDagNode.gvAttributes = sgNode.gvAttributes; // inherit method names and other attributes
-            dag.nodes.add(newDagNode);
-            DagElement newSgEl = new DagElement("subgraph", newDagNode, null);
-            */
-            
-            // ah crap. I just realised that for
+            // put the subgraph under the node so that 
             //   node.method > subgraph 
-            // to match, the subgraph element needs to be under the DagElement, instead of the other way around,
-            // which is what this code is doing
-            // on the plus side, that should be a bit simpler to implement.
-            // but we do still want the nodes we're selecting to appear inside the subgraph, so there is that.
-            
-            /*
-            // jsoup DOM doesn't have W3C DOM methods, which is a little annoying
-            Element parentEl = sgEl.parent();
-            int indexInParent = -1;
-            for (int j = 0; j < parentEl.childrenSize(); j++) {
-                if (parentEl.child(j)==sgEl) {
-                    indexInParent = j; break;
-                }
-            }
-            if (indexInParent == -1) { throw new IllegalStateException("child not in parent"); }
-            sgEl.remove();
-            parentEl.insertChildren(indexInParent, newSgEl);
-            // newSgEl.insertChildren(0, sgEl);
-            */
-            
-            // leave the node where it is and put the subgraph under the node
-            // will mean we can only style the subgraph, not the nodes in the subgraph, but that seems good enough for me.
-            // so not nesting subgraphs in the DOM
-            
+            // CSS rules match. will mean we can only style the subgraph, not the nodes in the subgraph, but that seems good enough for me.
+            // so not nesting subgraphs in the DOM.
             // but will be nesting subgraphs in the Dag
             DagSubgraph newSg;
             DagSubgraph sg = dag.dagNodeToSubgraph.get(sgNode);
@@ -634,21 +520,15 @@ public class JavaToGraphviz {
         sg.nodes.add(node);
         dag.dagNodeToSubgraph.put(node, sg);
 
-        /*
-        // for now, leave DOM nodes where they are
-        DagElement el = dagNodesToElements.get(node);
-        if (el == null) { throw new IllegalStateException("no DagElement for node"); } // this is probably going to happen, maybe skip it instead
-        if (el.parent() != null) { el.remove(); }
-        sgEl.appendChild(el);
-        */
-        
         for (DagNode child : node.children) {
-            // if they're already in a subgraph, that subgraph becomes a subgraph of this subgraph.
+            // if they're already in a subgraph, that subgraph should become a subgraph of this subgraph.
             // this should always be an immediate subgraph as we're traversing this in depth-first order
             // a node can only be in 1 subgraph at a time.
+            
             DagSubgraph ssg = dag.dagNodeToSubgraph.get(child);
             moveToSubgraph(sg, sgEl, dag, dagNodesToElements, child);
             
+            // @TODO maybe this still needs to happen
             /*
             if (ssg != null) {
                 if (ssg.container == sg) {
@@ -812,7 +692,7 @@ public class JavaToGraphviz {
 
         // a collection of edges from 'throw' statements
         // if we can get the exception type hierarchy out of this thing then
-        // we could channel them into a subgraph or something
+        // we could channel them into the right subgraph
         List<ExitEdge> throwEdges;
 
         // break/continue targets
@@ -1079,8 +959,6 @@ public class JavaToGraphviz {
 	    ExitEdge e = new ExitEdge();
         e.n1 = breakNode;
         // e.label = "break" + (label==null ? "" : " " + label);
-        // TODO use styles and formats
-        
         // e.gvAttributes.put("color", "red"); // @TODO replace all these with classes
         e.classes.add("break");
         e.gvAttributes.put("breakLabel", label == null ? "" : label);
@@ -1091,7 +969,6 @@ public class JavaToGraphviz {
 
 	// a continue will add an edge back to the continueNode only 
     // (and returns an empty list as we won't have a normal exit edge)
-	// @TODO labelled continue
     private List<ExitEdge> addContinueEdges(Dag dag, DagNode continueStatementNode, LexicalScope scope) {
         if (scope.continueNode == null) { 
             throw new IllegalStateException("continue encountered outside of continuable section");
@@ -1120,8 +997,6 @@ public class JavaToGraphviz {
         // or maybe this should create a new lexical scope. maybe it should.
         // so we can break/continue to it
         
-        // so could draw this with branches leading back up to the for node from each exit node of repeating block
-        // or branches down from each exit node to an artifical block at the bottom, with a branch up from that.
         if (labeledStatementNode.children.size() != 1) {
             throw new IllegalStateException("expected 1 child; found " + labeledStatementNode.children.size());
         }
@@ -1171,7 +1046,7 @@ public class JavaToGraphviz {
 
     
 	// draw branches from this block to then/else blocks
-	// exit nodes are combined exit nodes of both branches
+	// exit edges are combined exit edges of both branches
 	private List<ExitEdge> addIfEdges(Dag dag, DagNode block, LexicalScope scope) {
         // draw the edges
 	    List<ExitEdge> prevNodes = new ArrayList<>();
@@ -1223,14 +1098,16 @@ public class JavaToGraphviz {
             acceptChildren(visitor, this.catchClauses);
             acceptChild(visitor, getFinally());
         */
+        @SuppressWarnings("unchecked")
         List<ASTNode> resourcesNodes = ts.resources();
         ASTNode bodyNode = ts.getBody();
+        @SuppressWarnings("unchecked")
         List<ASTNode> catchClauseNodes = ts.catchClauses();
         ASTNode finallyNode = ts.getFinally();
         
-        List<DagNode> resourceDags = new ArrayList();
+        List<DagNode> resourceDags = new ArrayList<>();
         DagNode bodyDag = null;
-        List<DagNode> catchClauseDags = new ArrayList();
+        List<DagNode> catchClauseDags = new ArrayList<>();
         DagNode finallyDag = null;
         
         for (DagNode c : tryNode.children) {
@@ -1255,8 +1132,10 @@ public class JavaToGraphviz {
         }
 
         // add clusters for try, catch and finally blocks
-        // this occurs before CSS subgraph creation so they're all children of the Dag
+        // which we're doing in CSS now instead
+        
         /*
+        // this occurs before CSS subgraph creation so they're all children of the Dag
         DagSubgraph bodySg = new DagSubgraph(dag, dag);
         bodySg.classes.add("tryBody");
         dag.subgraphs.add(bodySg);
@@ -1317,6 +1196,7 @@ public class JavaToGraphviz {
         ForStatement fs;
         // so could draw this with branches leading back up to the for node from each exit node of repeating block
         // or branches down from each exit node to an artifical block at the bottom, with a branch up from that.
+        // which might be a bit cleaner if the for block has a lot of exit edges 
         if (forNode.children.size() != 1) {
             throw new IllegalStateException("expected 1 child; found " + forNode.children.size());
         }
@@ -1326,6 +1206,13 @@ public class JavaToGraphviz {
         dag.addEdge(forNode, repeatingBlock);
         LexicalScope newScope = scope.newBreakContinueScope(forNode);
         List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope);
+        
+        /*
+        if (repeatBlockPrevNodes.size() > bunchUpTheEdgesThreshold) {
+            // add an artificial node to bunch up the edges
+        }
+        */
+        
         for (ExitEdge e : repeatingBlockPrevNodes) {
             DagEdge backEdge = dag.addBackEdge(e.n1, forNode, null);
             backEdge.classes.add("for");
