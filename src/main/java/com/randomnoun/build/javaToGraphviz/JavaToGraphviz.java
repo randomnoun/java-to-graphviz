@@ -495,6 +495,7 @@ public class JavaToGraphviz {
                 vars.put("startNodeId", edge.n1.name);
                 vars.put("endNodeId", edge.n2.name);
                 vars.put("breakLabel", edge.gvAttributes.get("breakLabel") == null ? "" : edge.gvAttributes.get("breakLabel")); 
+                vars.put("continueLabel", edge.gvAttributes.get("continueLabel") == null ? "" : edge.gvAttributes.get("continueLabel"));
                 edge.label = Text.substitutePlaceholders(vars, labelFormat).trim();
             }
 
@@ -757,12 +758,12 @@ public class JavaToGraphviz {
         // e.gvAttributes.put("color", "red"); // @TODO replace all these with classes
         e.classes.add("break");
         e.gvAttributes.put("breakLabel", label == null ? "" : label);
-        scope.breakEdges.add(e);
+        namedScope.breakEdges.add(e);
         
         return Collections.emptyList();
     }
 
-	// a break will add an edge back to the continueNode only 
+	// a continue will add an edge back to the continueNode only 
     // (and returns an empty list as we won't have a normal exit edge)
 	// @TODO labelled continue
     private List<ExitEdge> addContinueEdges(Dag dag, DagNode continueStatementNode, LexicalScope scope) {
@@ -930,7 +931,7 @@ public class JavaToGraphviz {
         
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire for
         prevNodes.addAll(repeatingBlockPrevNodes);
-        prevNodes.addAll(scope.breakEdges);
+        prevNodes.addAll(newScope.breakEdges); // forward edges for any breaks inside the for scoped to this for
         return prevNodes;
     }
 
@@ -956,7 +957,7 @@ public class JavaToGraphviz {
 
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire for
         prevNodes.addAll(repeatingBlockPrevNodes);
-        prevNodes.addAll(scope.breakEdges);
+        prevNodes.addAll(newScope.breakEdges); // forward edges for any breaks inside the for scoped to this for
 
         return repeatingBlockPrevNodes;
     }
@@ -1339,10 +1340,10 @@ public class JavaToGraphviz {
 
 	/** Return a list of processed comments from the source file. 
 	 * 
-	 * GvStyleComment: "// gv-style: { xxx }"
-	 * GvDigraphComment: "// gv-digraph: xxx"
+	 * GvStyleComment:    "// gv-style: { xxx }"
+	 * GvDigraphComment:  "// gv-digraph: xxx"
 	 * GvSubgraphComment: "// gv-subgraph: xxx"
-	 * GvComment: "// gv.className.className.className: xxx { xxx }"
+	 * GvComment:         "// gv.className.className.className: xxx { xxx }"
 	 * 
 	 * @param cu
 	 * @param src
@@ -1527,8 +1528,7 @@ public class JavaToGraphviz {
 	    // when we're creating clusters we clear the edges each time
 	    // but probably need to start storing clusters in here as we go, seeing I'm going to want nested clusters soon
 	    // nodes are in clusters but edges can span clusters
-	    
-	    
+	    Map<ASTNode, DagNode> astToDagNode = new HashMap<>();
 	    
 	    List<DagNode> nodes = new ArrayList<>();
 	    List<DagNode> rootNodes = new ArrayList<>(); // subset of nodes which start each Dag tree
@@ -1543,8 +1543,15 @@ public class JavaToGraphviz {
         Map<String, String> gvNodeStyles = new HashMap<>();
         Map<String, String> gvEdgeStyles = new HashMap<>();
         
+        // OK so I'm aware graphviz can produce different layouts depending on the ordering of nodes and subgraphs, but
+        // from my minimal testing it appears the layouts are a bit nicer if all the subgraphs are defined right at the end
+        // so that's what I'm going to do.
+        
+        // NB all nodes and edges are defined in the structures above, these subgraphs *only* hold the subset of those 
+        // nodes that are in those subgraphs.
+        List<DagSubgraph> subgraphs = new ArrayList<>();
+        
 	    
-	    Map<ASTNode, DagNode> astToDagNode = new HashMap<>();
 	    public void addNode(DagNode n) {
 	        nodes.add(n);
 	        astToDagNode.put(n.astNode, n);
@@ -1626,8 +1633,14 @@ public class JavaToGraphviz {
             // e.gvAttributes.put("dir", "back");
             // e.gvAttributes.put("style", "dashed");
             e.classes.add("back");
-            
             return e;
+        }
+        
+        public void addBackEdge(ExitEdge e) {
+            if (e.n1 == null) { throw new NullPointerException("null n1"); }
+            if (e.n2 == null) { throw new NullPointerException("null n2"); }
+            e.back = true;
+            edges.add(e);
         }
 
 	    
@@ -1656,7 +1669,6 @@ public class JavaToGraphviz {
             names.add(n + "_" + idx); 
             return n + "_" + idx;
         }
-	    
 	}
 	static class DagNode {
 	    
@@ -1774,6 +1786,27 @@ public class JavaToGraphviz {
 	                "    ]") + ";";
         }
 	}
+    // in this data model, a subgraph is just used to group nodes together
+    // (those nodes must already exist at the Dag level)
+    static class DagSubgraph {
+        Dag dag;
+        
+        // graphviz formatting attributes for the digraph
+        Map<String, String> gvAttributes = new HashMap<>();
+        // styles after css rules have been applied
+        Map<String, String> gvStyles = new HashMap<>();
+        Map<String, String> gvNodeStyles = new HashMap<>();
+        Map<String, String> gvEdgeStyles = new HashMap<>();
+
+        List<DagNode> nodes = new ArrayList<>();
+        
+        public DagSubgraph(Dag dag) {
+            this.dag = dag;
+        }
+        
+    }
+
+    
 	
 	// an edge whose second node isn't known yet
 	static class ExitEdge extends DagEdge {

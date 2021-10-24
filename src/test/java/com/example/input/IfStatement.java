@@ -19,7 +19,7 @@ public class IfStatement {
 
 
     // gv: comment just before the method
-    public void testIf() {
+    public void testIf() {t
         // gv: start of method
         boolean iThink = false;
         if (iThink) { // gv: This is a reasonably long comment to see how wordwrap works
