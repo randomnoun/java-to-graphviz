@@ -14,6 +14,7 @@ public class ContinueBreakLabel {
         boolean snare;
         boolean hihat;
     
+        // that's bar1 (one), not barl (barl), by the way
         bar1: for (int semiquaver = 0; semiquaver < 16; semiquaver++) {
             hihat = (semiquaver % 2) == 0; // hihats on the quavers
             switch (semiquaver) {
