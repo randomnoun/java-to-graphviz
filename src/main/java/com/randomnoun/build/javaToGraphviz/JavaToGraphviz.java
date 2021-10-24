@@ -531,19 +531,30 @@ public class JavaToGraphviz {
 
     private void setIdLabel(DagEdge edge) {
         String labelFormat = edge.gvStyles.get("gv-labelFormat");
+        String xlabelFormat = edge.gvStyles.get("gv-xlabelFormat");
+        Map<String, String> vars = new HashMap<>();
+        vars.put("startNodeId", edge.n1.name);
+        vars.put("endNodeId", edge.n2.name);
+        vars.put("breakLabel", edge.gvAttributes.get("breakLabel") == null ? "" : edge.gvAttributes.get("breakLabel")); 
+        vars.put("continueLabel", edge.gvAttributes.get("continueLabel") == null ? "" : edge.gvAttributes.get("continueLabel"));
+
         if (edge.label == null && labelFormat != null) {
             if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
                 labelFormat = labelFormat.substring(1, labelFormat.length() - 1);
             } else {
                 throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
             }
-            Map<String, String> vars = new HashMap<>();
-            vars.put("startNodeId", edge.n1.name);
-            vars.put("endNodeId", edge.n2.name);
-            vars.put("breakLabel", edge.gvAttributes.get("breakLabel") == null ? "" : edge.gvAttributes.get("breakLabel")); 
-            vars.put("continueLabel", edge.gvAttributes.get("continueLabel") == null ? "" : edge.gvAttributes.get("continueLabel"));
             edge.label = Text.substitutePlaceholders(vars, labelFormat).trim();
         }
+        if (edge.label == null && xlabelFormat != null) {
+            if (xlabelFormat.startsWith("\"") && xlabelFormat.endsWith("\"")) {
+                xlabelFormat = xlabelFormat.substring(1, xlabelFormat.length() - 1);
+            } else {
+                throw new IllegalArgumentException("invalid gv-xlabelFormat '" + xlabelFormat + "'; expected double-quoted string");
+            }
+            edge.gvAttributes.put("xlabel",  Text.substitutePlaceholders(vars, xlabelFormat).trim());
+        }
+        
     }
 
     private void setIdLabel(DagSubgraph sg) {
@@ -615,10 +626,12 @@ public class JavaToGraphviz {
      * @param node
      */
     public void moveToSubgraph(DagSubgraph sg, DagElement sgEl, Dag dag,  Map<DagNode, DagElement> dagNodesToElements, DagNode node) {
-        sg.nodes.add(node);
         if (dag.dagNodeToSubgraph.containsKey(node)) {
-            throw new IllegalStateException("subgraph already contains node"); 
+            // throw new IllegalStateException("subgraph already contains node");
+            logger.warn("moving node to new subgraph");
+            dag.dagNodeToSubgraph.get(node).nodes.remove(node);
         }
+        sg.nodes.add(node);
         dag.dagNodeToSubgraph.put(node, sg);
 
         /*
@@ -634,17 +647,21 @@ public class JavaToGraphviz {
             // this should always be an immediate subgraph as we're traversing this in depth-first order
             // a node can only be in 1 subgraph at a time.
             DagSubgraph ssg = dag.dagNodeToSubgraph.get(child);
+            moveToSubgraph(sg, sgEl, dag, dagNodesToElements, child);
+            
+            /*
             if (ssg != null) {
                 if (ssg.container == sg) {
                     logger.warn("we're already in the right subgraph");
                 } else {
                     logger.warn("rejigging subgraphs"); // hoist the rigging
-                    sg.container.getSubgraphs().remove(ssg);
+                    ssg.container.getSubgraphs().remove(ssg);
                     sg.subgraphs.add(ssg);
                 }
             } else {
                 moveToSubgraph(sg, sgEl, dag, dagNodesToElements, child);
             }
+            */
         }
         
     }
@@ -844,6 +861,18 @@ public class JavaToGraphviz {
             return next;
         }
         
+        // scope that bounds statements that can throw
+        public LexicalScope newThrowScope() {
+            LexicalScope next = new LexicalScope();
+            next.breakEdges = this.breakEdges;
+            next.continueNode = this.continueNode;
+            next.returnEdges = this.returnEdges;
+            next.throwEdges = new ArrayList<>();
+            next.labeledScopes = this.labeledScopes;
+            return next;
+        }
+        
+        
         // scope for user-defined subgraphs, does not affect nodes and edges.
         // going to allow these around most grouping nodes, although I was hoping to do that when we apply CSS rules
         // which won't be possible if I'm doing this within blocks as well.
@@ -921,7 +950,7 @@ public class JavaToGraphviz {
         // x Throw
         // x While
         // x LabelledStatements
-        // try/catch
+        // x try/catch
         // synchronized
         
         // goto will be considered tedious if I have to do that. ho ho ho.
@@ -1180,28 +1209,105 @@ public class JavaToGraphviz {
     }
 	
 	// draw branches into and out of try body
-	// TODO: catch block
     private List<ExitEdge> addTryEdges(Dag dag, DagNode tryNode, LexicalScope scope) {
         // draw the edges
-        TryStatement ts;
-        DagNode body = null;
-        DagNode catchNode = null;
+        TryStatement ts = (TryStatement) tryNode.astNode;
+        
+        // children of TryStatement are
+        /*
+            // visit children in normal left to right reading order
+            if (this.ast.apiLevel >= AST.JLS4_INTERNAL) {
+                acceptChildren(visitor, this.resources);
+            }
+            acceptChild(visitor, getBody());
+            acceptChildren(visitor, this.catchClauses);
+            acceptChild(visitor, getFinally());
+        */
+        List<ASTNode> resourcesNodes = ts.resources();
+        ASTNode bodyNode = ts.getBody();
+        List<ASTNode> catchClauseNodes = ts.catchClauses();
+        ASTNode finallyNode = ts.getFinally();
+        
+        List<DagNode> resourceDags = new ArrayList();
+        DagNode bodyDag = null;
+        List<DagNode> catchClauseDags = new ArrayList();
+        DagNode finallyDag = null;
+        
         for (DagNode c : tryNode.children) {
-            // logger.info("try child " + c.locationInParent);
-            // both try and catch have a locationInParent of 'body'
-            if (c.astNode.getParent() instanceof CatchClause) {
-                catchNode = c;
+            if (resourcesNodes.contains(c.astNode)) {
+                resourceDags.add(c);
+                c.classes.add("tryResource");
+            } else if (bodyNode == c.astNode) {
+                bodyDag = c;
+                c.classes.add("tryBody");
+            } else if (catchClauseNodes.contains(c.astNode)) {
+                catchClauseDags.add(c);
+                c.classes.add("catchClause");
+            } else if (finallyNode == c.astNode) {
+                finallyDag = c;
+                c.classes.add("finally");
             } else {
-                body = c;
+                throw new IllegalStateException("child of TryStatement was not a resource, body, catchClause or finally node");
             }
         }
-        if (body == null) {
+        if (bodyDag == null) {
             throw new IllegalStateException("try with no body");
         }
+
+        // add clusters for try, catch and finally blocks
+        // this occurs before CSS subgraph creation so they're all children of the Dag
+        /*
+        DagSubgraph bodySg = new DagSubgraph(dag, dag);
+        bodySg.classes.add("tryBody");
+        dag.subgraphs.add(bodySg);
+        bodySg.nodes.add(bodyDag);
+        if (catchClauseDags.size() > 0) {
+            // List<DagSubgraph> catchClauseSgs = new ArrayList<>();
+            for (DagNode ccDag : catchClauseDags) {
+                DagSubgraph ccSg = new DagSubgraph(dag, dag);
+                ccSg.classes.add("catchClause");
+                dag.subgraphs.add(ccSg);
+                ccSg.nodes.add(ccDag);
+            }
+        }
+        if (finallyDag != null) {
+            DagSubgraph finallySg = new DagSubgraph(dag, dag);
+            finallySg.classes.add("finally");
+            dag.subgraphs.add(finallySg);
+            finallySg.nodes.add(finallyDag);
+        }
+        */
         
-        dag.addEdge(tryNode,  body);
-        List<ExitEdge> bodyPrevNodes = addEdges(dag, body, scope);
-        return bodyPrevNodes;
+        dag.addEdge(tryNode,  bodyDag);
+        
+        LexicalScope throwScope = scope.newThrowScope();
+        List<ExitEdge> tryPrevNodes = new ArrayList<>(addEdges(dag, bodyDag, throwScope));
+
+        for (DagNode ccDag : catchClauseDags) {
+            // dag.rootNodes.add(ccDag);
+            for (ExitEdge ee : throwScope.throwEdges) {
+                // don't know which catch without a type hierarchy so create an edge for each one
+                DagEdge de = new DagEdge();
+                de.n1 = ee.n1;
+                de.n2 = ccDag;
+                de.classes.add("throw");
+                dag.addEdge(de);
+            }
+            
+            List<ExitEdge> ccPrevNodes = addEdges(dag, ccDag, scope);
+            tryPrevNodes.addAll(ccPrevNodes);
+        }
+        
+        if (finallyDag != null) {
+            for (ExitEdge ee : tryPrevNodes) {
+                ee.n2 = finallyDag;
+                dag.addEdge(ee);
+            }
+            tryPrevNodes = addEdges(dag, finallyDag, scope);
+        }
+        
+        
+        return tryPrevNodes;
         // return prevNodes;
     }
     
@@ -2283,6 +2389,7 @@ public class JavaToGraphviz {
             // writeCommentsToLine(line);
 
             if (node instanceof MethodDeclaration ||
+                node instanceof CatchClause ||
                 (node instanceof Statement &&
                 (includeThrowNode || !(node instanceof ThrowStatement)) )) {
                 

@@ -93,6 +93,60 @@ node.methodDeclaration > subgraph {
   ranksep : 0.5;
 }
 
+/*
+node.try { gv-newSubgraph: true; }
+node.try > subgraph {
+  gv-idFormat : "cluster_t_${lineNumber}";
+  gv-labelFormat : "try";
+  pencolor : black; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
+*/
+
+/* these subgraphs are created by the code, not by CSS. Actually maybe I could do this in CSS. */
+
+node.tryResource { gv-newSubgraph: true; } 
+node.tryResource > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_resource_${lineNumber}";
+  gv-labelFormat : "resource";
+  pencolor : black; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
+
+
+node.tryBody { gv-newSubgraph: true; } 
+node.tryBody > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_body_${lineNumber}";
+  gv-labelFormat : "body";
+  pencolor : black; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
+
+node.catchClause { gv-newSubgraph: true; } 
+node.catchClause > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_catch_${lineNumber}";
+  gv-labelFormat : "catch ${exceptionSpec}";
+  pencolor : black; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
+
+node.finally { gv-newSubgraph: true; } 
+node.finally > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_finally_${lineNumber}";
+  gv-labelFormat : "finally";
+  pencolor : black; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
+
 
 
 /* edge styles */
@@ -100,7 +154,12 @@ node.methodDeclaration > subgraph {
 edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }
 edge.continue { color: red; gv-labelFormat: "continue ${continueLabel}"; }
 edge.return { color: blue; gv-labelFormat: "return"; }
-edge.throw { color: purple; gv-labelFormat: "throw"; }
+
+/* removed 'gv-labelFormat: "throw";' here
+   as labelling the throws really throws out the cluster layout
+   boom tish.
+*/ 
+edge.throw { color: purple;  }
 
 edge.back { style: dashed; }
 edge.back.for { gv-labelFormat: "for"; }
@@ -109,12 +168,9 @@ edge.back.while { gv-labelFormat: "while"; }
 edge.back.do { gv-labelFormat: "do"; }
 
 
-
-
-
-
-edge.if.true { gv-labelFormat: "Y"; }
-edge.if.false { gv-labelFormat: "N"; }
+/** @TODO If it's in a cluster, use xlabel rather than label otherwise layout goes all spaced out */
+edge.if.true { gv-xlabelFormat: "Y"; xlabel: "Y"; }
+edge.if.false { gv-xlabelFormat: "N"; xlabel: "N"; }
 
 edge.while.true { gv-labelFormat: "Y"; }
 edge.while.false { gv-labelFormat: "N"; }
