@@ -1,23 +1,23 @@
-package com.randomnoun.build.javaToGraphviz;
+package com.randomnoun.build.javaToGraphviz.dom;
 
 import java.util.Map;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Element;
 
-import com.randomnoun.build.javaToGraphviz.JavaToGraphviz.Dag;
-import com.randomnoun.build.javaToGraphviz.JavaToGraphviz.DagEdge;
-import com.randomnoun.build.javaToGraphviz.JavaToGraphviz.DagNode;
-import com.randomnoun.build.javaToGraphviz.JavaToGraphviz.DagSubgraph;
+import com.randomnoun.build.javaToGraphviz.dag.Dag;
+import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
+import com.randomnoun.build.javaToGraphviz.dag.DagNode;
+import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.common.Text;
 
 public class DagElement extends Element {
 
     // only one of these will be populated
-    Dag dag;
-    DagNode dagNode;
-    DagEdge dagEdge;
-    DagSubgraph dagSubgraph;
+    public Dag dag;
+    public DagNode dagNode;
+    public DagEdge dagEdge;
+    public DagSubgraph dagSubgraph;
     
     public DagElement(DagNode dagNode, Map<String, String> attributes) {
         super("node");

@@ -1,4 +1,4 @@
-package com.randomnoun.build.javaToGraphviz;
+package com.randomnoun.build.javaToGraphviz.dom;
 
 // copied from https://github.com/vilterp/StylesheetApplier/blob/master/src/StylesheetApplier.java
 // by knoxg on 2021-10-22 ( no license provided )
@@ -71,7 +71,7 @@ public class StylesheetApplier {
 				}
 			});
 
-	static class ExceptionErrorHandler implements ErrorHandler {
+	public static class ExceptionErrorHandler implements ErrorHandler {
 
 		@Override
 		public void warning( CSSParseException e ) throws CSSException {

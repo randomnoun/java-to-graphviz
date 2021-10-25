@@ -1,4 +1,4 @@
-package com.randomnoun.build.javaToGraphviz;
+package com.randomnoun.build.javaToGraphviz.dom;
 
 import java.io.IOException;
 import java.io.InputStream;
