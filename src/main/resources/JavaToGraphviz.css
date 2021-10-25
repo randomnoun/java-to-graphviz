@@ -160,7 +160,20 @@ node.finally > subgraph {
   ranksep : 0.5;
 }
 
+node.synchronized { gv-newSubgraph: true; } 
+node.synchronized > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_sync_${lineNumber}";
+  gv-labelFormat : "synchronized";
+  pencolor : black; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
 
+
+
+
+node.lambda { gv-newSubgraph: true; } /* when I get round to those */
 
 /* edge styles */
 

@@ -789,6 +789,8 @@ public class JavaToGraphviz {
 	        return addMethodDeclarationEdges(dag, node, scope);
 	    } else if (node.type.equals("Block")) {
 	        return addBlockEdges(dag, node, scope);
+	    } else if (node.type.equals("Synchronized")) {
+	        return addSynchronizedEdges(dag, node, scope);
 	    } else if (node.type.equals("If")) {
 	        return addIfEdges(dag, node, scope);
         } else if (node.type.equals("Try")) {
@@ -831,7 +833,7 @@ public class JavaToGraphviz {
         // x While
         // x LabelledStatements
         // x try/catch
-        // synchronized
+        // x synchronized
         
         // goto will be considered tedious if I have to do that. ho ho ho.
             
@@ -840,7 +842,6 @@ public class JavaToGraphviz {
           node.type.equals("EmptyStatement") ||
           node.type.equals("Expression") ||
           node.type.equals("SuperConstructorInvocation") ||
-          node.type.equals("Synchronized") || // could be same as Block really
           node.type.equals("TypeDeclaration") ||
           node.type.equals("VariableDeclaration") ||
           node.type.equals("comment")) { // lower-case c for nodes created from gv comments
@@ -876,7 +877,21 @@ public class JavaToGraphviz {
 	    }
 	    return prevNodes;
     }
-	
+
+    private List<ExitEdge> addSynchronizedEdges(Dag dag, DagNode synchronizedNode, LexicalScope scope) {
+        // there's an expression and a block but we don't draw expressions yet
+        if (synchronizedNode.children.size() != 1) {
+            throw new IllegalStateException("expected 1 child; found " + synchronizedNode.children.size());
+        }
+
+        // draw an edge to the sync node to the block so that we can put a subgraph around the sync node
+        DagNode synchronizedBlock = synchronizedNode.children.get(0);
+        dag.addEdge(synchronizedNode, synchronizedBlock);
+        List<ExitEdge> prevNodes = addBlockEdges(dag, synchronizedBlock, scope);  
+        return prevNodes;
+    }
+
+    
 	// draw lines from each statement to each other
     // returns an empty list
     private List<ExitEdge> addMethodDeclarationEdges(Dag dag, DagNode method, LexicalScope scope) {
