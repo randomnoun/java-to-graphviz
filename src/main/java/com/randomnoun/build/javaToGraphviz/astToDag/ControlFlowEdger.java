@@ -18,7 +18,6 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.internal.core.manipulation.dom.ASTResolving;
 
-import com.randomnoun.build.javaToGraphviz.JavaToGraphviz;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;

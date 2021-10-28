@@ -13,7 +13,7 @@ import org.eclipse.jdt.core.dom.ThrowStatement;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
-import com.randomnoun.build.javaToGraphviz.comment.GvDigraphComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
@@ -72,7 +72,7 @@ public class AstToDagVisitor extends ASTVisitor {
             if (ct instanceof GvComment) {
                 mn.classes.addAll(((GvComment) ct).classes);
                 mn.label = ct.text; // last comment wins
-            } else if (ct instanceof GvDigraphComment) {
+            } else if (ct instanceof GvGraphComment) {
                 mn.digraphId = ct.text;
             } else if (ct instanceof GvSubgraphComment) {
                 mn.subgraph = ct.text;
@@ -96,7 +96,7 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.astNode = null;
             if (ct instanceof GvComment) {
                 dn.classes.addAll(((GvComment) ct).classes);
-            } else if (ct instanceof GvDigraphComment) {
+            } else if (ct instanceof GvGraphComment) {
                 dn.digraphId = ct.text;
             } else if (ct instanceof GvSubgraphComment) {
                 dn.subgraph = ct.text;
@@ -176,7 +176,7 @@ public class AstToDagVisitor extends ASTVisitor {
                     if (gvComment.inlineStyleString!=null) {
                         dn.gvAttributes.put("style", gvComment.inlineStyleString);
                     }
-                } else if (ct instanceof GvDigraphComment) {
+                } else if (ct instanceof GvGraphComment) {
                     dn.digraphId = ct.text;
                 } else if (ct instanceof GvSubgraphComment) {
                     dn.subgraph = ct.text;

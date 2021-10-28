@@ -15,7 +15,7 @@ import org.w3c.dom.css.CSSStyleSheet;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
-import com.randomnoun.build.javaToGraphviz.comment.GvDigraphComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvStyleComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.dom.RestrictedCssStyleSheetImpl;
@@ -88,7 +88,7 @@ public class CommentExtractor {
 
             } else if (text.startsWith("gv-digraph:")) {
                 String s = text.substring(11).trim();
-                comments.add(new GvDigraphComment(c, cu.getLineNumber(start), s));
+                comments.add(new GvGraphComment(c, cu.getLineNumber(start), s));
 
             } else if (text.startsWith("gv-subgraph:")) {
                 String s = text.substring(11).trim();
