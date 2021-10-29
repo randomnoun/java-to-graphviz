@@ -25,16 +25,21 @@ public class JavaToGraphvizTest {
     
     @Test
     public void testControlFlowStatements() throws IOException {
-        // testStatement("com.example.input.DoStatement");
-        // testStatement("com.example.input.ForStatement");
-        // testStatement("com.example.input.IfStatement");
-        // testStatement("com.example.input.IfStatementExternalCss");
-        // testStatement("com.example.input.SwitchStatement");
-        // testStatement("com.example.input.WhileStatement");
-        // testStatement("com.example.input.ContinueBreakLabel");
-        // testStatement("com.example.input.TryCatchStatement");
-        // testStatement("com.example.input.SynchronizeStatement");
-        // testStatement("com.example.input.MultipleGraphs");
+        
+        testStatement("com.example.input.TryCatchStatement");
+        
+        testStatement("com.example.input.ContinueBreakLabel");
+        
+        testStatement("com.example.input.DoStatement");
+         testStatement("com.example.input.ForStatement");
+         testStatement("com.example.input.IfStatement");
+         testStatement("com.example.input.IfStatementExternalCss");
+         testStatement("com.example.input.SwitchStatement");
+         testStatement("com.example.input.WhileStatement");
+        
+         
+         testStatement("com.example.input.SynchronizeStatement");
+         testStatement("com.example.input.MultipleGraphs");
         testStatement("com.example.input.UserDefinedSubgraphs");
 
     }

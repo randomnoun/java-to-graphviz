@@ -202,21 +202,21 @@ edge.case.default { gv-labelFormat: "default"; }
 edge.switch.fallthrough { } /* fall through from case block to next case */
 edge.switch.false { } /* no case conditions match, and no default present */
 
-/** If edges are in a cluster, use xlabel rather than label otherwise layout goes all spaced out */
+/** If edges are in a subcluster, use xlabel rather than label otherwise layout goes all spaced out */
 
-subgraph edge.break { gv-labelFormat: unset; gv-xlabelFormat: "break ${breakLabel}"; }
-subgraph edge.continue { gv-labelFormat: unset; gv-xlabelFormat: "continue ${continueLabel}"; }
-subgraph edge.return { gv-labelFormat: unset; gv-xlabelFormat: "return"; }
-subgraph edge.back.for { gv-labelFormat: unset;  gv-xlabelFormat: "for"; }
-subgraph edge.back.enhancedFor { gv-labelFormat: unset; gv-xlabelFormat: "for"; }
-subgraph edge.back.while { gv-labelFormat: unset; gv-xlabelFormat: "while"; }
-subgraph edge.back.do { gv-labelFormat: unset; gv-xlabelFormat: "do"; }
-subgraph edge.if.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
-subgraph edge.if.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
-subgraph edge.while.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
-subgraph edge.while.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
-subgraph edge.case { gv-labelFormat: unset; gv-xlabelFormat: "case"; }
-subgraph edge.case.default { gv-labelFormat: unset; gv-xlabelFormat: "default"; }
+subgraph subgraph edge.break { gv-labelFormat: unset; gv-xlabelFormat: "break ${breakLabel}"; }
+subgraph subgraph edge.continue { gv-labelFormat: unset; gv-xlabelFormat: "continue ${continueLabel}"; }
+subgraph subgraph edge.return { gv-labelFormat: unset; gv-xlabelFormat: "return"; }
+subgraph subgraph edge.back.for { gv-labelFormat: unset;  gv-xlabelFormat: "for"; }
+subgraph subgraph edge.back.enhancedFor { gv-labelFormat: unset; gv-xlabelFormat: "for"; }
+subgraph subgraph edge.back.while { gv-labelFormat: unset; gv-xlabelFormat: "while"; }
+subgraph subgraph edge.back.do { gv-labelFormat: unset; gv-xlabelFormat: "do"; }
+subgraph subgraph edge.if.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
+subgraph subgraph edge.if.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
+subgraph subgraph edge.while.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
+subgraph subgraph edge.while.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
+subgraph subgraph edge.case { gv-labelFormat: unset; gv-xlabelFormat: "case"; }
+subgraph subgraph edge.case.default { gv-labelFormat: unset; gv-xlabelFormat: "default"; }
 
 
 
