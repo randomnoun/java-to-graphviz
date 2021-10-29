@@ -14,8 +14,6 @@ import com.randomnoun.common.Text;
 
 public class DagNode {
     
-    public String digraphId;
-    public String subgraph;
     public DagNode parentDagNode;
     public List<DagNode> children = new ArrayList<>();
     
