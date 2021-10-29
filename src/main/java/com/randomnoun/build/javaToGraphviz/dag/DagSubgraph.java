@@ -12,9 +12,9 @@ import com.randomnoun.common.Text;
 
 // a DagSubgraph is a graphviz graph ( if container == null)
 // or a graphviz subgraph 
-public class DagSubgraph implements SubgraphHolder {
+public class DagSubgraph  {
     public Dag dag; // top-level dag
-    public SubgraphHolder container; // if null, this is a root graph
+    public DagSubgraph container; // if null, this is a root graph
     
     public String name;  // graphviz name
     public String label; // graphviz label
@@ -35,7 +35,7 @@ public class DagSubgraph implements SubgraphHolder {
     // subsubgraphs
     public List<DagSubgraph> subgraphs = new ArrayList<>();
     
-    public DagSubgraph(Dag dag, SubgraphHolder container) {
+    public DagSubgraph(Dag dag, DagSubgraph container) {
         this.dag = dag;
         this.container = container;
     }
@@ -76,7 +76,8 @@ public class DagSubgraph implements SubgraphHolder {
           
         
         
-        String result = s +  (isRoot ? "digraph " : "subgraph " + name) + " {\n" +
+        String result = s +  (isRoot ? "digraph " : "subgraph ") +
+          (name == null ? "" : name + " " ) + "{\n" +
           (label == null ? "" : s + "  label=\"" + labelText + "\";\n") +
           (na.equals("") ? "" : "  node [\n" + na + "  ]\n") +
           (ea.equals("") ? "" : "  edge [\n" + ea + "  ]\n") +
@@ -125,7 +126,6 @@ public class DagSubgraph implements SubgraphHolder {
         return result;
     }
 
-    @Override
     public List<DagSubgraph> getSubgraphs() {
         return subgraphs;
     }
