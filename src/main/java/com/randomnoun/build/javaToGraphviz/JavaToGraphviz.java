@@ -54,7 +54,7 @@ public class JavaToGraphviz {
     List<CommentText> comments;
     CSSStyleSheet styleSheet;
     Dag dag;
-    int rootNodeIdx;
+    int rootGraphIdx;
     
     // options
     boolean removeNode = false;
@@ -171,7 +171,7 @@ public class JavaToGraphviz {
         cu.accept(dv);
         dag = dv.getDag();
         
-        rootNodeIdx = 0;
+        rootGraphIdx = 0;
 	}
 
 	/** Generate a single graphviz diagram.
@@ -182,9 +182,15 @@ public class JavaToGraphviz {
 	 */
 	public boolean writeGraphviz(Writer writer) throws IOException {
 	    
-	    DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
+	    // DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
+	    DagSubgraph rootGraph = dag.rootGraphs.get(rootGraphIdx);
+	    
         PrintWriter pw = new PrintWriter(writer);
 
+        dag.edges.clear();
+
+        
+        /*
         // clear edges and graphs from previous runs
         dag.edges.clear();
         dag.subgraphs.clear();
@@ -198,35 +204,36 @@ public class JavaToGraphviz {
         for (DagNode n : dag.nodes) {
             n.gvStyles.clear();
         }
+        */
         
-        
-        while (methodNode != null) {
-            LexicalScope lexicalScope = new LexicalScope();
-            
-            ControlFlowEdger edger = new ControlFlowEdger(dag);
-            edger.setIncludeThrowEdges(includeThrowEdges);
-            
-            List<ExitEdge> ee = edger.addEdges(dag, methodNode, lexicalScope);
-
-            DagNodeFilter filter = new DagNodeFilter(dag);
-            
-            methodNode.keepNode = false;
-            filter.setLastKeepNode(methodNode, methodNode);
-            if (removeNode) {
-                filter.removeNodes(methodNode); // peephole node removal.
-            }
-            
-            rootNodeIdx++;
-            methodNode = rootNodeIdx < dag.rootNodes.size() ? dag.rootNodes.get(rootNodeIdx) : null;
-            if (methodNode != null && methodNode.digraphId != null) {
-                methodNode = null;
+        for (DagNode methodNode : dag.rootNodes) {
+            if (rootGraph.nodes.contains(methodNode)) {
+                
+                LexicalScope lexicalScope = new LexicalScope();
+                
+                ControlFlowEdger edger = new ControlFlowEdger(dag);
+                edger.setIncludeThrowEdges(includeThrowEdges);
+                
+                List<ExitEdge> ee = edger.addEdges(dag, methodNode, lexicalScope);
+    
+                DagNodeFilter filter = new DagNodeFilter(dag);
+                
+                methodNode.keepNode = false;
+                filter.setLastKeepNode(methodNode, methodNode);
+                if (removeNode) {
+                    filter.removeNodes(methodNode); // peephole node removal.
+                }
             }
         }
 
         // subgraphs are now defined in the Dag from the stylesheet
-        DagStyleApplier dsa = new DagStyleApplier(dag);
+        DagStyleApplier dsa = new DagStyleApplier(dag, rootGraph);
         dsa.inlineStyles(styleSheet);
 
+        pw.println(rootGraph.toGraphviz(0));
+        
+        
+        /*
         pw.println(dag.toGraphvizHeader());
         for (DagNode node : dag.nodes) {
             // only draw nodes if they have an edge
@@ -250,8 +257,10 @@ public class JavaToGraphviz {
         }
         pw.println(dag.toGraphvizFooter());
         pw.flush();
+        */
         
-        return (rootNodeIdx < dag.rootNodes.size());
+        rootGraphIdx++; 
+        return (rootGraphIdx < dag.rootGraphs.size());
 	}
 
 	public static void main(String args[]) throws Exception {
