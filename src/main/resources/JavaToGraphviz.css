@@ -46,8 +46,8 @@ That DOM looks like this
 graph {
 	fontname: "Handlee";
 	bgcolor: transparent;
-	gv-idFormat: "graph";
-    gv-labelFormat: "";
+	gv-idFormat: "G";
+    gv-labelFormat: unset;
 }
 /* the styles on graphNode and graphEdge are applied at the graph level, 
    but styles on node and edge are (repeatedly) applied at the node and edges 
@@ -59,6 +59,16 @@ graphNode {
 graphEdge {
     fontname: "Handlee"
 }
+subgraph {
+  pencolor : white; 
+  labeljust : "l";
+
+  /* the ranksep here is an attempt to remove whitespace in the subgraph. 
+     turns out this attribute is disregarded if there are any edge labels in the subgraph. which is a bit annoying. 
+     xlabels don't add extra ranking whitespace, but the labels look a bit crap. */ 
+  ranksep : 0.5;
+}
+
 
 /* ok let's have some label formats as well */
 /* node { gv-labelFormat : "${nodeType}"; } */
@@ -81,18 +91,10 @@ node.method.end {
     gv-labelFormat: "return";
 }
 
+node.beginSubgraph { gv-beginOuterSubgraph: true; } /** create a subgraph element *above* this node, then move this node and all nodes to gv-endSubgraph into that subgraph */
+node.endSubgraph { gv-endOuterSubgraph: true; }
 
-subgraph {
-  pencolor : white; 
-  labeljust : "l";
-
-  /* the ranksep here is an attempt to remove whitespace in the subgraph. 
-     turns out this attribute is disregarded if there are any edge labels in the subgraph. which is a bit annoying. 
-     xlabels don't add extra ranking whitespace, but the labels look a bit crap. */ 
-  ranksep : 0.5;
-}
-
-node.methodDeclaration { gv-newSubgraph: true; }
+node.methodDeclaration { gv-newSubgraph: true; } /* create a subgraph element *under* this node, then move child nodes into that subgraph */
 
 /* through the magic of multiple CSS passes, the gv-newSubgraph rule above will construct a subgraph
    element which can also be styled in CSS. This only happens once.
@@ -138,6 +140,7 @@ node.tryBody > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_body_${lineNumber}";
   gv-labelFormat : "body";
+  pencolor : black;
 }
 
 node.catchClause { gv-newSubgraph: true; } 
@@ -145,6 +148,7 @@ node.catchClause > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_catch_${lineNumber}";
   gv-labelFormat : "catch ${exceptionSpec}";
+  pencolor : black;
 }
 
 node.finally { gv-newSubgraph: true; } 
@@ -152,6 +156,7 @@ node.finally > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_finally_${lineNumber}";
   gv-labelFormat : "finally";
+  pencolor : black;
 }
 
 node.synchronized { gv-newSubgraph: true; } 
@@ -159,6 +164,7 @@ node.synchronized > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_sync_${lineNumber}";
   gv-labelFormat : "synchronized";
+  pencolor : black;
 }
 
 
@@ -172,11 +178,8 @@ edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }
 edge.continue { color: red; gv-labelFormat: "continue ${continueLabel}"; }
 edge.return { color: blue; gv-labelFormat: "return"; }
 
-/* removed 'gv-labelFormat: "throw";' here
-   as labelling the throws really throws out the cluster layout
-   boom tish.
-*/ 
-edge.throw { color: maroon;  } /* go the broncos */
+/* 'gv-xlabelFormat' here as labelling the throws really throws out the cluster layout. */ 
+edge.throw { color: maroon;  gv-xlabelFormat: "throw"; } /* go the broncos */
 
 edge.back { style: dashed; }
 edge.back.for { gv-labelFormat: "for"; }
@@ -185,9 +188,9 @@ edge.back.while { gv-labelFormat: "while"; }
 edge.back.do { gv-labelFormat: "do"; }
 
 
-/** @TODO If it's in a cluster, use xlabel rather than label otherwise layout goes all spaced out */
-edge.if.true { gv-xlabelFormat: "Y"; xlabel: "Y"; }
-edge.if.false { gv-xlabelFormat: "N"; xlabel: "N"; }
+/** @TODO  */
+edge.if.true { gv-labelFormat: "Y"; }
+edge.if.false { gv-labelFormat: "N"; }
 
 edge.while.true { gv-labelFormat: "Y"; }
 edge.while.false { gv-labelFormat: "N"; }
@@ -198,6 +201,24 @@ edge.case { gv-labelFormat: "case"; }
 edge.case.default { gv-labelFormat: "default"; }
 edge.switch.fallthrough { } /* fall through from case block to next case */
 edge.switch.false { } /* no case conditions match, and no default present */
+
+/** If edges are in a cluster, use xlabel rather than label otherwise layout goes all spaced out */
+
+subgraph edge.break { gv-labelFormat: unset; gv-xlabelFormat: "break ${breakLabel}"; }
+subgraph edge.continue { gv-labelFormat: unset; gv-xlabelFormat: "continue ${continueLabel}"; }
+subgraph edge.return { gv-labelFormat: unset; gv-xlabelFormat: "return"; }
+subgraph edge.back.for { gv-labelFormat: unset;  gv-xlabelFormat: "for"; }
+subgraph edge.back.enhancedFor { gv-labelFormat: unset; gv-xlabelFormat: "for"; }
+subgraph edge.back.while { gv-labelFormat: unset; gv-xlabelFormat: "while"; }
+subgraph edge.back.do { gv-labelFormat: unset; gv-xlabelFormat: "do"; }
+subgraph edge.if.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
+subgraph edge.if.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
+subgraph edge.while.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
+subgraph edge.while.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
+subgraph edge.case { gv-labelFormat: unset; gv-xlabelFormat: "case"; }
+subgraph edge.case.default { gv-labelFormat: unset; gv-xlabelFormat: "default"; }
+
+
 
 
 
