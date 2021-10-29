@@ -196,13 +196,29 @@ public class AstToDagVisitor extends ASTVisitor {
                 }
                 lastIdx++;
             }
+            
+            // if this is a method node, include comments to the end of the method
+            
+            
+            
         }
         
         return true;
     }
     
     public void postVisit(ASTNode node) {
-        
+        DagNode pdn = getClosestDagNode(node);
+
+        if (node instanceof MethodDeclaration) {
+            DagNode dn = dag.astToDagNode.get(node);
+            int endLineNumber = cu.getLineNumber(node.getStartPosition() + node.getLength());
+            
+            // pdn is the node for the MethodDeclaration, add any trailing comments to the MethodBlock
+            DagNode methodBlock = pdn.children.get(0);
+            
+            // comments have their own nodes
+            createCommentNodesToLine(methodBlock, endLineNumber);
+        }
     }
     
     
