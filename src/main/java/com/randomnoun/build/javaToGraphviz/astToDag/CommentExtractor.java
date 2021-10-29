@@ -27,6 +27,55 @@ public class CommentExtractor {
 
     Logger logger = Logger.getLogger(CommentExtractor.class);
     
+    private static Pattern gvGraphClassPattern = Pattern.compile("^gv-graph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
+    private static Pattern gvSubgraphClassPattern = Pattern.compile("^gv-subgraph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
+    private static Pattern gvNodeClassPattern = Pattern.compile("^gv([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
+
+    private static Pattern gvNextClassPattern = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
+    private static Pattern curlyPattern = Pattern.compile("\\{(.*)\\}");  // @TODO quoting/escaping rules
+    
+    public CommentText getGvComment(String type, Comment c, int lineNumber, Matcher fgm, String text) {
+        List<String> classes = new ArrayList<>();
+        String id = null;
+        // logger.info("groupCount " + fgm.groupCount());
+        if (fgm.group(1)!=null) {
+            char ch = fgm.group(1).charAt(0);
+            if (ch == '#') {
+                id = fgm.group(1).substring(1);
+            } else if (ch == '.') {
+                classes.add(fgm.group(1).substring(1));
+            } else {
+                throw new IllegalStateException("expected '#' or '.', found '" + ch + "'");
+            }
+        }
+        int pos = fgm.end(1);
+        Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
+        logger.info(pos);
+        while (pos!=-1 && gm.find(pos)) {
+            
+            classes.add(gm.group(1).substring(1));
+            pos = gm.end(1);
+            logger.info(pos);
+        }
+        text = text.substring(fgm.end());
+        // System.out.println("classes " + classes + " in " + text); 
+
+        // if there's anything in curly brackets remaining, then that's a style rule.
+        // @TODO handle curlies outside of style rules somehow; quoted/escaped
+        String inlineStyleString = null;
+        Matcher cm = curlyPattern.matcher(text);
+        if (cm.find()) {
+            inlineStyleString = cm.group(1).trim();
+            text = text.substring(0, cm.start()) + text.substring(cm.end());
+        }
+        
+        return "node".equals(type) ? new GvComment(c, lineNumber, id, classes, text, inlineStyleString) :
+            "graph".equals(type) ? new GvGraphComment(c, lineNumber, id, classes, text, inlineStyleString) :
+            "subgraph".equals(type) ? new GvSubgraphComment(c, lineNumber, id, classes, text, inlineStyleString) :
+             null;
+        
+    }
+    
 	/** Return a list of processed comments from the source file. 
 	 * 
 	 * GvStyleComment:    "// gv-style: { xxx }"
@@ -47,10 +96,6 @@ public class CommentExtractor {
         // probably do this right at the end as gv.literal affects how we parse it
         // Pattern valPattern = Pattern.compile("(([a-zA-Z]+)\\s*([^;]*);\\s*)*"); // things;separated;by;semicolons;
         
-        Pattern gvClassPattern = Pattern.compile("^gv(\\.[a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
-        Pattern gvGraphClassPattern = Pattern.compile("^gv-graph(\\.[a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
-        Pattern gvNextClassPattern = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
-        Pattern curlyPattern = Pattern.compile("\\{(.*)\\}");  // @TODO quoting/escaping rules
         
         List<CommentText> comments = new ArrayList<>();
         for (Comment c : (List<Comment>) cu.getCommentList()) {
@@ -87,73 +132,33 @@ public class CommentExtractor {
                     throw new IllegalStateException("gv-style does not start with '{' and end with '}':  '" + text + "'");
                 }
 
-            } else if (text.startsWith("gv-subgraph:")) {
-                String s = text.substring(11).trim();
-                comments.add(new GvSubgraphComment(c, cu.getLineNumber(start), s));
             } else {
-                List<String> classes = new ArrayList<>();
+                Matcher fgm;
+                CommentText gvc = null;
+                fgm = gvNodeClassPattern.matcher(text);
 
-                Matcher fgm = gvGraphClassPattern.matcher(text);
                 if (fgm.find()) {
-                    // logger.info("groupCount " + fgm.groupCount());
-                    if (fgm.group(1)!=null) {
-                        classes.add(fgm.group(1).substring(1));
-                    }
-                    int pos = fgm.end(1);
-                    Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
-                    logger.info(pos);
-                    while (pos!=-1 && gm.find(pos)) {
-                        classes.add(gm.group(1).substring(1));
-                        pos = gm.end(1);
-                        logger.info(pos);
-                    }
-                    text = text.substring(fgm.end());
-                    // System.out.println("classes " + classes + " in " + text); 
-
-                    // if there's anything in curly brackets remaining, then that's a style rule.
-                    // @TODO handle curlies outside of style rules somehow; quoted/escaped
-                    String inlineStyleString = null;
-                    Matcher cm = curlyPattern.matcher(text);
-                    if (cm.find()) {
-                        inlineStyleString = cm.group(1).trim();
-                        text = text.substring(0, cm.start()) + text.substring(cm.end());
-                    }
-                    
-                    comments.add(new GvGraphComment(c, cu.getLineNumber(start), classes, text, inlineStyleString));
+                    gvc = getGvComment("node", c, cu.getLineNumber(start), fgm, text);
                     
                 } else {
-                    
-                    fgm = gvClassPattern.matcher(text);
+                    fgm = gvGraphClassPattern.matcher(text);
                     if (fgm.find()) {
-                        // logger.info("groupCount " + fgm.groupCount());
-                        if (fgm.group(1)!=null) {
-                            classes.add(fgm.group(1).substring(1));
-                        }
-                        int pos = fgm.end(1);
-                        Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
-                        logger.info(pos);
-                        while (pos!=-1 && gm.find(pos)) {
-                            classes.add(gm.group(1).substring(1));
-                            pos = gm.end(1);
-                            logger.info(pos);
-                        }
-                        text = text.substring(fgm.end());
-                        // System.out.println("classes " + classes + " in " + text); 
-
-                        // if there's anything in curly brackets remaining, then that's a style rule.
-                        // @TODO handle curlies outside of style rules somehow; quoted/escaped
-                        String inlineStyleString = null;
-                        Matcher cm = curlyPattern.matcher(text);
-                        if (cm.find()) {
-                            inlineStyleString = cm.group(1).trim();
-                            text = text.substring(0, cm.start()) + text.substring(cm.end());
-                        }
+                        gvc = getGvComment("graph", c, cu.getLineNumber(start), fgm, text);
                         
-                        comments.add(new GvComment(c, cu.getLineNumber(start), classes, text, inlineStyleString));
+                    } else {
+                        fgm = gvSubgraphClassPattern.matcher(text);
+                        if (fgm.find()) {
+                            gvc = getGvComment("subgraph", c, cu.getLineNumber(start), fgm, text);
+                        } else {
+                            // regular comment, ignore
+                        }
                         
                     }
-                    
                 }
+                if (gvc != null) {
+                    comments.add(gvc);
+                }
+                
             }
          
         }
