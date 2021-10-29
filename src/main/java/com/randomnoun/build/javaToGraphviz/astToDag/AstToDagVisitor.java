@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.dom.ThrowStatement;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
@@ -106,7 +107,7 @@ public class AstToDagVisitor extends ASTVisitor {
             DagNode dn = new DagNode();
             dn.keepNode = true; // always keep comments
             dn.type = "comment";
-            dn.line = ct.line;
+            dn.lineNumber = ct.line;
             // dn.name = dag.getUniqueName("c_" + ct.line);
             dn.classes.add("comment");
             dn.label = ct.text;
@@ -125,7 +126,10 @@ public class AstToDagVisitor extends ASTVisitor {
                 dn.name = gvsc.id;
                 dn.classes.addAll(gvsc.classes);
                 dn.classes.add("beginGraph");
-                
+
+            } else if (ct instanceof GvEndSubgraphComment) {
+                dn.classes.add("endGraph");
+
             }
             
             if (pdn!=null) {
@@ -163,7 +167,7 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.label = null; // now set by gv-labelFormat
             dn.classes.add(Text.toFirstLower(clazz));
             
-            dn.line = lineNumber;
+            dn.lineNumber = lineNumber;
             dn.parentDagNode = pdn;
             dn.astNode = node;
 
@@ -180,7 +184,7 @@ public class AstToDagVisitor extends ASTVisitor {
                 pdn.addChild(dn);
             } else {
                 // logger.warn("null pdn on " + node);
-                logger.warn("preVisit: null pdn on " + dn.type + " on line " + dn.line);
+                logger.warn("preVisit: null pdn on " + dn.type + " on line " + dn.lineNumber);
                 // each method is it's own subgraph
                 dag.addRootNode(dn);
             }
@@ -206,6 +210,8 @@ public class AstToDagVisitor extends ASTVisitor {
                     dn.classes.addAll(gvsc.classes);
                     dn.classes.add("beginGraph");
                     
+                } else if (ct instanceof GvEndSubgraphComment) {
+                    dn.classes.add("endGraph");
                     
                 }
                 lastIdx++;
