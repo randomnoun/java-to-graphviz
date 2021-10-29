@@ -202,7 +202,7 @@ edge.case.default { gv-labelFormat: "default"; }
 edge.switch.fallthrough { } /* fall through from case block to next case */
 edge.switch.false { } /* no case conditions match, and no default present */
 
-/** If edges are in a subcluster, use xlabel rather than label otherwise layout goes all spaced out */
+/** If edges are in a subcluster, use xlabel rather than label otherwise graphviz double-spaces and triple-spaces the nodes */
 
 subgraph subgraph edge.break { gv-labelFormat: unset; gv-xlabelFormat: "break ${breakLabel}"; }
 subgraph subgraph edge.continue { gv-labelFormat: unset; gv-xlabelFormat: "continue ${continueLabel}"; }
