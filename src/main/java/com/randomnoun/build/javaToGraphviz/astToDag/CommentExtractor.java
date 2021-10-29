@@ -15,6 +15,7 @@ import org.w3c.dom.css.CSSStyleSheet;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvStyleComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
@@ -50,12 +51,10 @@ public class CommentExtractor {
         }
         int pos = fgm.end(1);
         Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
-        logger.info(pos);
         while (pos!=-1 && gm.find(pos)) {
             
             classes.add(gm.group(1).substring(1));
             pos = gm.end(1);
-            logger.info(pos);
         }
         text = text.substring(fgm.end());
         // System.out.println("classes " + classes + " in " + text); 
@@ -132,6 +131,9 @@ public class CommentExtractor {
                     throw new IllegalStateException("gv-style does not start with '{' and end with '}':  '" + text + "'");
                 }
 
+            } else if (text.startsWith("gv-end")) {
+                comments.add(new GvEndSubgraphComment(c,  cu.getLineNumber(start)));
+                
             } else {
                 Matcher fgm;
                 CommentText gvc = null;
