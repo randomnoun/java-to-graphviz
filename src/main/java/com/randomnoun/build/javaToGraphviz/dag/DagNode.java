@@ -19,8 +19,6 @@ public class DagNode {
     public DagNode parentDagNode;
     public List<DagNode> children = new ArrayList<>();
     
-    public String locationInParent; 
-    
     public boolean keepNode = false;
     public DagNode lastKeepNode = null;
     public List<DagEdge> inEdges = new ArrayList<>();
