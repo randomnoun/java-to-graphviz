@@ -36,7 +36,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * <p>Okay so now the dag is only a dag if you don't follow back edges ( edge.back == true )
  * 
  */
-public class Dag implements SubgraphHolder {
+public class Dag {
+    
+    public Logger logger = Logger.getLogger(Dag.class);
     
     // a digraph.
     // when we're creating clusters we clear the edges each time
@@ -46,16 +48,20 @@ public class Dag implements SubgraphHolder {
     
     public List<DagNode> nodes = new ArrayList<>();
     public List<DagNode> rootNodes = new ArrayList<>(); // subset of nodes which start each Dag tree
-    public List<DagEdge> edges = new ArrayList<>();
-    public Set<String> names = new HashSet<String>();
-    public Logger logger = Logger.getLogger(Dag.class);
     
+    public Set<String> names = new HashSet<String>(); // node names, used to enforce uniqueness
+    public List<DagEdge> edges = new ArrayList<>();
+    
+
+    /*
     // graphviz formatting attributes for the digraph
     public Map<String, String> gvAttributes = new HashMap<>();
     // styles after css rules have been applied
     public Map<String, String> gvStyles = new HashMap<>();
     public Map<String, String> gvNodeStyles = new HashMap<>();
     public Map<String, String> gvEdgeStyles = new HashMap<>();
+    */
+    
     
     // OK so I'm aware graphviz can produce different layouts depending on the ordering of nodes and subgraphs, but
     // from my minimal testing it appears the layouts are a bit nicer if all the subgraphs are defined right at the end
@@ -64,18 +70,25 @@ public class Dag implements SubgraphHolder {
     // NB all nodes and edges are defined in the structures above, these subgraphs *only* hold the subset of those 
     // nodes that are in those subgraphs.
     public Map<DagNode, DagSubgraph> dagNodeToSubgraph = new HashMap<>(); // convenience map for finding nodes already in subgraphs
-    public List<DagSubgraph> subgraphs = new ArrayList<>();
+    // public List<DagSubgraph> subgraphs = new ArrayList<>();
     
-    @Override
-    public List<DagSubgraph> getSubgraphs() {
-        return subgraphs;
+    
+    public List<DagSubgraph> rootGraphs = new ArrayList<>(); // subgraphs which start each diagram
+    
+    public List<DagSubgraph> getRootGraphs() {
+        return rootGraphs;
     }
 
     
-    public void addNode(DagNode n) {
+    public void addNode(DagSubgraph root, DagNode n) {
         nodes.add(n);
         astToDagNode.put(n.astNode, n);
+        
+        dagNodeToSubgraph.put(n,  root);
+        root.nodes.add(n);
+        
     }
+    /*
     public String toGraphvizHeader() {
         String a = "", na = "", ea = "";
         for (Entry<String, String> e : gvStyles.entrySet()) {
@@ -102,6 +115,7 @@ public class Dag implements SubgraphHolder {
     public String toGraphvizFooter() {
         return "}\n";
     }
+    */
     
     
     public void addRootNode(DagNode n) {

@@ -17,6 +17,7 @@ import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
+import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.common.Text;
 
 /** An ASTVisitor that constructs the Dag
@@ -38,6 +39,7 @@ public class AstToDagVisitor extends ASTVisitor {
     String lastClass = null;
     String lastMethod = null;
     Dag dag;
+    DagSubgraph root;
     List<CommentText> comments;
     CompilationUnit cu;
     String src;
@@ -50,6 +52,8 @@ public class AstToDagVisitor extends ASTVisitor {
         this.src = src;
         this.includeThrowNode = includeThrowNode;
         dag = new Dag();
+        root = new DagSubgraph(dag, null);
+        dag.rootGraphs.add(root);
     }
     
     public Dag getDag() { 
@@ -73,7 +77,18 @@ public class AstToDagVisitor extends ASTVisitor {
                 mn.classes.addAll(((GvComment) ct).classes);
                 mn.label = ct.text; // last comment wins
             } else if (ct instanceof GvGraphComment) {
-                mn.digraphId = ct.text;
+                GvGraphComment gc =  ((GvGraphComment) ct);
+                // mn.digraphId = ct.text;
+                
+                // if the previous root doesn't have any nodes in it, apply these classes/styles to that root
+                if (root.nodes.size() > 0) {
+                    root = new DagSubgraph(dag, null);
+                    dag.rootGraphs.add(root);
+                }
+                root.name = gc.id;
+                root.classes.addAll(gc.classes);
+                root.gvAttributes.put("style", gc.inlineStyleString); // append to existing ?
+                
             } else if (ct instanceof GvSubgraphComment) {
                 mn.subgraph = ct.text;
             }
@@ -95,7 +110,11 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.label = ct.text;
             dn.astNode = null;
             if (ct instanceof GvComment) {
-                dn.classes.addAll(((GvComment) ct).classes);
+                GvComment gc = (GvComment) ct;
+                dn.classes.addAll(gc.classes);
+                dn.name = gc.id;
+                dn.gvAttributes.put("style", gc.inlineStyleString); // append to existing ?
+                
             } else if (ct instanceof GvGraphComment) {
                 dn.digraphId = ct.text;
             } else if (ct instanceof GvSubgraphComment) {
@@ -103,7 +122,7 @@ public class AstToDagVisitor extends ASTVisitor {
             }
             
             if (pdn!=null) {
-                dag.addNode(dn);
+                dag.addNode(root, dn);
                 pdn.addChild(dn);
             } else {
                 throw new IllegalStateException("null pdn in createCommentNodesToLine");
@@ -118,7 +137,7 @@ public class AstToDagVisitor extends ASTVisitor {
     public boolean preVisit2(ASTNode node) {
         DagNode pdn = getClosestDagNode(node);
         
-        int line = cu.getLineNumber(node.getStartPosition());
+        int lineNumber = cu.getLineNumber(node.getStartPosition());
         // writeCommentsToLine(line);
 
         if (node instanceof MethodDeclaration ||
@@ -131,31 +150,25 @@ public class AstToDagVisitor extends ASTVisitor {
             if (clazz.endsWith("Statement")) {
                 clazz = clazz.substring(0, clazz.length() - 9);
             }
-            // String lp = "s"; // linePrefix
-            // if (clazz.equals("If")) { lp = "if"; }
-            // else if (clazz.equals("MethodDeclaration")) { lp = "cluster"; }
             
             dn.type = clazz; // "if";
-            // dn.label = clazz; // "if"; 
+            dn.name = null;
             dn.label = null; // now set by gv-labelFormat
             dn.classes.add(Text.toFirstLower(clazz));
             
-            dn.line = line;
-            //dn.name = dag.getUniqueName(lp + "_" + line); // "if_" + line;
-            dn.name = null;
+            dn.line = lineNumber;
             dn.parentDagNode = pdn;
             dn.astNode = node;
-            dn.locationInParent = node.getLocationInParent().getId();
 
             if (node instanceof MethodDeclaration) {
                 // comments get assigned to this node
-                processCommentsToMethodNode(dn, line);
+                processCommentsToMethodNode(dn, lineNumber);
             } else {
                 // comments have their own nodes
-                createCommentNodesToLine(pdn, line);                    
+                createCommentNodesToLine(pdn, lineNumber);                    
             }
             
-            dag.addNode(dn);
+            dag.addNode(root, dn);
             if (pdn!=null) {
                 pdn.addChild(dn);
             } else {
@@ -165,7 +178,7 @@ public class AstToDagVisitor extends ASTVisitor {
                 dag.addRootNode(dn);
             }
             
-            if (lastIdx < comments.size() && comments.get(lastIdx).line == line) {
+            if (lastIdx < comments.size() && comments.get(lastIdx).line == lineNumber) {
                 CommentText ct = comments.get(lastIdx);
                 dn.keepNode = true; // always keep comments
                 
