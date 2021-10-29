@@ -14,7 +14,7 @@ import com.randomnoun.common.Text;
 public class DagElement extends Element {
 
     // only one of these will be populated
-    public Dag dag;
+    // public Dag dag;
     public DagNode dagNode;
     public DagEdge dagEdge;
     public DagSubgraph dagSubgraph;
@@ -36,6 +36,7 @@ public class DagElement extends Element {
         this.dagNode = dagNode;
     }
 
+    /*
     public DagElement(String tagName, Dag dag, Map<String, String> attributes) {
         super(tagName);
         attributes.entrySet().stream().forEach(e -> { 
@@ -47,6 +48,7 @@ public class DagElement extends Element {
         }
         this.dag = dag;
     }
+    */
 
     public DagElement(DagEdge dagEdge, Map<String, String> attributes) {
         super("edge");
@@ -64,8 +66,11 @@ public class DagElement extends Element {
     }
 
     // new subgraph elements
-    public DagElement(DagSubgraph dagSubgraph, Map<String, String> attributes) {
-        super("subgraph");
+    public DagElement(String tagName, DagSubgraph dagSubgraph, Map<String, String> attributes) {
+        super(tagName);
+        if (dagSubgraph.name != null) {
+            this.attr("id", dagSubgraph.name);
+        }
         if (!dagSubgraph.classes.isEmpty()) {
             this.attr("class", Text.join(dagSubgraph.classes, " "));
         }
