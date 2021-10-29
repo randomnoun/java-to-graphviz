@@ -48,6 +48,7 @@ public class CommentExtractor {
         // Pattern valPattern = Pattern.compile("(([a-zA-Z]+)\\s*([^;]*);\\s*)*"); // things;separated;by;semicolons;
         
         Pattern gvClassPattern = Pattern.compile("^gv(\\.[a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
+        Pattern gvGraphClassPattern = Pattern.compile("^gv-graph(\\.[a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:");  // gv.some.class.names: -> .some
         Pattern gvNextClassPattern = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
         Pattern curlyPattern = Pattern.compile("\\{(.*)\\}");  // @TODO quoting/escaping rules
         
@@ -86,21 +87,13 @@ public class CommentExtractor {
                     throw new IllegalStateException("gv-style does not start with '{' and end with '}':  '" + text + "'");
                 }
 
-            } else if (text.startsWith("gv-digraph:")) {
-                String s = text.substring(11).trim();
-                comments.add(new GvGraphComment(c, cu.getLineNumber(start), s));
-
             } else if (text.startsWith("gv-subgraph:")) {
                 String s = text.substring(11).trim();
                 comments.add(new GvSubgraphComment(c, cu.getLineNumber(start), s));
-
             } else {
-                    // text = text.substring(3).trim();
-                    // c.getAlternateRoot() is the CompilationUnit for all of these comments
-                    // which isn't all that useful really
-                
-                Matcher fgm = gvClassPattern.matcher(text);
                 List<String> classes = new ArrayList<>();
+
+                Matcher fgm = gvGraphClassPattern.matcher(text);
                 if (fgm.find()) {
                     // logger.info("groupCount " + fgm.groupCount());
                     if (fgm.group(1)!=null) {
@@ -117,7 +110,6 @@ public class CommentExtractor {
                     text = text.substring(fgm.end());
                     // System.out.println("classes " + classes + " in " + text); 
 
-                    
                     // if there's anything in curly brackets remaining, then that's a style rule.
                     // @TODO handle curlies outside of style rules somehow; quoted/escaped
                     String inlineStyleString = null;
@@ -127,10 +119,43 @@ public class CommentExtractor {
                         text = text.substring(0, cm.start()) + text.substring(cm.end());
                     }
                     
-                    comments.add(new GvComment(c, cu.getLineNumber(start), classes, text, inlineStyleString));
+                    comments.add(new GvGraphComment(c, cu.getLineNumber(start), classes, text, inlineStyleString));
+                    
+                } else {
+                    
+                    fgm = gvClassPattern.matcher(text);
+                    if (fgm.find()) {
+                        // logger.info("groupCount " + fgm.groupCount());
+                        if (fgm.group(1)!=null) {
+                            classes.add(fgm.group(1).substring(1));
+                        }
+                        int pos = fgm.end(1);
+                        Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
+                        logger.info(pos);
+                        while (pos!=-1 && gm.find(pos)) {
+                            classes.add(gm.group(1).substring(1));
+                            pos = gm.end(1);
+                            logger.info(pos);
+                        }
+                        text = text.substring(fgm.end());
+                        // System.out.println("classes " + classes + " in " + text); 
+
+                        // if there's anything in curly brackets remaining, then that's a style rule.
+                        // @TODO handle curlies outside of style rules somehow; quoted/escaped
+                        String inlineStyleString = null;
+                        Matcher cm = curlyPattern.matcher(text);
+                        if (cm.find()) {
+                            inlineStyleString = cm.group(1).trim();
+                            text = text.substring(0, cm.start()) + text.substring(cm.end());
+                        }
+                        
+                        comments.add(new GvComment(c, cu.getLineNumber(start), classes, text, inlineStyleString));
+                        
+                    }
                     
                 }
-            }            
+            }
+         
         }
         return comments;
     }

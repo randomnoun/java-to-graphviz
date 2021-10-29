@@ -185,8 +185,20 @@ public class JavaToGraphviz {
 	    DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
         PrintWriter pw = new PrintWriter(writer);
 
-        dag.edges = new ArrayList<>();
-        dag.subgraphs = new ArrayList<>();
+        // clear edges and graphs from previous runs
+        dag.edges.clear();
+        dag.subgraphs.clear();
+        dag.dagNodeToSubgraph.clear();
+        
+        // clear styles from previous runs
+        // doesn't clear calculated labels though. maybe it should. maybe. it. should.
+        dag.gvStyles.clear();
+        dag.gvNodeStyles.clear();
+        dag.gvEdgeStyles.clear();
+        for (DagNode n : dag.nodes) {
+            n.gvStyles.clear();
+        }
+        
         
         while (methodNode != null) {
             LexicalScope lexicalScope = new LexicalScope();
