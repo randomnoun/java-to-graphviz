@@ -165,7 +165,7 @@ public class ControlFlowEdger {
         DagNode rn = new DagNode();
         rn.keepNode = true; // always keep comments
         rn.type = "return"; // label this 'end' if it's a void method ?
-        rn.line = endOfMethodLine;
+        rn.lineNumber = endOfMethodLine;
         // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
         rn.classes.add("method");
         rn.classes.add("end");

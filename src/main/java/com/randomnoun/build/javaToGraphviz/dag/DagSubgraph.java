@@ -18,7 +18,7 @@ public class DagSubgraph  {
     
     public String name;  // graphviz name
     public String label; // graphviz label
-    public int line;
+    public int lineNumber;
     
     // graphviz formatting attributes for the digraph
     public Map<String, String> gvAttributes = new HashMap<>();

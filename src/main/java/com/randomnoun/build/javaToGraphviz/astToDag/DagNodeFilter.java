@@ -192,7 +192,7 @@ public class DagNodeFilter {
                 dag.addEdge(newEdge);
             }
             
-            logger.info("removed node " + node.type + ", " + node.line + ", " + node.name);
+            logger.info("removed node " + node.type + ", " + node.lineNumber + ", " + node.name);
             dag.nodes.remove(node);
             // start from n1 again as removing this node may make it possible to remove the parent node
             removeNodes(newEdge.n1, mergeEdges); // seenNodes

@@ -33,7 +33,7 @@ public class DagNode {
     public ASTNode astNode;
     public String type;      // astNode class, or one of a couple of extra artificial node types (comment, doExpression)
     public String javaLabel; // if this is a labeledStatement, the name of that label 
-    public int line;
+    public int lineNumber;
     
     public String name;  // graphviz name
     public String label; // graphviz label
@@ -72,7 +72,7 @@ public class DagNode {
     
     public String toGraphviz(boolean isDebugLabel) {
         String labelText = 
-            (isDebugLabel ? line + ": " : "") + wrapLabel(label) +
+            (isDebugLabel ? lineNumber + ": " : "") + wrapLabel(label) +
             (isDebugLabel && lastKeepNode != null ? ", lkn=" + lastKeepNode.name : ""); 
         String a = "";
         for (Entry<String, String> e : gvStyles.entrySet()) {
