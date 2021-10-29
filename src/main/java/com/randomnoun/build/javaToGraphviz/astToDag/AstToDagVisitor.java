@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -207,17 +208,14 @@ public class AstToDagVisitor extends ASTVisitor {
     }
     
     public void postVisit(ASTNode node) {
-        DagNode pdn = getClosestDagNode(node);
+        // DagNode pdn = getClosestDagNode(node);
 
-        if (node instanceof MethodDeclaration) {
+        if (node instanceof Block) {
             DagNode dn = dag.astToDagNode.get(node);
             int endLineNumber = cu.getLineNumber(node.getStartPosition() + node.getLength());
             
-            // pdn is the node for the MethodDeclaration, add any trailing comments to the MethodBlock
-            DagNode methodBlock = pdn.children.get(0);
-            
-            // comments have their own nodes
-            createCommentNodesToLine(methodBlock, endLineNumber);
+            // add comments at the end of a block to that block
+            createCommentNodesToLine(dn, endLineNumber);
         }
     }
     
