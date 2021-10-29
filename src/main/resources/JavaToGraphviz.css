@@ -60,7 +60,7 @@ graphEdge {
     fontname: "Handlee"
 }
 subgraph {
-  pencolor : white; 
+  pencolor : black; 
   labeljust : "l";
 
   /* the ranksep here is an attempt to remove whitespace in the subgraph. 
@@ -91,8 +91,12 @@ node.method.end {
     gv-labelFormat: "return";
 }
 
-node.beginSubgraph { gv-beginOuterSubgraph: true; } /** create a subgraph element *above* this node, then move this node and all nodes to gv-endSubgraph into that subgraph */
+/** create a user-defined subgraph element *above* this node, then move this node and all nodes to gv-endSubgraph into that subgraph */
+node.beginSubgraph { gv-beginOuterSubgraph: true; } 
 node.endSubgraph { gv-endOuterSubgraph: true; }
+
+/* hmm. subgraph:has(node.beginSubgraph) doesn't match here, but I think it should */
+subgraph:has(node) { gv-idFormat : "cluster_uds_${lineNumber}"; gv-labelFormat : ""; }
 
 node.methodDeclaration { gv-newSubgraph: true; } /* create a subgraph element *under* this node, then move child nodes into that subgraph */
 
@@ -103,6 +107,7 @@ node.methodDeclaration > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_m_${lineNumber}";
   gv-labelFormat : "method ${methodName}";
+  pencolor : white;
 }
 
 /* in retrospect I reckon the methodDeclaration node should be *inside* the subgraph, which
@@ -132,6 +137,7 @@ node.tryResource > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_resource_${lineNumber}";
   gv-labelFormat : "resource";
+  pencolor : white;
 }
 
 
@@ -140,7 +146,6 @@ node.tryBody > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_body_${lineNumber}";
   gv-labelFormat : "body";
-  pencolor : black;
 }
 
 node.catchClause { gv-newSubgraph: true; } 
@@ -148,7 +153,6 @@ node.catchClause > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_catch_${lineNumber}";
   gv-labelFormat : "catch ${exceptionSpec}";
-  pencolor : black;
 }
 
 node.finally { gv-newSubgraph: true; } 
@@ -156,7 +160,6 @@ node.finally > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_finally_${lineNumber}";
   gv-labelFormat : "finally";
-  pencolor : black;
 }
 
 node.synchronized { gv-newSubgraph: true; } 
@@ -164,7 +167,6 @@ node.synchronized > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_sync_${lineNumber}";
   gv-labelFormat : "synchronized";
-  pencolor : black;
 }
 
 

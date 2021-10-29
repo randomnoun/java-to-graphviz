@@ -39,7 +39,7 @@ public class JavaToGraphvizTest {
         
          
          testStatement("com.example.input.SynchronizeStatement");
-         testStatement("com.example.input.MultipleGraphs");
+         testStatement("com.example.input.MultipleGraphs"); 
         testStatement("com.example.input.UserDefinedSubgraphs");
 
     }

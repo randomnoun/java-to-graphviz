@@ -125,10 +125,10 @@ public class AstToDagVisitor extends ASTVisitor {
                 GvSubgraphComment gvsc = (GvSubgraphComment) ct;
                 dn.name = gvsc.id;
                 dn.classes.addAll(gvsc.classes);
-                dn.classes.add("beginGraph");
+                dn.classes.add("beginSubgraph");
 
             } else if (ct instanceof GvEndSubgraphComment) {
-                dn.classes.add("endGraph");
+                dn.classes.add("endSubgraph");
 
             }
             

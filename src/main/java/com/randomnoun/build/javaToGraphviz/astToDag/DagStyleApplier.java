@@ -121,17 +121,16 @@ public class DagStyleApplier {
         // use the gv-newSubgraph CSS properties to add subgraphs into both the Dag and the DOM
         applyDomStyles(document, stylesheet);
         List<DagElement> elementsToCreateSubgraphsInside = getElementsWithStyleProperty(document, "gv-newSubgraph", "true");
-        
-        // and construct CSS-defined subgraphs
+        List<DagElement> elementsToCreateSubgraphsFrom = getElementsWithStyleProperty(document, "gv-beginOuterSubgraph", "true");
+        List<DagElement> elementsToCreateSubgraphsTo = getElementsWithStyleProperty(document, "gv-endOuterSubgraph", "true");
+
+        // and construct CSS-defined subgraphs. gv-newSubgraph creates subgraphs under the node so that 
+        //   node.method > subgraph 
+        // CSS rules match. 
         for (int i = 0; i < elementsToCreateSubgraphsInside.size(); i++) {
             DagElement outsideEl = elementsToCreateSubgraphsInside.get(i);
             DagNode outsideNode = outsideEl.dagNode;
             
-            // put the subgraph under the node so that 
-            //   node.method > subgraph 
-            // CSS rules match. will mean we can only style the subgraph, not the nodes in the subgraph, but that seems good enough for me.
-            // so not nesting subgraphs in the DOM. actually now we are.
-            // but will be nesting subgraphs in the Dag
             
             DagSubgraph newSg;
             DagSubgraph sg = dag.dagNodeToSubgraph.get(outsideNode);
@@ -156,6 +155,65 @@ public class DagStyleApplier {
             // moves the nodes in the dag subgraphs
             moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, outsideNode);  
         }
+        
+        
+        // gv-beginOuterSubgraph creates subgraphs outside the node so that 
+        //   subgraph:has(> node.method) 
+        // CSS rules match
+        
+        for (int i = 0; i < elementsToCreateSubgraphsFrom.size(); i++) {
+            DagElement fromEl = elementsToCreateSubgraphsFrom.get(i);
+            Element fromParentEl = fromEl.parent();
+            DagNode fromNode = fromEl.dagNode;
+            
+            DagSubgraph newSg;
+            DagSubgraph sg = dag.dagNodeToSubgraph.get(fromNode);
+            if (sg == null) {
+                throw new IllegalStateException("this shouldn't happen any more");
+            } else {
+                newSg = new DagSubgraph(dag, sg);
+                sg.subgraphs.add(newSg);
+            }
+            newSg.lineNumber = fromNode.lineNumber;
+            newSg.gvAttributes = new HashMap<>(fromNode.gvAttributes);
+            
+            // moves the nodes in the dom
+            DagElement newSgEl = new DagElement("subgraph", newSg, newSg.gvAttributes);
+            
+            int idx = fromEl.elementSiblingIndex();
+            boolean done = false;
+            while (idx < fromParentEl.childrenSize() && !done) {
+                
+                // TODO: could probably remove the from and to nodes completely, but then I'll have to rejig the edges, 
+                // although they should always be straight-through so that should be easy enough
+                // and then apply the 'from' styles to the newly-created subgraph
+                
+                DagElement c = (DagElement) fromParentEl.child(idx);
+                if (elementsToCreateSubgraphsTo.contains(c)) {
+                    elementsToCreateSubgraphsTo.remove(c);
+                    done = true;
+                }
+                c.remove();
+                newSgEl.appendChild(c);
+
+                // moves the nodes in the dag subgraphs
+                if (c.dagNode != null) { // dag subgraphs don't contain edges
+                    moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, c.dagNode);  
+                }
+
+            }
+            if (!done) {
+                logger.warn("gv-subgraph without gv-end, closing subgraph at AST boundary");
+            }
+            fromParentEl.insertChildren(idx, newSgEl);
+
+
+        }
+        
+        if (elementsToCreateSubgraphsTo.size() > 0) {
+            throw new IllegalStateException("gv-end without gv-subgraph");
+        }
+        
         
         // reapply styles now the DOM contains CSS-defined subgraph elements
         resetDomStyles(document);
