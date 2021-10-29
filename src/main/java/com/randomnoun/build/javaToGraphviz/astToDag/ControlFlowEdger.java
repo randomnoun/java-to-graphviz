@@ -21,6 +21,7 @@ import org.eclipse.jdt.internal.core.manipulation.dom.ASTResolving;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
+import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.build.javaToGraphviz.dag.ExitEdge;
 
 // class that adds edges to the dag
@@ -170,7 +171,9 @@ public class ControlFlowEdger {
         rn.classes.add("end");
         // rn.label = "return";
         rn.astNode = null;
-        dag.addNode(rn);
+        
+        DagSubgraph sg = dag.dagNodeToSubgraph.get(method);
+        dag.addNode(sg, rn);
         
         for (ExitEdge e : lexicalScope.returnEdges) {
             e.n2 = rn;
