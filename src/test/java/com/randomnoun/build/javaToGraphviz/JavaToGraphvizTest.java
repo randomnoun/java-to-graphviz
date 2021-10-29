@@ -34,7 +34,9 @@ public class JavaToGraphvizTest {
         // testStatement("com.example.input.ContinueBreakLabel");
         // testStatement("com.example.input.TryCatchStatement");
         // testStatement("com.example.input.SynchronizeStatement");
-        testStatement("com.example.input.MultipleGraphs");
+        // testStatement("com.example.input.MultipleGraphs");
+        testStatement("com.example.input.UserDefinedSubgraphs");
+
     }
     
     public void testStatement(String className) throws IOException {
