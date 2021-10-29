@@ -91,8 +91,9 @@ public class AstToDagVisitor extends ASTVisitor {
                 root.gvAttributes.put("style", gc.inlineStyleString); // append to existing ?
                 
             } else if (ct instanceof GvSubgraphComment) {
-                mn.subgraph = ct.text;
+                logger.warn("gv-subgraph outside of method");
             }
+                            
             lastIdx ++; 
         }
     }
@@ -112,14 +113,19 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.astNode = null;
             if (ct instanceof GvComment) {
                 GvComment gc = (GvComment) ct;
-                dn.classes.addAll(gc.classes);
                 dn.name = gc.id;
+                dn.classes.addAll(gc.classes);
                 dn.gvAttributes.put("style", gc.inlineStyleString); // append to existing ?
                 
             } else if (ct instanceof GvGraphComment) {
-                dn.digraphId = ct.text;
+                // @TODO something
+
             } else if (ct instanceof GvSubgraphComment) {
-                dn.subgraph = ct.text;
+                GvSubgraphComment gvsc = (GvSubgraphComment) ct;
+                dn.name = gvsc.id;
+                dn.classes.addAll(gvsc.classes);
+                dn.classes.add("beginGraph");
+                
             }
             
             if (pdn!=null) {
@@ -191,9 +197,16 @@ public class AstToDagVisitor extends ASTVisitor {
                         dn.gvAttributes.put("style", gvComment.inlineStyleString);
                     }
                 } else if (ct instanceof GvGraphComment) {
-                    dn.digraphId = ct.text;
+                    // @TODO something
+                    
                 } else if (ct instanceof GvSubgraphComment) {
-                    dn.subgraph = ct.text;
+                    GvSubgraphComment gvsc = (GvSubgraphComment) ct;
+                    dn.label = gvsc.text; // if not blank ?
+                    dn.name = gvsc.id;
+                    dn.classes.addAll(gvsc.classes);
+                    dn.classes.add("beginGraph");
+                    
+                    
                 }
                 lastIdx++;
             }
