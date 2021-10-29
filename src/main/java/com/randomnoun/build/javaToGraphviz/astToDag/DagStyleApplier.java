@@ -37,6 +37,44 @@ public class DagStyleApplier {
         this.root = root;
     }
     
+    // recursively within this subgraph only
+    public List<DagElement> getDagElements(Map<DagNode, DagElement> dagNodesToElements, DagSubgraph sg, DagNode node) {
+        
+        List<DagElement> result = new ArrayList<>();
+        
+        node.gvStyles = new HashMap<>(); // clear applied styles
+        DagElement child = new DagElement(node, node.gvAttributes);
+        // could add attributes for edges and/or connected nodes here
+        dagNodesToElements.put(node, child);
+        for (int i = 0; i < node.children.size(); i++) {
+            DagNode childNode = node.children.get(i);
+            if (dagNodesToElements.containsKey(childNode)) {
+                // should never happen, but skip it
+                logger.warn("repeated node in Dag");
+            } else if (!sg.nodes.contains(childNode)) {
+                // wrong subgraph, skip it
+                
+            } else {
+                child.appendChildren(getDagElements(dagNodesToElements, sg, childNode));
+            }
+        }
+        result.add(child);
+        
+        for (int j = 0; j < dag.edges.size(); j++) {  /* TODO: outrageously inefficient */
+            DagEdge edge = dag.edges.get(j);
+            // if (sg.nodes.contains(edge.n1)) { 
+            if (edge.n1 == node) {
+                edge.gvStyles = new HashMap<>(); // clear applied styles
+                child = new DagElement(edge, edge.gvAttributes);
+                // edges don't have IDs here but could
+                // child.attr("id", edge.name);
+                result.add(child);
+            }
+        }
+
+        
+        return result;
+    }
 
     public DagElement getDagElement(Map<DagNode, DagElement> dagNodesToElements, DagSubgraph sg) {
         DagElement graphEl = new DagElement(sg.container == null ? "graph" : "subgraph", sg, sg.gvAttributes);
@@ -46,25 +84,21 @@ public class DagStyleApplier {
         DagElement graphEdgeEl = new DagElement("graphEdge", sg, sg.gvAttributes);
         graphEl.appendChild(graphEdgeEl);
         
-        // dag.nodes here or sg.nodes ?
-        // hmm. depends whether we style nodes based on which subgraph they're in.
-        // which I guess might be useful
-        
         for (int i = 0; i < sg.nodes.size(); i++) {
             DagNode node = sg.nodes.get(i);
-            node.gvStyles = new HashMap<>(); // clear applied styles
-            
-            DagElement child = new DagElement(node, node.gvAttributes);
-            // could add attributes for edges and/or connected nodes here
-            graphEl.appendChild(child);
-            
-            dagNodesToElements.put(node, child);
+            if (dagNodesToElements.containsKey(node)) {
+                // skip it
+            } else {
+                graphEl.appendChildren(getDagElements(dagNodesToElements, sg, node));
+                
+            }
         }
         // hrm where to we put the edges then ?
         // either they're all top level, or they're grouped with the start node, or they're grouped with the end node.
         // which would allow us to style them based on which subgraph they start in, or which subgraph they end in, respectively.
         // let's group with the start node and see how that goes.
         
+        /*
         for (int i = 0; i < dag.edges.size(); i++) {
             DagEdge edge = dag.edges.get(i);
             if (sg.nodes.contains(edge.n1)) { 
@@ -76,6 +110,7 @@ public class DagStyleApplier {
                 graphEl.appendChild(child);
             }
         }
+        */
         return graphEl;
     }
     
@@ -129,40 +164,44 @@ public class DagStyleApplier {
         */
         
         // use the gv-newSubgraph CSS properties to add subgraphs into both the Dag and the DOM
-        List<DagElement> subgraphElements = getSubgraphElementsFromStylesheet(document, stylesheet);
+        List<DagElement> elementsToCreateSubgraphsInside = getSubgraphElementsFromStylesheet(document, stylesheet);
         
         // should probably do the idFormat and labelFormat changes here as well
         // so that we only need 2 CSS passes
 
         // and construct CSS-defined subgraphs
         
-        for (int i = 0; i < subgraphElements.size(); i++) {
-            DagElement sgEl = subgraphElements.get(i);
-            DagNode sgNode = sgEl.dagNode;
+        for (int i = 0; i < elementsToCreateSubgraphsInside.size(); i++) {
+            DagElement outsideEl = elementsToCreateSubgraphsInside.get(i);
+            DagNode outsideNode = outsideEl.dagNode;
             
             // put the subgraph under the node so that 
             //   node.method > subgraph 
             // CSS rules match. will mean we can only style the subgraph, not the nodes in the subgraph, but that seems good enough for me.
-            // so not nesting subgraphs in the DOM.
+            // so not nesting subgraphs in the DOM. actually now we are.
             // but will be nesting subgraphs in the Dag
+            
             DagSubgraph newSg;
-            DagSubgraph sg = dag.dagNodeToSubgraph.get(sgNode);
+            DagSubgraph sg = dag.dagNodeToSubgraph.get(outsideNode);
             if (sg == null) {
                 throw new IllegalStateException("this shouldn't happen any more");
-                // newSg = new DagSubgraph(dag, dag);
-                // dag.subgraphs.add(newSg);
             } else {
                 newSg = new DagSubgraph(dag, sg);
                 sg.subgraphs.add(newSg);
             }
-            newSg.line = sgNode.line;
-            newSg.gvAttributes = new HashMap<>(sgNode.gvAttributes);
+            newSg.line = outsideNode.line;
+            newSg.gvAttributes = new HashMap<>(outsideNode.gvAttributes);
             
             DagElement newSgEl = new DagElement("subgraph", newSg, newSg.gvAttributes);
-            sgEl.appendChild(newSgEl);
+            while (outsideEl.childrenSize() > 0) {
+                Element c = outsideEl.child(0);
+                c.remove();
+                newSgEl.appendChild(c);
+            }
+            outsideEl.appendChild(newSgEl);
 
             
-            moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, sgNode); 
+            moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, outsideNode);  // moves the nodes in the node.subgraphs structures only
         }
         
         // reapply styles now the DOM contains CSS-defined subgraph elements
@@ -194,6 +233,9 @@ public class DagStyleApplier {
     private void setIdLabel(DagEdge edge) {
         String labelFormat = edge.gvStyles.get("gv-labelFormat");
         String xlabelFormat = edge.gvStyles.get("gv-xlabelFormat");
+        if ("unset".equals(labelFormat)) { labelFormat = null; }
+        if ("unset".equals(xlabelFormat)) { xlabelFormat = null; }
+        
         Map<String, String> vars = new HashMap<>();
         vars.put("startNodeId", edge.n1.name);
         vars.put("endNodeId", edge.n2.name);
@@ -214,7 +256,7 @@ public class DagStyleApplier {
             } else {
                 throw new IllegalArgumentException("invalid gv-xlabelFormat '" + xlabelFormat + "'; expected double-quoted string");
             }
-            edge.gvAttributes.put("xlabel",  Text.substitutePlaceholders(vars, xlabelFormat).trim());
+            edge.gvStyles.put("xlabel",  "\"" + Text.substitutePlaceholders(vars, xlabelFormat).trim() + "\"");
         }
         
     }
@@ -223,6 +265,7 @@ public class DagStyleApplier {
         String idFormat = sg.gvStyles.get("gv-idFormat");
         String labelFormat = sg.gvStyles.get("gv-labelFormat");
         
+
         Map<String, String> vars = new HashMap<>();
         vars.put("lineNumber", String.valueOf(sg.line));
         //vars.put("nodeType", sg.type);
@@ -242,6 +285,9 @@ public class DagStyleApplier {
     private String[] getIdLabel(String idFormat, String labelFormat, String id, String label, Map<String, String> vars) {
         String[] result = new String[] { id, label };
         
+        if ("unset".equals(idFormat)) { idFormat = null; }
+        if ("unset".equals(labelFormat)) { labelFormat = null; }
+        
         // id can refer to label, or label can refer to id, but not both
         boolean idFirst = true; 
         if (labelFormat != null && labelFormat.contains("${label}")) {
@@ -253,6 +299,7 @@ public class DagStyleApplier {
         } else {
             idFirst = labelFormat == null || !labelFormat.contains("${id}");
         }
+        
         
         for (int j=0; j<2; j++) {
             if ((( j==0 ) == idFirst)  && (id == null && idFormat != null)) {
@@ -406,9 +453,6 @@ public class DagStyleApplier {
                             if (tagName.equals("graph") || tagName.equals("subgraph")) {
                                 logger.info("setting graph prop " + prop + " to " + declaration.getPropertyValue(prop));
                                 dagSubgraph.gvStyles.put(prop,  declaration.getPropertyValue(prop));
-                                if (setIds) {
-                                    setIdLabel(dagSubgraph);
-                                }
 
                             } else if (tagName.equals("graphNode")) {
                                 logger.info("setting graphNode prop " + prop + " to " + declaration.getPropertyValue(prop));
@@ -417,6 +461,9 @@ public class DagStyleApplier {
                                 logger.info("setting graphEdge prop " + prop + " to " + declaration.getPropertyValue(prop));
                                 dagSubgraph.gvEdgeStyles.put(prop,  declaration.getPropertyValue(prop));
                             }
+                        }
+                        if ((tagName.equals("graph") || tagName.equals("subgraph")) && setIds) {
+                            setIdLabel(dagSubgraph);
                         }
                     
                     } else if (dagNode != null) {
