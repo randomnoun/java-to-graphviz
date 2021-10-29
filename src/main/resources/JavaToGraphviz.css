@@ -46,6 +46,8 @@ That DOM looks like this
 graph {
 	fontname: "Handlee";
 	bgcolor: transparent;
+	gv-idFormat: "graph";
+    gv-labelFormat: "";
 }
 /* the styles on graphNode and graphEdge are applied at the graph level, 
    but styles on node and edge are (repeatedly) applied at the node and edges 
