@@ -95,8 +95,7 @@ public class AstToDagVisitor extends ASTVisitor {
             } else if (ct instanceof GvSubgraphComment) {
                 logger.warn("gv-subgraph outside of method");
             } else if (ct instanceof GvLiteralComment) {
-                GvLiteralComment gvlc = (GvLiteralComment) ct;
-                root.literals.add(gvlc.text);
+                logger.warn("gv-literal outside of method");
 
             }
             
@@ -137,8 +136,8 @@ public class AstToDagVisitor extends ASTVisitor {
 
             } else if (ct instanceof GvLiteralComment) {
                 GvLiteralComment gvlc = (GvLiteralComment) ct;
-                root.literals.add(gvlc.text);
-                dn = null;
+                dn.classes.add("literal");
+                dn.skipNode = true;
                 
             }
 
@@ -228,7 +227,7 @@ public class AstToDagVisitor extends ASTVisitor {
 
                 } else if (ct instanceof GvLiteralComment) {
                     GvLiteralComment gvlc = (GvLiteralComment) ct;
-                    root.literals.add(gvlc.text);
+                    dn.classes.add("literal");
 
                 }
                 lastIdx++;

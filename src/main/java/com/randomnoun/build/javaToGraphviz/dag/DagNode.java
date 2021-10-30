@@ -18,6 +18,7 @@ public class DagNode {
     public List<DagNode> children = new ArrayList<>();
     
     public boolean keepNode = false;
+    public boolean skipNode = false; // true for literal nodes only
     public DagNode lastKeepNode = null;
     public List<DagEdge> inEdges = new ArrayList<>();
     public List<DagEdge> outEdges = new ArrayList<>();
