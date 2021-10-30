@@ -116,11 +116,13 @@ public class ControlFlowEdger {
 	    List<ExitEdge> prevNodes = Collections.singletonList(start);
 	    
 	    for (DagNode c : block.children) {
-            for (ExitEdge e : prevNodes) {
-                e.n2 = c;
-                dag.addEdge(e);
-            }
-            prevNodes = addEdges(dag, c, scope);
+	        if (!c.skipNode) {
+                for (ExitEdge e : prevNodes) {
+                    e.n2 = c;
+                    dag.addEdge(e);
+                }
+                prevNodes = addEdges(dag, c, scope);
+	        }
 	    }
 	    return prevNodes;
     }
