@@ -19,8 +19,8 @@ public class DagElement extends Element {
     public DagEdge dagEdge;
     public DagSubgraph dagSubgraph;
     
-    public DagElement(DagNode dagNode, Map<String, String> attributes) {
-        super("node");
+    public DagElement(String tagName, DagNode dagNode, Map<String, String> attributes) {
+        super(tagName);
         this.attr("id", dagNode.name);
         this.attr("label", dagNode.label);
         attributes.entrySet().stream().forEach(e -> { 
