@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.jsoup.nodes.Document;
@@ -43,7 +44,7 @@ public class DagStyleApplier {
         List<DagElement> result = new ArrayList<>();
         
         node.gvStyles = new HashMap<>(); // clear applied styles
-        DagElement child = new DagElement(node, node.gvAttributes);
+        DagElement child = new DagElement(node.classes.contains("literal") ? "literal" : "node", node, node.gvAttributes);
         // could add attributes for edges and/or connected nodes here
         dagNodesToElements.put(node, child);
         for (int i = 0; i < node.children.size(); i++) {
@@ -224,8 +225,12 @@ public class DagStyleApplier {
         // TODO: arguably now that the node IDs have changed, couple reapply a third time in case there are any
         // ID-specific CSS rules
         // applyStyles(document, stylesheet, dag);
+        
+        setDagSubgraphLiterals(document, stylesheet);
+        
     }
     
+
     private List<DagElement> getElementsWithStyleProperty(Document document, final String propertyName, final String propertyValue) {
         List<DagElement> result = new ArrayList<>();
         
@@ -512,4 +517,46 @@ public class DagStyleApplier {
         
     }
 
+    // copy any literal elements into their containing subgraphs
+    private void setDagSubgraphLiterals(Document document, CSSStyleSheet stylesheet) {
+        Stack<DagSubgraph> subgraphStack = new Stack<>();
+        
+        final CSSOMParser inlineParser = new CSSOMParser();
+        inlineParser.setErrorHandler( new ExceptionErrorHandler() );
+        NodeTraversor.traverse( new NodeVisitor() {
+            @Override
+            public void head( Node node, int depth ) {
+                if ( node instanceof DagElement) {
+
+                    DagElement dagElement = (DagElement) node;
+                    String tagName = ((Element) node).tagName();
+                    DagSubgraph dagSubgraph = dagElement.dagSubgraph;
+                    DagNode dagNode = dagElement.dagNode;
+                    if (dagSubgraph != null) {
+                        subgraphStack.push(dagSubgraph);
+                    }
+
+                    if ("literal".equals(tagName)) {
+                        if (subgraphStack.size() == 0) {
+                            // could add to root subgraph instead
+                            throw new IllegalStateException("literal outside of subgraph");
+                        }
+                        subgraphStack.peek().literals.add(dagNode.label);
+                    }
+                }
+            }
+
+            @Override
+            public void tail( Node node, int depth ) {
+                if ( node instanceof DagElement) {
+                    DagElement dagElement = (DagElement) node;
+                    if (dagElement.dagSubgraph != null) {
+                        subgraphStack.pop();
+                    }
+                }
+            }
+        }, document.body() );
+    }
+
+    
 }
