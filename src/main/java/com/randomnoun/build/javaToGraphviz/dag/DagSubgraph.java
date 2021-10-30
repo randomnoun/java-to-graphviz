@@ -109,10 +109,6 @@ public class DagSubgraph  {
                     result += edge.toGraphviz() + "\n";
                 // }
             }            
-            for (String literal : literals) {
-                result += "  " + literal + "\n";
-            }
-
         } else {
             
             result += s + " ";
@@ -127,8 +123,10 @@ public class DagSubgraph  {
                 }
             }
         }
-        
         result += "\n";
+        for (String literal : literals) {
+            result += s + "  " + literal + "\n";
+        }
         for (DagSubgraph sg : subgraphs) {
             result += sg.toGraphviz(indent + 2);
         }
