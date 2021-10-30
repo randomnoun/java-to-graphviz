@@ -48,9 +48,11 @@ public class ContinueBreakRank {
                     throw new IllegalStateException("Out of time");
             };
             
+            // gv-literal: { rank = same; case0; case1; case2; case3; case4; case5; case6; case7; case8; case9; case10; case11; case12; case13; case14; case15; caseDefault }
+            
             // gv-end
             
-            // gv-literal: { rank = same; case0; case1; case2; case3; case4; case5; case6; case7; case8; case9; case10; case11; case12; case13; case14; case15; caseDefault }
+            
             if (beatBoxing && semiquaver == 0) {
                 System.out.println("bpppff");
                 continue bar1;
