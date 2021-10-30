@@ -17,6 +17,7 @@ import com.randomnoun.build.javaToGraphviz.comment.GvComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvLiteralComment;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
@@ -93,8 +94,12 @@ public class AstToDagVisitor extends ASTVisitor {
                 
             } else if (ct instanceof GvSubgraphComment) {
                 logger.warn("gv-subgraph outside of method");
+            } else if (ct instanceof GvLiteralComment) {
+                GvLiteralComment gvlc = (GvLiteralComment) ct;
+                root.literals.add(gvlc.text);
+
             }
-                            
+            
             lastIdx ++; 
         }
     }
@@ -130,14 +135,21 @@ public class AstToDagVisitor extends ASTVisitor {
             } else if (ct instanceof GvEndSubgraphComment) {
                 dn.classes.add("endSubgraph");
 
+            } else if (ct instanceof GvLiteralComment) {
+                GvLiteralComment gvlc = (GvLiteralComment) ct;
+                root.literals.add(gvlc.text);
+                dn = null;
+                
             }
-            
-            if (pdn!=null) {
-                dag.addNode(root, dn);
-                pdn.addChild(dn);
-            } else {
-                throw new IllegalStateException("null pdn in createCommentNodesToLine");
-                // logger.warn("null pdn on " + dn.type + " on line " + dn.line);
+
+            if (dn != null) {
+                if (pdn!=null) {
+                    dag.addNode(root, dn);
+                    pdn.addChild(dn);
+                } else {
+                    throw new IllegalStateException("null pdn in createCommentNodesToLine");
+                    // logger.warn("null pdn on " + dn.type + " on line " + dn.line);
+                }
             }
             lastIdx ++; 
         }
@@ -191,11 +203,12 @@ public class AstToDagVisitor extends ASTVisitor {
             
             if (lastIdx < comments.size() && comments.get(lastIdx).line == lineNumber) {
                 CommentText ct = comments.get(lastIdx);
-                dn.keepNode = true; // always keep comments
+                dn.keepNode = true; // always keep commented nodes
                 
                 if (ct instanceof GvComment) {
                     GvComment gvComment = (GvComment) ct;
-                    dn.label = gvComment.text; // if not blank ?
+                    if (!Text.isBlank(gvComment.id)) { dn.name = gvComment.id; }
+                    if (!Text.isBlank(gvComment.text)) { dn.label = gvComment.text; } 
                     dn.classes.addAll(gvComment.classes);
                     if (gvComment.inlineStyleString!=null) {
                         dn.gvAttributes.put("style", gvComment.inlineStyleString);
@@ -212,7 +225,11 @@ public class AstToDagVisitor extends ASTVisitor {
                     
                 } else if (ct instanceof GvEndSubgraphComment) {
                     dn.classes.add("endGraph");
-                    
+
+                } else if (ct instanceof GvLiteralComment) {
+                    GvLiteralComment gvlc = (GvLiteralComment) ct;
+                    root.literals.add(gvlc.text);
+
                 }
                 lastIdx++;
             }

@@ -35,6 +35,13 @@ public class DagSubgraph  {
     // subsubgraphs
     public List<DagSubgraph> subgraphs = new ArrayList<>();
     
+    // literals are used to define { rank=same } relationships between nodes with known IDs
+    
+    // going to dump the literals at the end of the graphviz graph until I find a reason not to do that
+    // if we move them inside the subgraphs then the output can look a bit better, but it's still a bit crap
+    
+    public List<String> literals = new ArrayList<>();
+    
     public DagSubgraph(Dag dag, DagSubgraph container) {
         this.dag = dag;
         this.container = container;
@@ -102,6 +109,9 @@ public class DagSubgraph  {
                     result += edge.toGraphviz() + "\n";
                 // }
             }            
+            for (String literal : literals) {
+                result += "  " + literal + "\n";
+            }
 
         } else {
             
