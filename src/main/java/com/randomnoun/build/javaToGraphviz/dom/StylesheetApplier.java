@@ -227,7 +227,10 @@ public class StylesheetApplier {
 				for ( int j = 0; j < rule.getSelectors().getLength(); j++ ) {
 					Selector selector = rule.getSelectors().item( j );
 					Elements matches = null;
+					// selector.toString() converts a~=b to a~="b" which then includes the double quotes in the regex
+					// could remove this but the jsoup impl to ~= is wrong anyway ( should be performing a word search, not a regex )
 					matches = htmlDocument.select( selector.toString() );
+					
 					// for each matched element....
 					for ( Element match: matches ) {
 						elementMatches.put( match, new RuleStyleApplication( selector, rule.getStyle() ) );
