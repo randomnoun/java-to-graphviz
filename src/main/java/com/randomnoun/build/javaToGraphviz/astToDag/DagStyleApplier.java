@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -42,11 +44,13 @@ public class DagStyleApplier {
     public List<DagElement> getDagElements(Map<DagNode, DagElement> dagNodesToElements, DagSubgraph sg, DagNode node) {
         
         List<DagElement> result = new ArrayList<>();
-        
         node.gvStyles = new HashMap<>(); // clear applied styles
-        DagElement child = new DagElement(node.classes.contains("literal") ? "literal" : "node", node, node.gvAttributes);
-        // could add attributes for edges and/or connected nodes here
-        dagNodesToElements.put(node, child);
+        
+        boolean isLiteral = node.classes.contains("literal");
+        
+        DagElement nodeElement = new DagElement(isLiteral ? "literal" : "node", node, node.gvAttributes);
+        
+        dagNodesToElements.put(node, nodeElement);
         for (int i = 0; i < node.children.size(); i++) {
             DagNode childNode = node.children.get(i);
             if (dagNodesToElements.containsKey(childNode)) {
@@ -56,24 +60,39 @@ public class DagStyleApplier {
                 // wrong subgraph, skip it
                 
             } else {
-                child.appendChildren(getDagElements(dagNodesToElements, sg, childNode));
+                nodeElement.appendChildren(getDagElements(dagNodesToElements, sg, childNode));
             }
         }
-        result.add(child);
-        
+        result.add(nodeElement);
+        String inNodeIds = null; 
+        String outNodeIds = null; 
+        Set<String> inNodeClasses = new HashSet<>();
+        Set<String> outNodeClasses = new HashSet<>();
         for (int j = 0; j < dag.edges.size(); j++) {  /* TODO: outrageously inefficient */
             DagEdge edge = dag.edges.get(j);
             // if (sg.nodes.contains(edge.n1)) { 
             if (edge.n1 == node) {
                 edge.gvStyles = new HashMap<>(); // clear applied styles
-                child = new DagElement(edge, edge.gvAttributes);
+                DagElement edgeElement = new DagElement(edge, edge.gvAttributes);
                 // edges don't have IDs here but could
                 // child.attr("id", edge.name);
-                result.add(child);
+                edgeElement.attr("inNodeId", edge.n1.name);
+                edgeElement.attr("outNodeId", edge.n2.name);
+                edgeElement.attr("inNodeClass", Text.join(edge.n1.classes, " "));
+                edgeElement.attr("outNodeClass", Text.join(edge.n2.classes, " "));
+                outNodeIds = outNodeIds == null ? edge.n2.name : outNodeIds + " " + edge.n2.name;
+                outNodeClasses.addAll(edge.n2.classes);
+                result.add(edgeElement);
+            }
+            if (edge.n2 == node) {
+                inNodeIds = inNodeIds == null ? edge.n1.name : inNodeIds + " " + edge.n1.name;
+                inNodeClasses.addAll(edge.n1.classes);
             }
         }
-
-        
+        nodeElement.attr("inNodeId", inNodeIds);
+        nodeElement.attr("outNodeId", outNodeIds);
+        nodeElement.attr("inNodeClass", Text.join(inNodeClasses,  " "));
+        nodeElement.attr("outNodeClass", Text.join(outNodeClasses,  " "));
         return result;
     }
 
@@ -224,6 +243,8 @@ public class DagStyleApplier {
         
         // TODO: arguably now that the node IDs have changed, couple reapply a third time in case there are any
         // ID-specific CSS rules
+        // TODO: also recreate element inNodeId, outNodeId inNodeIds, outNodeIds attributes
+        
         // applyStyles(document, stylesheet, dag);
         
         setDagSubgraphLiterals(document, stylesheet);
