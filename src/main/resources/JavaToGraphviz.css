@@ -15,11 +15,22 @@ That DOM looks like this
       'label' is special HTML attribute for the 'label' graphviz attribute; use [label="xxxx"] in CSS rules
       'class' contains classes created by the AST ( 'if', 'expression' ) + some others created by the DAG ( 'break', 'continue' edges )
         will make a list of those somewhere.
+      
+      node attributes  
+        'inNodeId' contains IDs of the nodes connected to those edges; use [inEdges~="abc"] to select a node with a particular inEdge
+        'outNodeId' contains IDs of the nodes connected to those edges
+        'inNodeClass', 'outNodeClass', same but for classes
+
+      going to assign these after node/edge removal, doesn't include css-defined IDs yet
+      
+      edge attributes
+        'inNodeId' contains start node ID 
+        'outNodeId' contains end node ID
+        'inNodeClass' contains start node class
+        'outNodeClass' contains end node class
+
+		      
         
-      'inEdgeIds' contains IDs of in edges
-      'inNodeIds' contains IDs of the nodes connected to those edges; use [inEdges~="abc"] to select a node with a particular inEdge
-      'outEdgeIds' contains IDs of out edges
-      'outNodeIds' contains IDs of the nodes connected to those edges
     -->
     <graph>
         
