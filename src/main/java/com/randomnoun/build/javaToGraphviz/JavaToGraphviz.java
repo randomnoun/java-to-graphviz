@@ -217,12 +217,12 @@ public class JavaToGraphviz {
                 List<ExitEdge> ee = edger.addEdges(dag, methodNode, lexicalScope);
     
                 DagNodeFilter filter = new DagNodeFilter(dag);
-                
                 methodNode.keepNode = false;
                 filter.setLastKeepNode(methodNode, methodNode);
                 if (removeNode) {
                     filter.removeNodes(methodNode); // peephole node removal.
                 }
+                
             }
         }
 
