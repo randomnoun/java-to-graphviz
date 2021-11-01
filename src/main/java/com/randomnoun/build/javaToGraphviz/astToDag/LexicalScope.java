@@ -13,17 +13,21 @@ import com.randomnoun.build.javaToGraphviz.dag.ExitEdge;
 // on the type of scope.
 public class LexicalScope {
     // within this scope, the node that a 'continue' will continue to
+    // an edge to a continueNode is always a back edge
     DagNode continueNode;
     
-    // a collection of edges from 'break' statements 
+    // a collection of edges from 'break' statements
+    // these are always forward edges
     List<ExitEdge> breakEdges;
     
     // a collection of edges from 'return' statements
+    // these are always forward edges
     List<ExitEdge> returnEdges;
 
     // a collection of edges from 'throw' statements
     // if we can get the exception type hierarchy out of this thing then
     // we could channel them into the right subgraph
+    // these are always forward edges
     List<ExitEdge> throwEdges;
 
     // break/continue targets
@@ -91,7 +95,7 @@ public class LexicalScope {
     // or via classes (constructed when the styles are being applied)
     // easy peasy.
     // am I going to allow unbalanced subgraphs ( subgraph boundaries that don't line up with AST boundaries ) ? probably not.
-    
+    /* OK so user-defined subgraphs don't create a scope
     public LexicalScope newSubgraphScope() {
         LexicalScope next = new LexicalScope();
         next.breakEdges = this.breakEdges;
@@ -101,6 +105,7 @@ public class LexicalScope {
         next.labeledScopes = this.labeledScopes;
         return next;
     }
+    */
     
 
 }

@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -19,13 +18,12 @@ import org.w3c.dom.css.CSSStyleSheet;
 
 import com.randomnoun.build.javaToGraphviz.astToDag.AstToDagVisitor;
 import com.randomnoun.build.javaToGraphviz.astToDag.CommentExtractor;
-import com.randomnoun.build.javaToGraphviz.astToDag.DagStyleApplier;
 import com.randomnoun.build.javaToGraphviz.astToDag.ControlFlowEdger;
 import com.randomnoun.build.javaToGraphviz.astToDag.DagNodeFilter;
+import com.randomnoun.build.javaToGraphviz.astToDag.DagStyleApplier;
 import com.randomnoun.build.javaToGraphviz.astToDag.LexicalScope;
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
-import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.build.javaToGraphviz.dag.ExitEdge;
