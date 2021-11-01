@@ -1,6 +1,7 @@
 package com.randomnoun.build.javaToGraphviz.astToDag;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -37,16 +38,17 @@ public class AstToDagVisitor extends ASTVisitor {
     Logger logger = Logger.getLogger(AstToDagVisitor.class);
     
     int lastIdx = 0;
-    String className; // SimpleName ?
-    String methodName;
-    String lastClass = null;
-    String lastMethod = null;
     Dag dag;
     DagSubgraph root;
     List<CommentText> comments;
     CompilationUnit cu;
     String src;
     boolean includeThrowNode;
+    
+    // Map of line number -> list of ASTs that start / end on that line
+    Map<Integer, List<ASTNode>> startLineNumberAsts;
+    Map<Integer, List<ASTNode>> endLineNumberAsts;
+    
     
     public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode) {
         super(true);
@@ -57,6 +59,11 @@ public class AstToDagVisitor extends ASTVisitor {
         dag = new Dag();
         root = new DagSubgraph(dag, null);
         dag.rootGraphs.add(root);
+        
+        AstToLineVisitor lv = new AstToLineVisitor(cu, src, comments, includeThrowNode);
+        cu.accept(lv);
+        startLineNumberAsts = lv.getStartLineNumberAstsMap();
+        endLineNumberAsts = lv.getEndLineNumberAstsMap();
     }
     
     public Dag getDag() { 
@@ -160,6 +167,10 @@ public class AstToDagVisitor extends ASTVisitor {
         DagNode pdn = getClosestDagNode(node);
         
         int lineNumber = cu.getLineNumber(node.getStartPosition());
+        int columnNumber = cu.getColumnNumber(node.getStartPosition());
+        
+        
+        
         // writeCommentsToLine(line);
 
         if (node instanceof MethodDeclaration ||
@@ -200,6 +211,17 @@ public class AstToDagVisitor extends ASTVisitor {
                 dag.addRootNode(dn);
             }
             
+            // ok. so.
+            // if this line has multiple comments, then attribute them
+            // I'd also like to attribute them using some kind of indicator in the comment; e.g. 
+            //   gv:^: text the statement that ended above this line
+            //   gv:<: text the statement that ended to the left
+            //   gv:>: text the statement that starts to the right
+            //   gv:v: text the statement that starts below
+            // or some other syntax
+            // for nested AST/DagNodes, the outermost AST/DagNode that started/ended on that line
+            
+            
             if (lastIdx < comments.size() && comments.get(lastIdx).line == lineNumber) {
                 CommentText ct = comments.get(lastIdx);
                 dn.keepNode = true; // always keep commented nodes
@@ -212,6 +234,10 @@ public class AstToDagVisitor extends ASTVisitor {
                     if (gvComment.inlineStyleString!=null) {
                         dn.gvAttributes.put("style", gvComment.inlineStyleString);
                     }
+                    
+                    // if this comment start col is before columnNumber then it's not for this statement
+                    
+                    
                 } else if (ct instanceof GvGraphComment) {
                     // @TODO something
                     

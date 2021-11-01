@@ -26,10 +26,11 @@ public class JavaToGraphvizTest {
     @Test
     public void testControlFlowStatements() throws IOException {
         
-        testStatement("com.example.input.IfStatementFlip");
+        testStatement("com.example.input.CommentAttribution");
         
         
         /*
+        testStatement("com.example.input.IfStatementFlip");
         testStatement("com.example.input.ContinueBreakRank");
         testStatement("com.example.input.TryCatchStatement");
         

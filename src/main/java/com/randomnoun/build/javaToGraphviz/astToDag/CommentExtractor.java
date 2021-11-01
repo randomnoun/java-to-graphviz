@@ -21,17 +21,21 @@ import com.randomnoun.build.javaToGraphviz.comment.GvLiteralComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvStyleComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.dom.RestrictedCssStyleSheetImpl;
+import com.randomnoun.common.Text;
 import com.steadystate.css.dom.CSSStyleSheetImpl;
 import com.steadystate.css.parser.CSSOMParser;
 import com.steadystate.css.parser.SACParserCSS3;
 
+/* Converts Comment objects ( in their separate list separate from the main AST ) into GvComment classes & subclasses
+ * 
+ */
 public class CommentExtractor {
 
     Logger logger = Logger.getLogger(CommentExtractor.class);
     
-    private static Pattern gvGraphClassPattern = Pattern.compile("^gv-graph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");  // gv.some.class.names: -> .some
-    private static Pattern gvSubgraphClassPattern = Pattern.compile("^gv-subgraph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");  // gv.some.class.names: -> .some
-    private static Pattern gvNodeClassPattern = Pattern.compile("^gv([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");  // gv.some.class.names: -> .some
+    private static Pattern gvGraphClassPattern = Pattern.compile("^gv-graph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");        // gv-graph.some.class.names: -> .some
+    private static Pattern gvSubgraphClassPattern = Pattern.compile("^gv-subgraph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");  // gv-subgraph.some.class.names: -> .some
+    private static Pattern gvNodeClassPattern = Pattern.compile("^gv([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*(:-*[v^<>]-*)?:?"); // gv.some.class.names: -> .some
 
     private static Pattern gvNextClassPattern = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
     private static Pattern curlyPattern = Pattern.compile("\\{(.*)\\}");  // @TODO quoting/escaping rules
@@ -40,6 +44,7 @@ public class CommentExtractor {
         List<String> classes = new ArrayList<>();
         String id = null;
         boolean hasColon = fgm.group(0).endsWith(":");
+        String dir = null;
         logger.info("group0 " + fgm.group(0));
         if (fgm.group(1)!=null) {
             char ch = fgm.group(1).charAt(0);
@@ -50,6 +55,9 @@ public class CommentExtractor {
             } else {
                 throw new IllegalStateException("expected '#' or '.', found '" + ch + "'");
             }
+        }
+        if (fgm.groupCount()==3 && fgm.group(3) != null) { // :v
+            dir = Text.replaceString(fgm.group(3).substring(1), "-", "");
         }
         int pos = fgm.end(1);
         Matcher gm = gvNextClassPattern.matcher(fgm.group(0));
@@ -74,7 +82,7 @@ public class CommentExtractor {
             text = null; 
         }
         
-        return "node".equals(type) ? new GvComment(c, lineNumber, id, classes, text, inlineStyleString) :
+        return "node".equals(type) ? new GvComment(c, lineNumber, id, classes, dir, text, inlineStyleString) :
             "graph".equals(type) ? new GvGraphComment(c, lineNumber, id, classes, text, inlineStyleString) :
             "subgraph".equals(type) ? new GvSubgraphComment(c, lineNumber, id, classes, text, inlineStyleString) :
              null;
@@ -84,7 +92,7 @@ public class CommentExtractor {
 	/** Return a list of processed comments from the source file. 
 	 * 
 	 * GvStyleComment:    "// gv-style: { xxx }"
-	 * GvDigraphComment:  "// gv-digraph: xxx"
+	 * GvDigraphComment:  "// gv-graph:    xxx"
 	 * GvSubgraphComment: "// gv-subgraph: xxx"
 	 * GvComment:         "// gv.className.className.className: xxx { xxx }"
 	 * 
@@ -178,7 +186,7 @@ public class CommentExtractor {
         return comments;
     }
     
- // when we construct the DagNodes, automatically add classes based on AST type
+    // when we construct the DagNodes, automatically add classes based on AST type
     // and line number, which will make colouring these things in from jacoco output that much simpler
     // and whatever JVMTI uses, which is probably line numbers as well
     
