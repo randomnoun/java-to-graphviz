@@ -13,12 +13,15 @@ import org.eclipse.jdt.core.dom.Comment;
 public class CommentText {
     public Comment comment;
     public int line;
-    
+    public int column;
+    boolean eolComment;
     public String text;
     
-    public CommentText(Comment c, int line, String text) {
+    public CommentText(Comment c, int line, int column, boolean eolComment, String text) {
         this.comment = c;
         this.line = line;
+        this.column = column;
+        this.eolComment = eolComment; 
         this.text = text;
     }
 }
