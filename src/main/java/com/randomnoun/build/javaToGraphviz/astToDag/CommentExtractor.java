@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.LineComment;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSStyleSheet;
 
@@ -40,10 +41,11 @@ public class CommentExtractor {
     private static Pattern gvNextClassPattern = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
     private static Pattern curlyPattern = Pattern.compile("\\{(.*)\\}");  // @TODO quoting/escaping rules
     
-    public CommentText getGvComment(String type, Comment c, int lineNumber, Matcher fgm, String text) {
+    public CommentText getGvComment(String type, Comment c, int lineNumber, int column, Matcher fgm, String text) {
         List<String> classes = new ArrayList<>();
         String id = null;
         boolean hasColon = fgm.group(0).endsWith(":");
+        boolean eolComment = (c instanceof LineComment);
         String dir = null;
         logger.info("group0 " + fgm.group(0));
         if (fgm.group(1)!=null) {
@@ -82,9 +84,9 @@ public class CommentExtractor {
             text = null; 
         }
         
-        return "node".equals(type) ? new GvComment(c, lineNumber, id, classes, dir, text, inlineStyleString) :
-            "graph".equals(type) ? new GvGraphComment(c, lineNumber, id, classes, text, inlineStyleString) :
-            "subgraph".equals(type) ? new GvSubgraphComment(c, lineNumber, id, classes, text, inlineStyleString) :
+        return "node".equals(type) ? new GvComment(c, lineNumber, column, eolComment, id, classes, dir, text, inlineStyleString) :
+            "graph".equals(type) ? new GvGraphComment(c, lineNumber, column, eolComment, id, classes, text, inlineStyleString) :
+            "subgraph".equals(type) ? new GvSubgraphComment(c, lineNumber, column, eolComment, id, classes, text, inlineStyleString) :
              null;
         
     }
@@ -113,9 +115,13 @@ public class CommentExtractor {
         List<CommentText> comments = new ArrayList<>();
         for (Comment c : (List<Comment>) cu.getCommentList()) {
             // comment.accept(cv);
+            boolean eolComment = (c instanceof LineComment);
             int start = c.getStartPosition();
             int end = start + c.getLength();
             String text = src.substring(start, end);
+            int line = cu.getLineNumber(start);
+            int column = cu.getColumnNumber(start);
+            
             if (c.isBlockComment()) {
                 if (text.startsWith("/*") && text.endsWith("*/")) {
                     text = text.substring(2, text.length() - 2).trim();
@@ -139,36 +145,36 @@ public class CommentExtractor {
                     // here be the css
                     // remove inline comments
                     // logger.info("maybe here ? " +  s);
-                    comments.add(new GvStyleComment(c, cu.getLineNumber(start), text, s));
+                    comments.add(new GvStyleComment(c, line, column, eolComment, text, s));
                     
                 } else {
                     throw new IllegalStateException("gv-style does not start with '{' and end with '}':  '" + text + "'");
                 }
 
             } else if (text.startsWith("gv-end")) {
-                comments.add(new GvEndSubgraphComment(c,  cu.getLineNumber(start)));
+                comments.add(new GvEndSubgraphComment(c, line, column, eolComment));
                 
             } else if (text.startsWith("gv-literal:")) {
                 String s = text.substring(11).trim();
-                comments.add(new GvLiteralComment(c,  cu.getLineNumber(start), s));
+                comments.add(new GvLiteralComment(c, line, column, eolComment, s));
                     
             } else {
                 Matcher fgm;
                 CommentText gvc = null;
                 fgm = gvGraphClassPattern.matcher(text);
                 if (fgm.find()) {
-                    gvc = getGvComment("graph", c, cu.getLineNumber(start), fgm, text);
+                    gvc = getGvComment("graph", c, line, column, fgm, text);
                     
                 } else {
                     fgm = gvSubgraphClassPattern.matcher(text);
                     if (fgm.find()) {
-                        gvc = getGvComment("subgraph", c, cu.getLineNumber(start), fgm, text);
+                        gvc = getGvComment("subgraph", c, line, column, fgm, text);
                     
                     } else {
                         fgm = gvNodeClassPattern.matcher(text);
 
                         if (fgm.find()) {
-                            gvc = getGvComment("node", c, cu.getLineNumber(start), fgm, text);
+                            gvc = getGvComment("node", c, line, column, fgm, text);
                             
                         } else {
                             // regular comment, ignore
