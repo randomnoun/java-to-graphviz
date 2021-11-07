@@ -38,6 +38,7 @@ public class DagNode {
     
     public String name;  // graphviz name
     public String label; // graphviz label
+    public boolean hasComment;
     
     public void addChild(DagNode node) {
         children.add(node);
