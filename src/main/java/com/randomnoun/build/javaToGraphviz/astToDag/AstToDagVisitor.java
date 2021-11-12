@@ -33,6 +33,9 @@ import com.randomnoun.common.Text;
  * <p>Comments that appear on the same line as a statement are associated with that statement.
  *
  * <p>If there are multiple statements on a line, it will be associated with the first one on the line.
+ * 
+ * <p>Actually this is a bit more complicated now, as comments can have directions ('^', '>', 'v', '<') to  
+ * give the developer more control over which statement is being annotated.
  */
 public class AstToDagVisitor extends ASTVisitor {
     
