@@ -26,10 +26,10 @@ public class JavaToGraphvizTest {
     @Test
     public void testControlFlowStatements() throws IOException {
         
-        testStatement("com.example.input.CommentAttribution");
+        testStatement("com.example.input.MethodChain");
         
         
-        /*
+        
         testStatement("com.example.input.IfStatementFlip");
         testStatement("com.example.input.ContinueBreakRank");
         testStatement("com.example.input.TryCatchStatement");
@@ -47,7 +47,8 @@ public class JavaToGraphvizTest {
          testStatement("com.example.input.SynchronizeStatement");
          testStatement("com.example.input.MultipleGraphs"); 
         testStatement("com.example.input.UserDefinedSubgraphs");
-        */
+        testStatement("com.example.input.CommentAttribution");
+        
 
     }
     
@@ -63,7 +64,7 @@ public class JavaToGraphvizTest {
         // ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
-        javaToGraphviz.setBaseCssHref("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
+        javaToGraphviz.setBaseCssUrl("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
         // javaToGraphviz.setRemoveNode(true);
         javaToGraphviz.parse(fis, "UTF-8");
         fis.close();
