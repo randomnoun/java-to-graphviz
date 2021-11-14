@@ -196,8 +196,33 @@ public class CommentExtractor {
     // and line number, which will make colouring these things in from jacoco output that much simpler
     // and whatever JVMTI uses, which is probably line numbers as well
     
-    public CSSStyleSheet getStyleSheet(List<CommentText> comments, String baseCssHref) throws IOException {
-        String css = "@import \"" + baseCssHref + "\";\n";
+    /** Return a stylesheet, composed of:
+     * <ul>
+     * <li>imported base CSS
+     * <li>imported user CSS
+     * <li>source code styles (gv-style blocks), may import other CSS
+     * <li>user CSS rules
+     * </ul>
+     * 
+     * @param comments
+     * @param baseCssHref
+     * @param userCssHrefs
+     * @param userCssRules
+     * @return
+     * @throws IOException
+     */
+    public CSSStyleSheet getStyleSheet(List<CommentText> comments, String baseCssHref, 
+        List<String> userCssHrefs, List<String> userCssRules) throws IOException 
+    {
+        String css = "";
+        if (!Text.isBlank(baseCssHref) && !baseCssHref.equals("-")) {
+            css = "@import \"" + baseCssHref + "\";\n";
+        }
+        if (userCssHrefs != null) {
+            for (String s : userCssHrefs) {
+                css += "@import \"" + s + "\";\n";
+            }
+        }
         for (CommentText c : comments) {
             // String t = c.text;
             if (c instanceof GvStyleComment) {
@@ -214,6 +239,11 @@ public class CommentExtractor {
             } else if (c instanceof GvComment) {
                 // could check inline styles here maybe
                 
+            }
+        }
+        if (userCssRules != null) {
+            for (String s : userCssRules) {
+                css += s + "\n";
             }
         }
         
