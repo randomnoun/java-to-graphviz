@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import com.randomnoun.build.javaToGraphviz.comment.GvComment;
 import com.randomnoun.common.Text;
 
 public class DagNode {
@@ -39,6 +40,7 @@ public class DagNode {
     public String name;  // graphviz name
     public String label; // graphviz label
     public boolean hasComment;
+    public List<GvComment> gvComments = new ArrayList<>(); // in case we need to bubble these up the AST. although what are the chances of that. I mean really.
     
     public void addChild(DagNode node) {
         children.add(node);
