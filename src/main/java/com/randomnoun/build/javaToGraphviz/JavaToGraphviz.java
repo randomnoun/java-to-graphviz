@@ -8,19 +8,24 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.jsoup.nodes.Document;
 import org.w3c.dom.css.CSSStyleSheet;
 
+import com.randomnoun.build.javaToGraphviz.astToDag.AstEdger;
 import com.randomnoun.build.javaToGraphviz.astToDag.AstToDagVisitor;
 import com.randomnoun.build.javaToGraphviz.astToDag.CommentExtractor;
 import com.randomnoun.build.javaToGraphviz.astToDag.ControlFlowEdger;
 import com.randomnoun.build.javaToGraphviz.astToDag.DagNodeFilter;
 import com.randomnoun.build.javaToGraphviz.astToDag.DagStyleApplier;
+import com.randomnoun.build.javaToGraphviz.astToDag.ExpressionEdger;
 import com.randomnoun.build.javaToGraphviz.astToDag.LexicalScope;
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
@@ -57,10 +62,13 @@ public class JavaToGraphviz {
     // options
     boolean removeNode = false;
     int astParserLevel = JLS11;
-    boolean isDebugLabel = false;
     boolean includeThrowEdges = true;
     boolean includeThrowNodes = true;
-    String baseCssHref = "JavaToGraphviz-base.css";
+    String format = "dot";
+    String baseCssUrl = "JavaToGraphviz-base.css";
+    List<String> userCssUrls = null;
+    List<String> userCssRules = null;
+    List<String> edgerNames = Collections.singletonList("control-flow");
     
     // non-deprecated AST constants. 
     // there's an eclipse ticket to create an alternative non-deprecated interface for these which isn't complete yet.
@@ -121,10 +129,6 @@ public class JavaToGraphviz {
         this.removeNode = removeNode;
     }
     
-    public void setDebugLabel(boolean isDebugLabel) {
-        this.isDebugLabel = isDebugLabel;
-    }
-    
     public void setAstParserLevel(int astParserLevel) {
         this.astParserLevel = astParserLevel;
     }
@@ -137,9 +141,23 @@ public class JavaToGraphviz {
         this.includeThrowEdges = includeThrowEdges;
     }
     
-    public void setBaseCssHref(String baseCssHref) {
-        this.baseCssHref = baseCssHref;
+    public void setBaseCssUrl(String baseCssUrl) {
+        this.baseCssUrl = baseCssUrl;
     }
+
+    public void setEdgerNames(List<String> edgerNames) {
+        this.edgerNames = edgerNames;
+    }
+
+    public void setUserCssUrls(List<String> userCssUrls) {
+        this.userCssUrls = userCssUrls;
+    }
+
+    public void setUserCssRules(List<String> userCssRules) {
+        this.userCssRules = userCssRules;
+    }
+    
+    
     
     /** Parse the java source code in the supplied inputstream.
      * 
@@ -163,7 +181,7 @@ public class JavaToGraphviz {
 		
 		CommentExtractor ce = new CommentExtractor();
 		comments = ce.getComments(cu, src);
-		styleSheet = ce.getStyleSheet(comments, baseCssHref);
+		styleSheet = ce.getStyleSheet(comments, baseCssUrl, userCssUrls, userCssRules);
 		
 		AstToDagVisitor dv = new AstToDagVisitor(cu, src, comments, includeThrowNodes);
         cu.accept(dv);
@@ -208,27 +226,64 @@ public class JavaToGraphviz {
             if (rootGraph.nodes.contains(methodNode)) {
                 
                 LexicalScope lexicalScope = new LexicalScope();
-                
-                ControlFlowEdger edger = new ControlFlowEdger(dag);
-                edger.setIncludeThrowEdges(includeThrowEdges);
-                
-                List<ExitEdge> ee = edger.addEdges(dag, methodNode, lexicalScope);
-    
-                DagNodeFilter filter = new DagNodeFilter(dag);
-                methodNode.keepNode = false;
-                filter.setLastKeepNode(methodNode, methodNode);
+
+                for (String edgerName : edgerNames) {
+                    if (edgerName.equals("control-flow")) {
+                        ControlFlowEdger edger = new ControlFlowEdger(dag);
+                        edger.setIncludeThrowEdges(includeThrowEdges);
+                        edger.addEdges(dag, methodNode, lexicalScope);
+                    } else if (edgerName.equals("ast")) {
+                        AstEdger edger = new AstEdger(dag);
+                        edger.addEdges(dag,  methodNode, lexicalScope);
+                    }
+                }
+
                 if (removeNode) {
+                    DagNodeFilter filter = new DagNodeFilter(dag);
+                    methodNode.keepNode = false;
+                    filter.setLastKeepNode(methodNode, methodNode);
                     filter.removeNodes(methodNode); // peephole node removal.
                 }
-                
             }
         }
 
         // subgraphs are now defined in the Dag from the stylesheet
         DagStyleApplier dsa = new DagStyleApplier(dag, rootGraph);
-        dsa.inlineStyles(styleSheet);
+        Document doc = dsa.createDom();
+        if (format.equals("dom1")) {
+            pw.println(doc.toString());
+        } else {
+            dsa.inlineStyles(styleSheet);
+        }
+        
+        
+        
 
-        pw.println(rootGraph.toGraphviz(0));
+        // actually think I'm going to evaluate some of this css as the dag is being constructed.
+        /*
+        // find any DagNodes that have gv-fluent: true on them
+        // and add some more edges into the graph
+        ArrayList<DagNode> fluentNodes = new ArrayList<>();
+        for (DagNode methodNode : dag.rootNodes) {
+            if (rootGraph.nodes.contains(methodNode)) {
+                findNodesWithGvStyle(fluentNodes, methodNode, "gv-fluent", "true");
+            }
+        }
+        for (DagNode expressionNode : fluentNodes) {
+            LexicalScope lexicalScope = new LexicalScope();
+            ExpressionEdger edger = new ExpressionEdger(dag);
+            edger.setIncludeThrowEdges(includeThrowEdges);
+            edger.addEdges(dag, expressionNode, lexicalScope);
+        }
+        // probably need to restyle things again
+         */
+        
+        if (format.equals("dom2")) {
+            doc = dsa.getDocument();
+            pw.println(doc.toString());
+        } else {
+            pw.println(rootGraph.toGraphviz(0));
+        }
         
         
         /*
@@ -261,34 +316,66 @@ public class JavaToGraphviz {
         return (rootGraphIdx < dag.rootGraphs.size());
 	}
 
-	public static void main(String args[]) throws Exception {
-	    Log4jCliConfiguration lcc = new Log4jCliConfiguration();
-	    lcc.init("[JavaToGraphviz]", null);
-	    Logger logger = Logger.getLogger(JavaToGraphviz.class);
+	private void findNodesWithGvStyle(ArrayList<DagNode> result, DagNode node, String gvStyleName, String value) {
+        if (value.equals(node.gvStyles.get(gvStyleName))) {
+            result.add(node);
+        }
+        for (DagNode n : node.children) {
+            findNodesWithGvStyle(result, n, gvStyleName, value);
+        }
+    }
 
-        // InputStream is = JavaToGraphviz4.class.getResourceAsStream("/test.java");
-	    // InputStream is = JavaToGraphviz.class.getResourceAsStream("/Statements.java");
+    public void setFormat(String format) {
+        this.format = format;
+    }
 
-	    String className = "com.example.input.SwitchStatement2";
-        File f = new File("src/test/java/" + Text.replaceString(className,  ".",  "/") + ".java");
-        FileInputStream is = new FileInputStream(f);
-	    
-		JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
-		javaToGraphviz.setDebugLabel(true);
-		javaToGraphviz.setRemoveNode(true);
-		javaToGraphviz.setIncludeThrowEdges(false); // collapse throw edges
-		javaToGraphviz.setIncludeThrowNodes(false); // collapse throw nodes
-		javaToGraphviz.parse(is, "UTF-8");
-        is.close();
+    public void setSourceVersion(String sourceVersion) {
+        switch (sourceVersion) {
+            // up until 1.5 sun maintained a fairly normal version numbering scheme
+            case "1":
+            case "1.0":
+            case "1.1":
+            case "1.2": 
+            case "1.3":
+            case "1.4":
+                astParserLevel = JLS2; break;
+            case "1.5":
+                astParserLevel = JLS3; break;
+                
+            // then we started dropping the '1.' on occasion 
+            case "6":
+            case "1.6":
+            case "7":
+            case "1.7":
+                astParserLevel = JLS4; break;
+            case "1.8":
+            case "8":
+                astParserLevel = JLS8; break;
+                
+            // from 9 onwards we don't have the '1.' prefix any more    
+            case "9":
+                astParserLevel = JLS9; break;
+            case "10":
+                astParserLevel = JLS10; break;
+            case "11":
+                astParserLevel = JLS11; break;
+            case "12":
+                astParserLevel = JLS12; break;
+            case "13":
+                astParserLevel = JLS13; break;
+            case "14":
+                astParserLevel = JLS14; break;
+            case "15":
+                astParserLevel = JLS15; break;
+            case "16":
+                astParserLevel = JLS16; break;
+            default:
+                throw new IllegalArgumentException("Unknown source version '" + sourceVersion + "'");
+        }
+    }
 
-		boolean hasNext;
-        do {
-            StringWriter sw = new StringWriter();
-            hasNext = javaToGraphviz.writeGraphviz(sw);
-            System.out.println(sw.toString());
-            if (hasNext) { System.out.println("==========================="); }
-        } while (hasNext);
-	}
+    
+
 	
 	// yeah ok
 	/*
