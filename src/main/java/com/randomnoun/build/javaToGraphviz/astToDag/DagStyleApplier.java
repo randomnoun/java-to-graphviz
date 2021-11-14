@@ -34,87 +34,27 @@ public class DagStyleApplier {
     Logger logger = Logger.getLogger(DagStyleApplier.class);
     Dag dag;
     DagSubgraph root;
+    Document document;
+    Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
     
     public DagStyleApplier(Dag dag, DagSubgraph root) {
         this.dag = dag;
         this.root = root;
     }
     
-    // recursively within this subgraph only
-    public List<DagElement> getDagElements(Map<DagNode, DagElement> dagNodesToElements, DagSubgraph sg, DagNode node) {
+    public Document createDom() {
+        // construct a DOM, as we need that to be able to apply the CSS rules
+        document = Document.createShell("");
+        Element bodyEl = document.getElementsByTag("body").get(0);
         
-        List<DagElement> result = new ArrayList<>();
-        node.gvStyles = new HashMap<>(); // clear applied styles
-        
-        boolean isLiteral = node.classes.contains("literal");
-        
-        DagElement nodeElement = new DagElement(isLiteral ? "literal" : "node", node, node.gvAttributes);
-        
-        dagNodesToElements.put(node, nodeElement);
-        for (int i = 0; i < node.children.size(); i++) {
-            DagNode childNode = node.children.get(i);
-            if (dagNodesToElements.containsKey(childNode)) {
-                // should never happen, but skip it
-                logger.warn("repeated node in Dag");
-            } else if (!sg.nodes.contains(childNode)) {
-                // wrong subgraph, skip it
-                
-            } else {
-                nodeElement.appendChildren(getDagElements(dagNodesToElements, sg, childNode));
-            }
-        }
-        result.add(nodeElement);
-        String inNodeIds = null; 
-        String outNodeIds = null; 
-        Set<String> inNodeClasses = new HashSet<>();
-        Set<String> outNodeClasses = new HashSet<>();
-        for (int j = 0; j < dag.edges.size(); j++) {  /* TODO: outrageously inefficient */
-            DagEdge edge = dag.edges.get(j);
-            // if (sg.nodes.contains(edge.n1)) { 
-            if (edge.n1 == node) {
-                edge.gvStyles = new HashMap<>(); // clear applied styles
-                DagElement edgeElement = new DagElement(edge, edge.gvAttributes);
-                // edges don't have IDs here but could
-                // child.attr("id", edge.name);
-                edgeElement.attr("inNodeId", edge.n1.name);
-                edgeElement.attr("outNodeId", edge.n2.name);
-                edgeElement.attr("inNodeClass", Text.join(edge.n1.classes, " "));
-                edgeElement.attr("outNodeClass", Text.join(edge.n2.classes, " "));
-                outNodeIds = outNodeIds == null ? edge.n2.name : outNodeIds + " " + edge.n2.name;
-                outNodeClasses.addAll(edge.n2.classes);
-                result.add(edgeElement);
-            }
-            if (edge.n2 == node) {
-                inNodeIds = inNodeIds == null ? edge.n1.name : inNodeIds + " " + edge.n1.name;
-                inNodeClasses.addAll(edge.n1.classes);
-            }
-        }
-        nodeElement.attr("inNodeId", inNodeIds);
-        nodeElement.attr("outNodeId", outNodeIds);
-        nodeElement.attr("inNodeClass", Text.join(inNodeClasses,  " "));
-        nodeElement.attr("outNodeClass", Text.join(outNodeClasses,  " "));
-        return result;
+        // construct the initial DOM
+        DagElement graphEl = getDagElement(dagNodesToElements, root);
+        bodyEl.appendChild(graphEl);
+        return document;
     }
-
-    public DagElement getDagElement(Map<DagNode, DagElement> dagNodesToElements, DagSubgraph sg) {
-        DagElement graphEl = new DagElement(sg.container == null ? "graph" : "subgraph", sg, sg.gvAttributes);
-        // bodyEl.appendChild(graphEl);
-        DagElement graphNodeEl = new DagElement("graphNode", sg, sg.gvAttributes);
-        graphEl.appendChild(graphNodeEl);
-        DagElement graphEdgeEl = new DagElement("graphEdge", sg, sg.gvAttributes);
-        graphEl.appendChild(graphEdgeEl);
-        
-        for (int i = 0; i < sg.nodes.size(); i++) {
-            DagNode node = sg.nodes.get(i);
-            if (dagNodesToElements.containsKey(node)) {
-                // skip it
-            } else {
-                graphEl.appendChildren(getDagElements(dagNodesToElements, sg, node));
-                
-            }
-        }
-        
-        return graphEl;
+    
+    public Document getDocument() { 
+        return document;
     }
     
     
@@ -127,18 +67,13 @@ public class DagStyleApplier {
      */
     public void inlineStyles(CSSStyleSheet stylesheet) throws IOException {
 
-        // construct a DOM, as we need that to be able to apply the CSS rules
-        Document document = Document.createShell("");
-        Element bodyEl = document.getElementsByTag("body").get(0);
-        
-        // construct the initial DOM
-        Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
-
-        DagElement graphEl = getDagElement(dagNodesToElements, root);
-        bodyEl.appendChild(graphEl);
+        // OK so before we create the subgraphs, create dag edges for things that are enabled by style properties
+        // applyDomStyles(document, stylesheet);
+        // List<DagElement> elementsToExpandInExcruciatingDetail = getElementsWithStyleProperty(document, "gv-fluent", "true"); // enable method nodes
 
         
         // use the gv-newSubgraph CSS properties to add subgraphs into both the Dag and the DOM
+        resetDomStyles(document);
         applyDomStyles(document, stylesheet);
         List<DagElement> elementsToCreateSubgraphsInside = getElementsWithStyleProperty(document, "gv-newSubgraph", "true");
         List<DagElement> elementsToCreateSubgraphsFrom = getElementsWithStyleProperty(document, "gv-beginOuterSubgraph", "true");
@@ -240,10 +175,11 @@ public class DagStyleApplier {
         applyDomStyles(document, stylesheet);
         setDagStyles(document, stylesheet, true); // true = set IDs
         
-        
         // TODO: arguably now that the node IDs have changed, couple reapply a third time in case there are any
         // ID-specific CSS rules
         // TODO: also recreate element inNodeId, outNodeId inNodeIds, outNodeIds attributes
+
+        
         
         // applyStyles(document, stylesheet, dag);
         
@@ -252,6 +188,82 @@ public class DagStyleApplier {
     }
     
 
+    // recursively within this subgraph only
+    public List<DagElement> getDagElements(Map<DagNode, DagElement> dagNodesToElements, DagSubgraph sg, DagNode node) {
+        
+        List<DagElement> result = new ArrayList<>();
+        node.gvStyles = new HashMap<>(); // clear applied styles
+        
+        boolean isLiteral = node.classes.contains("literal");
+        
+        DagElement nodeElement = new DagElement(isLiteral ? "literal" : "node", node, node.gvAttributes);
+        
+        dagNodesToElements.put(node, nodeElement);
+        for (int i = 0; i < node.children.size(); i++) {
+            DagNode childNode = node.children.get(i);
+            if (dagNodesToElements.containsKey(childNode)) {
+                // should never happen, but skip it
+                logger.warn("repeated node in Dag");
+            } else if (!sg.nodes.contains(childNode)) {
+                // wrong subgraph, skip it
+                
+            } else {
+                nodeElement.appendChildren(getDagElements(dagNodesToElements, sg, childNode));
+            }
+        }
+        result.add(nodeElement);
+        String inNodeIds = null; 
+        String outNodeIds = null; 
+        Set<String> inNodeClasses = new HashSet<>();
+        Set<String> outNodeClasses = new HashSet<>();
+        for (int j = 0; j < dag.edges.size(); j++) {  /* TODO: outrageously inefficient */
+            DagEdge edge = dag.edges.get(j);
+            // if (sg.nodes.contains(edge.n1)) { 
+            if (edge.n1 == node) {
+                edge.gvStyles = new HashMap<>(); // clear applied styles
+                DagElement edgeElement = new DagElement(edge, edge.gvAttributes);
+                // edges don't have IDs here but could
+                // child.attr("id", edge.name);
+                edgeElement.attr("inNodeId", edge.n1.name);
+                edgeElement.attr("outNodeId", edge.n2.name);
+                edgeElement.attr("inNodeClass", Text.join(edge.n1.classes, " "));
+                edgeElement.attr("outNodeClass", Text.join(edge.n2.classes, " "));
+                outNodeIds = outNodeIds == null ? edge.n2.name : outNodeIds + " " + edge.n2.name;
+                outNodeClasses.addAll(edge.n2.classes);
+                result.add(edgeElement);
+            }
+            if (edge.n2 == node) {
+                inNodeIds = inNodeIds == null ? edge.n1.name : inNodeIds + " " + edge.n1.name;
+                inNodeClasses.addAll(edge.n1.classes);
+            }
+        }
+        nodeElement.attr("inNodeId", inNodeIds);
+        nodeElement.attr("outNodeId", outNodeIds);
+        nodeElement.attr("inNodeClass", Text.join(inNodeClasses,  " "));
+        nodeElement.attr("outNodeClass", Text.join(outNodeClasses,  " "));
+        return result;
+    }
+
+    public DagElement getDagElement(Map<DagNode, DagElement> dagNodesToElements, DagSubgraph sg) {
+        DagElement graphEl = new DagElement(sg.container == null ? "graph" : "subgraph", sg, sg.gvAttributes);
+        // bodyEl.appendChild(graphEl);
+        DagElement graphNodeEl = new DagElement("graphNode", sg, sg.gvAttributes);
+        graphEl.appendChild(graphNodeEl);
+        DagElement graphEdgeEl = new DagElement("graphEdge", sg, sg.gvAttributes);
+        graphEl.appendChild(graphEdgeEl);
+        
+        for (int i = 0; i < sg.nodes.size(); i++) {
+            DagNode node = sg.nodes.get(i);
+            if (dagNodesToElements.containsKey(node)) {
+                // skip it
+            } else {
+                graphEl.appendChildren(getDagElements(dagNodesToElements, sg, node));
+                
+            }
+        }
+        
+        return graphEl;
+    }
     private List<DagElement> getElementsWithStyleProperty(Document document, final String propertyName, final String propertyValue) {
         List<DagElement> result = new ArrayList<>();
         
