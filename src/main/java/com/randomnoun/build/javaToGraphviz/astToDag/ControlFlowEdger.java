@@ -9,11 +9,16 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ContinueStatement;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
+import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.internal.core.manipulation.dom.ASTResolving;
@@ -81,13 +86,15 @@ public class ControlFlowEdger {
             return addThrowEdges(dag, node, scope);
         } else if (node.type.equals("Labeled")) {
             return addLabeledStatementEdges(dag, node, scope);
+        } else if (node.type.equals("ExpressionStatement")) {
+            return addExpressionStatementEdges(dag, node, scope);
+            
             
         // goto will be considered tedious if I have to do that. ho ho ho.
             
         } else if (node.type.equals("Assert") ||
           node.type.equals("ConstructorInvocation") ||
           node.type.equals("EmptyStatement") ||
-          node.type.equals("Expression") ||
           node.type.equals("SuperConstructorInvocation") ||
           node.type.equals("TypeDeclaration") ||
           node.type.equals("VariableDeclaration") ||
@@ -105,7 +112,38 @@ public class ControlFlowEdger {
 	    }
 	    
 	}
-	
+
+	// this will probably go into the ExpressionEdger later
+    public List<ExitEdge> addExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
+        if (node.type.equals("MethodInvocation")) {
+            return addMethodInvocationEdges(dag, node, scope);
+        } else {
+            logger.warn("non-implemented expression " + node.type);
+
+            // edge the AST so we've got something for now
+            node.classes.add("ast");
+            addAstEdges(dag, node, scope);
+            
+            // non-control flow statement
+            ExitEdge e = new ExitEdge();
+            e.n1 = node;
+            return Collections.singletonList(e);
+        }
+        
+    }
+
+    private void addAstEdges(Dag dag, DagNode node, LexicalScope scope) {
+        
+        if (node.children != null && node.children.size() > 0) {
+            for (DagNode c : node.children) {
+                DagEdge ce = dag.addEdge(node, c);
+                ce.classes.add("ast");
+                addEdges(dag, c, scope);
+            }
+        }
+    }
+
+	   
 	// draw lines from each statement to each other
 	// exit node is the last statement
 	
@@ -128,13 +166,13 @@ public class ControlFlowEdger {
     }
 
     private List<ExitEdge> addSynchronizedEdges(Dag dag, DagNode synchronizedNode, LexicalScope scope) {
-        // there's an expression and a block but we don't draw expressions yet
-        if (synchronizedNode.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + synchronizedNode.children.size());
-        }
+        // there's an expression and a block but we don't draw expressions yet. OH YES WE DO.t
+        SynchronizedStatement ss = (SynchronizedStatement) synchronizedNode.astNode;
+        
 
         // draw an edge to the sync node to the block so that we can put a subgraph around the sync node
-        DagNode synchronizedBlock = synchronizedNode.children.get(0);
+        // DagNode synchronizedBlock = synchronizedNode.children.get(0);
+        DagNode synchronizedBlock = getDagChild(synchronizedNode.children, ss.getBody(), null);
         dag.addEdge(synchronizedNode, synchronizedBlock);
         List<ExitEdge> prevNodes = addBlockEdges(dag, synchronizedBlock, scope);  
         return prevNodes;
@@ -144,14 +182,12 @@ public class ControlFlowEdger {
 	// draw lines from each statement to each other
     // returns an empty list
     private List<ExitEdge> addMethodDeclarationEdges(Dag dag, DagNode method, LexicalScope scope) {
-        if (method.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + method.children.size());
-        }
         MethodDeclaration md = (MethodDeclaration) method.astNode;
         // method.label = "method " + md.getName();
         method.gvAttributes.put("methodName",  md.getName().toString());
         
-        DagNode methodBlock = method.children.get(0);
+        // last child is the block
+        DagNode methodBlock = method.children.get(method.children.size() - 1);
         dag.addEdge(method, methodBlock);
         
         LexicalScope lexicalScope = new LexicalScope(); 
@@ -265,11 +301,12 @@ public class ControlFlowEdger {
         // or maybe this should create a new lexical scope. maybe it should.
         // so we can break/continue to it
         
-        if (labeledStatementNode.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + labeledStatementNode.children.size());
+        // label, body
+        if (labeledStatementNode.children.size() != 2) {
+            throw new IllegalStateException("expected 2 children; found " + labeledStatementNode.children.size());
         }
 
-        DagNode c = labeledStatementNode.children.get(0);
+        DagNode c = labeledStatementNode.children.get(1);
         dag.addEdge(labeledStatementNode, c);
 
         LabeledStatement ls = (LabeledStatement) labeledStatementNode.astNode;
@@ -310,16 +347,62 @@ public class ControlFlowEdger {
         scope.throwEdges.add(e);
         return Collections.emptyList();
     }
+    
+    private List<ExitEdge> addExpressionStatementEdges(Dag dag, DagNode expressionStatementNode, LexicalScope scope) {
+        ExpressionStatement es = (ExpressionStatement) expressionStatementNode.astNode;
+        Expression e = es.getExpression();
+        if (expressionStatementNode.children.size() != 1) {
+            throw new IllegalStateException("expected 1 child; found " + expressionStatementNode.children.size());
+        }
+        DagNode eNode = expressionStatementNode.children.get(0);
+        dag.addEdge(expressionStatementNode, eNode);
+        
+        return addExpressionEdges(dag, eNode, scope);
+    }
 
+    private List<ExitEdge> addMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
+        MethodInvocation mi = (MethodInvocation) methodInvocationNode.astNode;
+        DagNode expressionDag = getDagChild(methodInvocationNode.children, mi.getExpression(), null);
+        // DagNode name = getDagChild(methodInvocationNode.children, mi.getName(), null);
+        methodInvocationNode.gvAttributes.put("methodName", mi.getName().toString());
+        
+            
+        List<DagNode> argumentDags = getDagChildren(methodInvocationNode.children, mi.arguments(), null);
+
+        // expression is null for method calls within the same object
+        if (expressionDag != null) {
+            List<ExitEdge> expressionPrevNodes = addExpressionEdges(dag, expressionDag, scope);
+            for (ExitEdge e : expressionPrevNodes) {
+                e.n2 = methodInvocationNode;
+                e.classes.add("invocationObject");
+                dag.addEdge(e);
+            }
+        }
+            
+        List<ExitEdge> argumentPrevNodes = new ArrayList<>();
+        for (DagNode a : argumentDags) {
+            argumentPrevNodes.addAll( addExpressionEdges(dag, a, scope ));
+        }
+        for (ExitEdge e : argumentPrevNodes) {
+            e.n2 = methodInvocationNode;
+            e.classes.add("invocationArgument");
+            dag.addEdge(e);
+        }
+        ExitEdge e = new ExitEdge();
+        e.n1 = methodInvocationNode;
+        return Collections.singletonList(e);
+    }
 
     
 	// draw branches from this block to then/else blocks
 	// exit edges are combined exit edges of both branches
 	private List<ExitEdge> addIfEdges(Dag dag, DagNode block, LexicalScope scope) {
         // draw the edges
+	    // now have a node for the condition
+	    
 	    List<ExitEdge> prevNodes = new ArrayList<>();
-	    if (block.children.size() == 1) {
-	        DagNode c = block.children.get(0);
+	    if (block.children.size() == 2) {
+	        DagNode c = block.children.get(1);
             DagEdge trueEdge = dag.addEdge(block, c, null);
             trueEdge.classes.add("if");
             trueEdge.classes.add("true");
@@ -334,9 +417,9 @@ public class ControlFlowEdger {
             prevNodes.addAll(branchPrevNodes); // Y branch
             prevNodes.add(e); // N branch
 	       
-	    } else if (block.children.size() == 2) {
-	        DagNode c1 = block.children.get(0);
-	        DagNode c2 = block.children.get(1);
+	    } else if (block.children.size() == 3) {
+	        DagNode c1 = block.children.get(1);
+	        DagNode c2 = block.children.get(2);
             DagEdge trueEdge = dag.addEdge(block, c1, null); trueEdge.classes.add("if"); trueEdge.classes.add("true");
             DagEdge falseEdge = dag.addEdge(block, c2, null); falseEdge.classes.add("if"); falseEdge.classes.add("false");
             List<ExitEdge> branch1PrevNodes = addEdges(dag, c1, scope);
@@ -345,7 +428,7 @@ public class ControlFlowEdger {
             prevNodes.addAll(branch2PrevNodes);
             
 	    } else {
-	        throw new IllegalStateException("expected 2 children, found " + block.children.size());
+	        throw new IllegalStateException("expected 2 or 3 children, found " + block.children.size());
 	    }
            
         return prevNodes;
@@ -356,74 +439,14 @@ public class ControlFlowEdger {
         // draw the edges
         TryStatement ts = (TryStatement) tryNode.astNode;
         
-        // children of TryStatement are
-        /*
-            // visit children in normal left to right reading order
-            if (this.ast.apiLevel >= AST.JLS4_INTERNAL) {
-                acceptChildren(visitor, this.resources);
-            }
-            acceptChild(visitor, getBody());
-            acceptChildren(visitor, this.catchClauses);
-            acceptChild(visitor, getFinally());
-        */
-        @SuppressWarnings("unchecked")
-        List<ASTNode> resourcesNodes = ts.resources();
-        ASTNode bodyNode = ts.getBody();
-        @SuppressWarnings("unchecked")
-        List<ASTNode> catchClauseNodes = ts.catchClauses();
-        ASTNode finallyNode = ts.getFinally();
+        List<DagNode> resourceDags = getDagChildren(tryNode.children, ts.resources(), "tryResource");
+        DagNode bodyDag = getDagChild(tryNode.children, ts.getBody(), "tryBody");
+        List<DagNode> catchClauseDags = getDagChildren(tryNode.children, ts.catchClauses(), "finally");
+        DagNode finallyDag = getDagChild(tryNode.children, ts.getFinally(), "finally");
         
-        List<DagNode> resourceDags = new ArrayList<>();
-        DagNode bodyDag = null;
-        List<DagNode> catchClauseDags = new ArrayList<>();
-        DagNode finallyDag = null;
-        
-        for (DagNode c : tryNode.children) {
-            if (resourcesNodes.contains(c.astNode)) {
-                resourceDags.add(c);
-                c.classes.add("tryResource");
-            } else if (bodyNode == c.astNode) {
-                bodyDag = c;
-                c.classes.add("tryBody");
-            } else if (catchClauseNodes.contains(c.astNode)) {
-                catchClauseDags.add(c);
-                c.classes.add("catchClause");
-            } else if (finallyNode == c.astNode) {
-                finallyDag = c;
-                c.classes.add("finally");
-            } else {
-                throw new IllegalStateException("child of TryStatement was not a resource, body, catchClause or finally node");
-            }
-        }
         if (bodyDag == null) {
             throw new IllegalStateException("try with no body");
         }
-
-        // add clusters for try, catch and finally blocks
-        // which we're doing in CSS now instead
-        
-        /*
-        // this occurs before CSS subgraph creation so they're all children of the Dag
-        DagSubgraph bodySg = new DagSubgraph(dag, dag);
-        bodySg.classes.add("tryBody");
-        dag.subgraphs.add(bodySg);
-        bodySg.nodes.add(bodyDag);
-        if (catchClauseDags.size() > 0) {
-            // List<DagSubgraph> catchClauseSgs = new ArrayList<>();
-            for (DagNode ccDag : catchClauseDags) {
-                DagSubgraph ccSg = new DagSubgraph(dag, dag);
-                ccSg.classes.add("catchClause");
-                dag.subgraphs.add(ccSg);
-                ccSg.nodes.add(ccDag);
-            }
-        }
-        if (finallyDag != null) {
-            DagSubgraph finallySg = new DagSubgraph(dag, dag);
-            finallySg.classes.add("finally");
-            dag.subgraphs.add(finallySg);
-            finallySg.nodes.add(finallyDag);
-        }
-        */
         
         dag.addEdge(tryNode,  bodyDag);
         
@@ -458,19 +481,41 @@ public class ControlFlowEdger {
         // return prevNodes;
     }
     
+    private DagNode getDagChild(List<DagNode> children, ASTNode astNode, String className) {
+        for (DagNode c : children) {
+            if (astNode == c.astNode) {
+                if (className != null) { 
+                    c.classes.add(className);
+                }
+                return c;
+            }
+        }
+        return null;
+    }
+    private List<DagNode> getDagChildren(List<DagNode> children, List<?> astNodes, String className) {
+        List<DagNode> result = new ArrayList<>();
+        for (DagNode c : children) {
+            if (astNodes.contains(c.astNode)) {
+                result.add(c);
+                if (className != null) { 
+                    c.classes.add(className);
+                }
+            }
+        }
+        return result;
+    }
     // draw branches into and out of for body
     private List<ExitEdge> addForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
-        ForStatement fs;
+        ForStatement fs = (ForStatement) forNode.astNode;
         // so could draw this with branches leading back up to the for node from each exit node of repeating block
         // or branches down from each exit node to an artifical block at the bottom, with a branch up from that.
         // which might be a bit cleaner if the for block has a lot of exit edges 
-        if (forNode.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + forNode.children.size());
-        }
+
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
-        DagNode repeatingBlock = forNode.children.get(0);
+        
+        DagNode repeatingBlock = getDagChild(forNode.children, fs.getBody(), null);
         dag.addEdge(forNode, repeatingBlock);
         LexicalScope newScope = scope.newBreakContinueScope(forNode);
         List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope);
@@ -495,15 +540,13 @@ public class ControlFlowEdger {
     // draw branches into and out of extended for body
     private List<ExitEdge> addEnhancedForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
-        EnhancedForStatement fs;
+        EnhancedForStatement fs = (EnhancedForStatement) forNode.astNode;
         // so could draw this with branches leading back up to the for node from each exit node of repeating block
         // or branches down from each exit node to an artifical block at the bottom, with a branch up from that.
-        if (forNode.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + forNode.children.size());
-        }
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
-        DagNode repeatingBlock = forNode.children.get(0);
+        // DagNode repeatingBlock = forNode.children.get(0);
+        DagNode repeatingBlock = getDagChild(forNode.children, fs.getBody(), null);
         dag.addEdge(forNode, repeatingBlock);
         LexicalScope newScope = scope.newBreakContinueScope(forNode);
         List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope);
@@ -521,14 +564,12 @@ public class ControlFlowEdger {
     
     private List<ExitEdge> addWhileEdges(Dag dag, DagNode whileNode, LexicalScope scope) {
         // draw the edges
-        WhileStatement ws;
+        WhileStatement ws = (WhileStatement) whileNode.astNode;
         
-        if (whileNode.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + whileNode.children.size());
-        }
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
-        DagNode repeatingBlock = whileNode.children.get(0);
+        DagNode repeatingBlock = getDagChild(whileNode.children, ws.getBody(), null);
+        // DagNode repeatingBlock = whileNode.children.get(0);
         DagEdge whileTrue = dag.addEdge(whileNode, repeatingBlock);
         // whileTrue.label = "Y";
         whileTrue.classes.add("while");
@@ -559,14 +600,13 @@ public class ControlFlowEdger {
     
     private List<ExitEdge> addDoEdges(Dag dag, DagNode doNode, LexicalScope scope) {
         // draw the edges
-        // DoStatement ds;
+        DoStatement ds = (DoStatement) doNode.astNode;
         
-        if (doNode.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + doNode.children.size());
-        }
+        
+        
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
-        DagNode repeatingBlock = doNode.children.get(0);
+        DagNode repeatingBlock = getDagChild(doNode.children, ds.getBody(), null);
         DagEdge doTrue = dag.addEdge(doNode, repeatingBlock);
         doTrue.classes.add("do");
         doTrue.classes.add("start");
@@ -686,6 +726,9 @@ public class ControlFlowEdger {
         }
 
         return prevNodes;
-    }    
+    }
+ 
+    
+    
     
 }
