@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
@@ -135,6 +136,7 @@ public class AstToDagVisitor extends ASTVisitor {
         } else {
             dn.hasComment = true;
         }
+        dn.gvComments.add(gc);
     }
     
     
@@ -226,9 +228,7 @@ public class AstToDagVisitor extends ASTVisitor {
                     DagNode prevDagNode = getStartingDagNodeOnLine(ct.line);
                     if (prevDagNode == null) {
                         // no direction
-                        dn.name = gc.id;
-                        dn.classes.addAll(gc.classes);
-                        dn.gvAttributes.put("style", gc.inlineStyleString); // append to existing ?                
+                        annotateDag(dn, gc);
                     } else {
                         annotateDag(prevDagNode, gc);
                         dn = null;
@@ -317,14 +317,19 @@ public class AstToDagVisitor extends ASTVisitor {
 
         if (node instanceof MethodDeclaration ||
             node instanceof CatchClause ||
-            (node instanceof Statement &&
-            (includeThrowNode || !(node instanceof ThrowStatement)) )) {
+            (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
+            node instanceof Expression // inside ExpressionStatements
+            ) {
             
             DagNode dn = new DagNode();
             String clazz = Text.getLastComponent(node.getClass().getName());
-            if (clazz.endsWith("Statement")) {
+            if (clazz.endsWith("Statement") && !clazz.equals("ExpressionStatement")) {
                 clazz = clazz.substring(0, clazz.length() - 9);
             }
+            
+            // ok we treat all Expressions as DagNodes here so we can edge them up later
+            // and then if it turns out that we're not edging them, we bubble up any comments associated with
+            // those DagNodes to the containing statement.
             
             dn.type = clazz; // "if";
             dn.name = null;
@@ -378,7 +383,6 @@ public class AstToDagVisitor extends ASTVisitor {
             }
             
             processCommentsToStatementNode(pdn, lineNumber, columnNumber, dn);
-            
 
             /*
             if (lastIdx < comments.size() && comments.get(lastIdx).line == lineNumber) {

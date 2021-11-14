@@ -3,7 +3,7 @@
 Righteo here's the default CSS then.
 
 When we're generating the GV diagram, we create a completely separate DOM just for the purpose of styling the diagram.
-Because I'm using jsoup to do the CSS selectors, it's a HTML DOM.
+Because I'm using jsoup to do the CSS selectors, it's a HTML DOM, but ignore the outermost html/body elements.
  
 That DOM looks like this
 
@@ -28,7 +28,6 @@ That DOM looks like this
         'outNodeId' contains end node ID
         'inNodeClass' contains start node class
         'outNodeClass' contains end node class
-
 		      
         
     -->
@@ -101,6 +100,14 @@ node.method.end {
     gv-idFormat: "m_${lineNumber}";
     gv-labelFormat: "return";
 }
+node.methodInvocation {
+	gv-labelFormat: "${methodName}()";
+}
+
+/* node and edges marked 'ast' are temporary until I've written all 20 or so expression node edgers */ 
+node.ast { color: green; }
+edge.ast { color: green; }
+
 
 /** create a user-defined subgraph element *above* this node, then move this node and all nodes to gv-endSubgraph into that subgraph */
 node.beginSubgraph { gv-beginOuterSubgraph: true; } 
@@ -108,6 +115,9 @@ node.endSubgraph { gv-endOuterSubgraph: true; }
 
 /* hmm. subgraph:has(node.beginSubgraph) doesn't match here, but I think it should */
 subgraph:has(node) { gv-idFormat : "cluster_uds_${lineNumber}"; gv-labelFormat : ""; }
+
+/* this double-spaces everything inside the expression, bout I don't think it should 
+node.expressionStatement { gv-newSubgraph: true; }  */
 
 node.methodDeclaration { gv-newSubgraph: true; } /* create a subgraph element *under* this node, then move child nodes into that subgraph */
 
