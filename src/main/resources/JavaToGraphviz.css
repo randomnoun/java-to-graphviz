@@ -104,6 +104,12 @@ node.methodInvocation {
 	gv-labelFormat: "${methodName}()";
 }
 
+/* expression labels */
+node.simpleName { gv-labelFormat: "${name}"; }
+node.qualifiedName { gv-labelFormat: "${name}"; }
+node.infixExpression { gv-labelFormat: "${operator}"; }
+
+
 /* node and edges marked 'ast' are temporary until I've written all 20 or so expression node edgers */ 
 node.ast { color: green; }
 edge.ast { color: green; }
