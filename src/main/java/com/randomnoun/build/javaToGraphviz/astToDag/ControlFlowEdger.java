@@ -8,15 +8,18 @@ import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -27,6 +30,7 @@ import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
+import com.randomnoun.build.javaToGraphviz.dag.EntryEdge;
 import com.randomnoun.build.javaToGraphviz.dag.ExitEdge;
 
 // class that adds edges to the dag
@@ -113,36 +117,7 @@ public class ControlFlowEdger {
 	    
 	}
 
-	// this will probably go into the ExpressionEdger later
-    public List<ExitEdge> addExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
-        if (node.type.equals("MethodInvocation")) {
-            return addMethodInvocationEdges(dag, node, scope);
-        } else {
-            logger.warn("non-implemented expression " + node.type);
-
-            // edge the AST so we've got something for now
-            node.classes.add("ast");
-            addAstEdges(dag, node, scope);
-            
-            // non-control flow statement
-            ExitEdge e = new ExitEdge();
-            e.n1 = node;
-            return Collections.singletonList(e);
-        }
-        
-    }
-
-    private void addAstEdges(Dag dag, DagNode node, LexicalScope scope) {
-        
-        if (node.children != null && node.children.size() > 0) {
-            for (DagNode c : node.children) {
-                DagEdge ce = dag.addEdge(node, c);
-                ce.classes.add("ast");
-                addEdges(dag, c, scope);
-            }
-        }
-    }
-
+	
 	   
 	// draw lines from each statement to each other
 	// exit node is the last statement
@@ -348,68 +323,25 @@ public class ControlFlowEdger {
         return Collections.emptyList();
     }
     
-    private List<ExitEdge> addExpressionStatementEdges(Dag dag, DagNode expressionStatementNode, LexicalScope scope) {
-        ExpressionStatement es = (ExpressionStatement) expressionStatementNode.astNode;
-        Expression e = es.getExpression();
-        if (expressionStatementNode.children.size() != 1) {
-            throw new IllegalStateException("expected 1 child; found " + expressionStatementNode.children.size());
-        }
-        DagNode eNode = expressionStatementNode.children.get(0);
-        dag.addEdge(expressionStatementNode, eNode);
-        
-        return addExpressionEdges(dag, eNode, scope);
-    }
 
-    private List<ExitEdge> addMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
-        MethodInvocation mi = (MethodInvocation) methodInvocationNode.astNode;
-        DagNode expressionDag = getDagChild(methodInvocationNode.children, mi.getExpression(), null);
-        // DagNode name = getDagChild(methodInvocationNode.children, mi.getName(), null);
-        methodInvocationNode.gvAttributes.put("methodName", mi.getName().toString());
-        
-            
-        List<DagNode> argumentDags = getDagChildren(methodInvocationNode.children, mi.arguments(), null);
-
-        // expression is null for method calls within the same object
-        if (expressionDag != null) {
-            List<ExitEdge> expressionPrevNodes = addExpressionEdges(dag, expressionDag, scope);
-            for (ExitEdge e : expressionPrevNodes) {
-                e.n2 = methodInvocationNode;
-                e.classes.add("invocationObject");
-                dag.addEdge(e);
-            }
-        }
-            
-        List<ExitEdge> argumentPrevNodes = new ArrayList<>();
-        for (DagNode a : argumentDags) {
-            argumentPrevNodes.addAll( addExpressionEdges(dag, a, scope ));
-        }
-        for (ExitEdge e : argumentPrevNodes) {
-            e.n2 = methodInvocationNode;
-            e.classes.add("invocationArgument");
-            dag.addEdge(e);
-        }
-        ExitEdge e = new ExitEdge();
-        e.n1 = methodInvocationNode;
-        return Collections.singletonList(e);
-    }
 
     
 	// draw branches from this block to then/else blocks
 	// exit edges are combined exit edges of both branches
-	private List<ExitEdge> addIfEdges(Dag dag, DagNode block, LexicalScope scope) {
+	private List<ExitEdge> addIfEdges(Dag dag, DagNode ifNode, LexicalScope scope) {
         // draw the edges
 	    // now have a node for the condition
 	    
 	    List<ExitEdge> prevNodes = new ArrayList<>();
-	    if (block.children.size() == 2) {
-	        DagNode c = block.children.get(1);
-            DagEdge trueEdge = dag.addEdge(block, c, null);
+	    if (ifNode.children.size() == 2) {
+	        DagNode c = ifNode.children.get(1);
+            DagEdge trueEdge = dag.addEdge(ifNode, c, null);
             trueEdge.classes.add("if");
             trueEdge.classes.add("true");
             
             List<ExitEdge> branchPrevNodes = addEdges(dag, c, scope);
             ExitEdge e = new ExitEdge();
-            e.n1 = block;
+            e.n1 = ifNode;
             // e.label = "N";
             e.classes.add("if");
             e.classes.add("false");
@@ -417,18 +349,18 @@ public class ControlFlowEdger {
             prevNodes.addAll(branchPrevNodes); // Y branch
             prevNodes.add(e); // N branch
 	       
-	    } else if (block.children.size() == 3) {
-	        DagNode c1 = block.children.get(1);
-	        DagNode c2 = block.children.get(2);
-            DagEdge trueEdge = dag.addEdge(block, c1, null); trueEdge.classes.add("if"); trueEdge.classes.add("true");
-            DagEdge falseEdge = dag.addEdge(block, c2, null); falseEdge.classes.add("if"); falseEdge.classes.add("false");
+	    } else if (ifNode.children.size() == 3) {
+	        DagNode c1 = ifNode.children.get(1);
+	        DagNode c2 = ifNode.children.get(2);
+            DagEdge trueEdge = dag.addEdge(ifNode, c1, null); trueEdge.classes.add("if"); trueEdge.classes.add("true");
+            DagEdge falseEdge = dag.addEdge(ifNode, c2, null); falseEdge.classes.add("if"); falseEdge.classes.add("false");
             List<ExitEdge> branch1PrevNodes = addEdges(dag, c1, scope);
             List<ExitEdge> branch2PrevNodes = addEdges(dag, c2, scope);
             prevNodes.addAll(branch1PrevNodes);
             prevNodes.addAll(branch2PrevNodes);
             
 	    } else {
-	        throw new IllegalStateException("expected 2 or 3 children, found " + block.children.size());
+	        throw new IllegalStateException("expected 2 or 3 children, found " + ifNode.children.size());
 	    }
            
         return prevNodes;
@@ -728,7 +660,246 @@ public class ControlFlowEdger {
         return prevNodes;
     }
  
+    /************************************************************************************************
+     ************************************************************************************************ 
+     ***
+     *** Expression nodes
+     ***
+     ***
+     */
+    
+    private List<ExitEdge> addExpressionStatementEdges(Dag dag, DagNode expressionStatementNode, LexicalScope scope) {
+        ExpressionStatement es = (ExpressionStatement) expressionStatementNode.astNode;
+        Expression e = es.getExpression();
+        if (expressionStatementNode.children.size() != 1) {
+            throw new IllegalStateException("expected 1 child; found " + expressionStatementNode.children.size());
+        }
+        DagNode eNode = expressionStatementNode.children.get(0);
+        dag.addEdge(expressionStatementNode, eNode);
+        
+        return addExpressionEdges(dag, eNode, scope);
+    }
+
+    // this will probably go into the ExpressionEdger later
+    // so what we should probably be doing is converting this into the RPN sequence of evaluations
+    // or maybe that's RRPN.
+    // so c = a + b becomes
+    // evaluate a -> evaluate b -> addition -> assignment
     
     
+    public List<ExitEdge> addExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
+        if (node.type.equals("MethodInvocation")) {
+            return addMethodInvocationEdges(dag, node, scope);
+
+        } else if (node.type.equals("ConditionalExpression")) {
+            return addConditionalExpressionEdges(dag, node, scope);
+
+        } else if (node.type.equals("SimpleName") ||
+            node.type.equals("QualifiedName")) {
+            return addNameEdges(dag, node, scope);
+            
+        } else if (node.type.equals("BooleanLiteral") ||
+            node.type.equals("CharacterLiteral") || 
+            node.type.equals("NumberLiteral") ||
+            node.type.equals("NullLiteral") ||
+            node.type.equals("TypeLiteral")) {
+            
+            // @TODO mark as ignored, move comments up the tree
+            // return Collections.emptyList();
+            
+            ExitEdge e = new ExitEdge();
+            e.n1 = node;
+            return Collections.singletonList(e);
+
+        } else if (node.type.equals("InfixExpression")) {
+            return addInfixExpressionEdges(dag, node, scope);
+
+        } else {
+            logger.warn("non-implemented expression " + node.type);
+
+            // edge the AST so we've got something for now
+            node.classes.add("ast");
+            addAstEdges(dag, node, scope);
+            
+            // non-control flow statement
+            ExitEdge e = new ExitEdge();
+            e.n1 = node;
+            return Collections.singletonList(e);
+        }
+        
+    }
+
+    private void addAstEdges(Dag dag, DagNode node, LexicalScope scope) {
+        
+        if (node.children != null && node.children.size() > 0) {
+            for (DagNode c : node.children) {
+                DagEdge ce = dag.addEdge(node, c);
+                ce.classes.add("ast");
+                addExpressionEdges(dag, c, scope);
+            }
+        }
+    }
+
+    private List<ExitEdge> addMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
+        MethodInvocation mi = (MethodInvocation) methodInvocationNode.astNode;
+        DagNode expressionDag = getDagChild(methodInvocationNode.children, mi.getExpression(), null);
+        // DagNode name = getDagChild(methodInvocationNode.children, mi.getName(), null);
+        methodInvocationNode.gvAttributes.put("methodName", mi.getName().toString());
+        List<DagNode> argumentDags = getDagChildren(methodInvocationNode.children, mi.arguments(), null);
+
+        // move methodInvocation node after the expression & argument nodes
+        List<DagEdge> inEdges = new ArrayList<>();
+        for (DagEdge e : dag.edges) { if ( e.n2 == methodInvocationNode ) { inEdges.add(e); } }
+        if (inEdges.size() == 0) { throw new IllegalStateException("no inEdges"); }
+
+        // first node is inEdge.n2
+        EntryEdge inEdge = new EntryEdge();
+        
+        // expression is null for method calls within the same object
+        List<ExitEdge> prevNodes = null;
+        if (expressionDag != null) {
+            inEdge.n2 = expressionDag;
+            dag.edges.add(inEdge);
+            prevNodes = addExpressionEdges(dag, expressionDag, scope);
+        }
+        for (DagNode a : argumentDags) {
+            if (prevNodes != null) {
+                for (ExitEdge e : prevNodes) {
+                    e.n2 = a;
+                    e.classes.add("invocationArgument");
+                    dag.addEdge(e);
+                }
+            } else {
+                inEdge.n2 = a;
+                dag.edges.add(inEdge);
+            }
+            prevNodes = addExpressionEdges(dag, a, scope );
+        }
+        
+        // move the top node here instead
+        if (prevNodes != null) {
+            // inEdge may have been rejiggered as well though, so the firstNode may no longer be the firstNode
+            for (DagEdge e : inEdges) {
+                e.n2 = inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
+            }
+            for (DagEdge e : prevNodes) {
+                e.n2 = methodInvocationNode;
+                dag.edges.add(e);
+            }
+            dag.edges.remove(inEdge);
+        }
+        ExitEdge e = new ExitEdge();
+        e.n1 = methodInvocationNode;
+        prevNodes = Collections.singletonList(e);
+        return prevNodes;
+    }   
+    
+
+    private List<ExitEdge> addInfixExpressionEdges(Dag dag, DagNode ieNode, LexicalScope scope) {
+        InfixExpression ie = (InfixExpression) ieNode.astNode;
+        DagNode leftDag = getDagChild(ieNode.children, ie.getLeftOperand(), null);
+        DagNode rightDag = getDagChild(ieNode.children, ie.getRightOperand(), null);
+        List<DagNode> extendedDags = getDagChildren(ieNode.children, ie.extendedOperands(), null);
+        
+        ieNode.gvAttributes.put("operator", ie.getOperator().toString());
+        
+        // a + b      becomes a -> b -> +
+        // a + b + c  should becomes a -> b -> + -> c -> + , which has two + nodes, even though there's only one in the AST. because you know. eclipse.
+        
+        // InfixExpressions also include shortcut || which doesn't evaluate the second parameter if the first is true
+        // so it should be a something a bit more complicated, control-flow wise
+        
+        // a 
+        // true? -N->  b
+        //  :Y         :   
+        //  v          v          
+        
+        // move infixExpression node after the a and b nodes
+        List<DagEdge> inEdges = new ArrayList<>();
+        for (DagEdge e : dag.edges) { if ( e.n2 == ieNode ) { inEdges.add(e); } }
+        if (inEdges.size() == 0) { throw new IllegalStateException("no inEdges"); }
+
+        // first node is inEdge.n2
+        EntryEdge inEdge = new EntryEdge();
+        
+        // not entirely sure why I deconstructed the list in order to reconstruct it here,
+        // but hey 
+        List<DagNode> allDags = new ArrayList<DagNode>();
+        allDags.add(leftDag);
+        allDags.add(rightDag);
+        allDags.addAll(extendedDags);
+        
+        // expression is null for method calls within the same object
+        List<ExitEdge> prevNodes = null;
+        for (DagNode a : allDags) {
+            if (prevNodes != null) {
+                for (ExitEdge e : prevNodes) {
+                    e.n2 = a;
+                    // e.classes.add("invocationArgument");
+                    dag.addEdge(e);
+                }
+            } else {
+                inEdge.n2 = a;
+                dag.edges.add(inEdge);
+            }
+            prevNodes = addExpressionEdges(dag, a, scope );
+        }
+        
+        // move the top node here instead
+        if (prevNodes != null) {
+            // inEdge may have been rejiggered as well though, so the firstNode may no longer be the firstNode
+            for (DagEdge e : inEdges) {
+                e.n2 = inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
+            }
+            for (DagEdge e : prevNodes) {
+                e.n2 = ieNode;
+                dag.edges.add(e);
+            }
+            dag.edges.remove(inEdge);
+        }
+        ExitEdge e = new ExitEdge();
+        e.n1 = ieNode;
+        prevNodes = Collections.singletonList(e);
+        return prevNodes;
+        
+        
+        
+    }
+
+        
+    private List<ExitEdge> addConditionalExpressionEdges(Dag dag, DagNode ceNode, LexicalScope scope) {
+        ConditionalExpression ce = (ConditionalExpression) ceNode.astNode;
+        
+        DagNode expressionDag = getDagChild(ceNode.children, ce.getExpression(), null);
+        DagNode thenDag = getDagChild(ceNode.children, ce.getThenExpression(), null);
+        DagNode elseDag = getDagChild(ceNode.children, ce.getElseExpression(), null);
+        
+        List<ExitEdge> ee = addExpressionEdges(dag, expressionDag, scope);
+        for (DagEdge e : ee) {
+            e.n2 = ceNode;
+        }
+                
+        List<ExitEdge> prevNodes = new ArrayList<>();
+        DagEdge trueEdge = dag.addEdge(ceNode, thenDag, null); trueEdge.classes.add("conditionalExpression"); trueEdge.classes.add("true");
+        DagEdge falseEdge = dag.addEdge(ceNode, elseDag, null); falseEdge.classes.add("conditionalExpression"); falseEdge.classes.add("false");
+        List<ExitEdge> branch1PrevNodes = addExpressionEdges(dag, thenDag, scope);
+        List<ExitEdge> branch2PrevNodes = addExpressionEdges(dag, elseDag, scope);
+        
+        prevNodes.addAll(branch1PrevNodes);
+        prevNodes.addAll(branch2PrevNodes);
+        return prevNodes;
+    }
+    
+    
+    private List<ExitEdge> addNameEdges(Dag dag, DagNode nameNode, LexicalScope scope) {
+        Name n = (Name) nameNode.astNode; // SimpleName or QualifiedName
+        nameNode.gvAttributes.put("name", n.getFullyQualifiedName());
+        
+        // names don't have edges
+        // return Collections.emptyList();
+        ExitEdge e = new ExitEdge();
+        e.n1 = nameNode;
+        return Collections.singletonList(e);
+    }
     
 }
