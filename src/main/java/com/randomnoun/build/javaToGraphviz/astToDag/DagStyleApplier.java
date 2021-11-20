@@ -37,6 +37,9 @@ public class DagStyleApplier {
     Document document;
     Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
     
+    public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name", "operator" };
+    public static String[] EDGE_LABEL_VARIABLES = new String[] { "breakLabel", "continueLabel" };
+    
     public DagStyleApplier(Dag dag, DagSubgraph root) {
         this.dag = dag;
         this.root = root;
@@ -306,8 +309,9 @@ public class DagStyleApplier {
         vars.put("lineNumber", String.valueOf(node.lineNumber));
         vars.put("nodeType", node.type);
         vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
-        vars.put("className",  node.gvAttributes.get("className") == null ? "" : node.gvAttributes.get("className"));
-        vars.put("methodName",  node.gvAttributes.get("methodName") == null ? "" : node.gvAttributes.get("methodName"));
+        for (String v : NODE_LABEL_VARIABLES) {
+            vars.put(v,  node.gvAttributes.get(v) == null ? "" : node.gvAttributes.get(v));
+        }
         
         String[] idLabel = getIdLabel(idFormat, labelFormat, node.name, node.label, vars);
         node.name = idLabel[0];
@@ -323,8 +327,9 @@ public class DagStyleApplier {
         Map<String, String> vars = new HashMap<>();
         vars.put("startNodeId", edge.n1.name);
         vars.put("endNodeId", edge.n2.name);
-        vars.put("breakLabel", edge.gvAttributes.get("breakLabel") == null ? "" : edge.gvAttributes.get("breakLabel")); 
-        vars.put("continueLabel", edge.gvAttributes.get("continueLabel") == null ? "" : edge.gvAttributes.get("continueLabel"));
+        for (String v : EDGE_LABEL_VARIABLES) {
+            vars.put(v, edge.gvAttributes.get(v) == null ? "" : edge.gvAttributes.get(v));
+        }
 
         if (edge.label == null && labelFormat != null) {
             if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
@@ -354,8 +359,11 @@ public class DagStyleApplier {
         vars.put("lineNumber", String.valueOf(sg.lineNumber));
         //vars.put("nodeType", sg.type);
         //vars.put("lastKeepNodeId",  sg.lastKeepNode == null ? "" : sg.lastKeepNode.name);
-        vars.put("className",  sg.gvAttributes.get("className") == null ? "" : sg.gvAttributes.get("className"));
-        vars.put("methodName",  sg.gvAttributes.get("methodName") == null ? "" : sg.gvAttributes.get("methodName"));
+
+        // node vars get copied into subgraph object 
+        for (String v : NODE_LABEL_VARIABLES) {
+            vars.put(v,  sg.gvAttributes.get(v) == null ? "" : sg.gvAttributes.get(v));
+        }
         
         String[] idLabel = getIdLabel(idFormat, labelFormat, sg.name, sg.label, vars);
         sg.name = idLabel[0];
