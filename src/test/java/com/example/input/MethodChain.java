@@ -1,6 +1,6 @@
 package com.example.input;
 
-/** do loop test cases
+/** method chaining test cases
  * 
  */
 public class MethodChain {
