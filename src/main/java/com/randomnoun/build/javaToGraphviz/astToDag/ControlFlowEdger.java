@@ -7,11 +7,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
+import org.eclipse.jdt.core.dom.ArrayCreation;
+import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ContinueStatement;
@@ -126,7 +129,6 @@ public class ControlFlowEdger {
             return addExpressionStatementEdges(dag, node, scope);
         } else if (node.type.equals("VariableDeclaration")) {
             return addVariableDeclarationStatementEdges(dag, node, scope);
-            
             
         // goto will be considered tedious if I have to do that. ho ho ho.
             
@@ -827,6 +829,14 @@ public class ControlFlowEdger {
             node.type.equals("TypeMethodReference")) {
             return addMethodReferenceEdges(dag, node, scope);
 
+        } else if (node.type.equals("ArrayCreation")) {
+            return addArrayCreationEdges(dag, node, scope);
+        } else if (node.type.equals("ArrayInitializer")) {
+            return addArrayInitializerEdges(dag, node, scope);
+        } else if (node.type.equals("ClassInstanceCreation")) {
+            return addClassInstanceCreationEdges(dag, node, scope);
+
+            
             
         } else {
             logger.warn("non-implemented expression " + node.type);
@@ -1319,17 +1329,132 @@ public class ControlFlowEdger {
         ArrayAccess fa = (ArrayAccess) node.astNode;
 
         // maybe we evaluate the index first ? not sure. reckon it's probably the array ref
-        DagNode exprDag = getDagChild(node.children, fa.getArray(), null);
+        DagNode arrayDag = getDagChild(node.children, fa.getArray(), null);
         DagNode indexDag = getDagChild(node.children, fa.getIndex(), null); 
         // DagNode fieldDag = getDagChild(node.children, fa.getName(), null); // will put the name on the FA node
         
         // node.gvAttributes.put("fieldName", fa.getIndex().toString()); 
-        Rejigger rejigger = hoistNode(dag, node, exprDag);
-        List<ExitEdge> prevNodes = addExpressionEdges(dag, exprDag, scope);
-        dag.addEdge(exprDag, indexDag);
+        Rejigger rejigger = hoistNode(dag, node, arrayDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, arrayDag, scope);
+        dag.addEdge(arrayDag, indexDag);
         prevNodes = addExpressionEdges(dag, indexDag, scope);
         prevNodes = rejigger.unhoistNode(dag, prevNodes);
         return prevNodes;
     }    
+
+
+    private List<ExitEdge> addClassInstanceCreationEdges(Dag dag, DagNode node, LexicalScope scope) {
+        ClassInstanceCreation cic = (ClassInstanceCreation) node.astNode;
+        
+        // @TODO  cic.getAnonymousClassDeclaration() 
+
+        // maybe we evaluate the index first ? not sure. reckon it's probably the array ref
+        DagNode expressionDag = getDagChild(node.children, cic.getExpression(), null);
+        List<DagNode> argumentDags = getDagChildren(node.children, cic.arguments(), null);
+        node.gvAttributes.put("type", cic.getType().toString());
+        
+        // DagNode indexDag = getDagChild(node.children, fa.getIndex(), null); 
+        // DagNode fieldDag = getDagChild(node.children, fa.getName(), null); // will put the name on the FA node
+        
+        List<ExitEdge> prevNodes = null;
+        if (expressionDag != null || argumentDags.size() > 0) {
+            // move methodInvocation node after the expression & argument nodes
+            Rejigger rejigger = hoistNode(dag, node, expressionDag != null ? expressionDag : argumentDags.get(0));
+            // expression is null for method calls within the same object
+            if (expressionDag != null) {
+                prevNodes = addExpressionEdges(dag, expressionDag, scope);
+            }
+            for (DagNode a : argumentDags) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = a;
+                        e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
+                }
+                prevNodes = addExpressionEdges(dag, a, scope );
+            }
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        } else {
+            ExitEdge e = new ExitEdge();
+            e.n1 = node;
+            prevNodes = Collections.singletonList(e);
+        }
+        return prevNodes;
+    }
+    
+    
+    private List<ExitEdge> addArrayInitializerEdges(Dag dag, DagNode node, LexicalScope scope) {
+        ArrayInitializer ai = (ArrayInitializer) node.astNode;
+
+        // maybe we evaluate the index first ? not sure. reckon it's probably the array ref
+        List<DagNode> expressionDags = getDagChildren(node.children, ai.expressions(), null);
+         
+        List<ExitEdge> prevNodes = null;
+        if (expressionDags.size() > 0) {
+            // move methodInvocation node after the expression & argument nodes
+            
+            Rejigger rejigger = hoistNode(dag, node, expressionDags.get(0));
+            for (DagNode expr : expressionDags) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = expr;
+                        e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
+                }
+                prevNodes = addExpressionEdges(dag, expr, scope );
+            }
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        } else {
+            ExitEdge e = new ExitEdge();
+            e.n1 = node;
+            prevNodes = Collections.singletonList(e);
+        }
+        return prevNodes;
+    }
+    
+    private List<ExitEdge> addArrayCreationEdges(Dag dag, DagNode node, LexicalScope scope) {
+        ArrayCreation ac = (ArrayCreation) node.astNode;
+
+        List<DagNode> dimensionDags = getDagChildren(node.children, ac.dimensions(), null);
+        DagNode arrayInitDag = getDagChild(node.children, ac.getInitializer(), null);
+        node.gvAttributes.put("type", ac.getType().toString());
+        
+        
+        List<ExitEdge> prevNodes = null;
+        if (arrayInitDag != null || dimensionDags.size() > 0) {
+            // move methodInvocation node after the expression & argument nodes
+            Rejigger rejigger = hoistNode(dag, node, dimensionDags.size() == 0 ? arrayInitDag : dimensionDags.get(0));
+            for (DagNode a : dimensionDags) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = a;
+                        // e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
+                }
+                prevNodes = addExpressionEdges(dag, a, scope );
+            }
+            // expression is null for method calls within the same object
+            if (arrayInitDag != null) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = arrayInitDag;
+                        // e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
+                }
+                prevNodes = addExpressionEdges(dag, arrayInitDag, scope);
+            }
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        } else {
+            ExitEdge e = new ExitEdge();
+            e.n1 = node;
+            prevNodes = Collections.singletonList(e);
+        }
+        return prevNodes;
+    }
+    
 }
 
