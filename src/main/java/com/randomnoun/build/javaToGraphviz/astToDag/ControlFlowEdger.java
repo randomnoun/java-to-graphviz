@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -32,6 +33,7 @@ import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.build.javaToGraphviz.dag.EntryEdge;
 import com.randomnoun.build.javaToGraphviz.dag.ExitEdge;
+import com.randomnoun.common.Text;
 
 // class that adds edges to the dag
 public class ControlFlowEdger {
@@ -109,6 +111,7 @@ public class ControlFlowEdger {
             return Collections.singletonList(e);
             
 	    } else {
+	        // names in the package declaration trigger this
 	        logger.warn("non-implemented control flow statement " + node.type);
 	        ExitEdge e = new ExitEdge();
 	        e.n1 = node;
@@ -739,131 +742,194 @@ public class ControlFlowEdger {
             }
         }
     }
+    
+    
+    /** A rejigger is a hoisted node, which has been removed from the dag with the intention of adding it back in again
+     * a bit further down ( unhoisting ). This class is mostly necessary since I don't trust the edge collections in the DagNodes
+     * whilst things are moving around, or even after they've moved around for that matter.
+     * 
+     */
+    public static class Rejigger {
+        DagNode hoistedNode;
+        List<DagEdge> inEdges;  // old in edges
+        EntryEdge inEdge;       // new in edge
+        
+        public List<ExitEdge> unhoistNode(Dag dag, List<ExitEdge> prevNodes) {
+            // inEdge may have been rejiggered as well though, so the firstNode may no longer be the firstNode
+            for (DagEdge e : this.inEdges) {
+                e.n2 = this.inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
+            }
+            for (DagEdge e : prevNodes) {
+                e.n2 = hoistedNode;
+                dag.edges.add(e);
+            }
+            dag.edges.remove(this.inEdge);
+            
+            ExitEdge e = new ExitEdge();
+            e.n1 = hoistedNode;
+            prevNodes = new ArrayList<>();
+            prevNodes.add(e);
+            return prevNodes;
+        }
+
+    }
+    
+    private Rejigger hoistNode(Dag dag, DagNode node, DagNode newNode) {
+        // move methodInvocation node after the expression & argument nodes
+        List<DagEdge> inEdges = new ArrayList<>();
+        for (DagEdge e : dag.edges) { if ( e.n2 == node ) { inEdges.add(e); } }
+        if (inEdges.size() == 0) { throw new IllegalStateException("no inEdges"); }
+
+        EntryEdge inEdge = new EntryEdge();
+        inEdge.n2 = newNode;
+        dag.edges.add(inEdge);
+        
+        Rejigger rejigger = new Rejigger();
+        rejigger.hoistedNode = node;
+        rejigger.inEdges = inEdges;
+        rejigger.inEdge = inEdge;
+        
+        // first node is inEdge.n2
+        return rejigger;
+        
+    }
+    
 
     private List<ExitEdge> addMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
         MethodInvocation mi = (MethodInvocation) methodInvocationNode.astNode;
         DagNode expressionDag = getDagChild(methodInvocationNode.children, mi.getExpression(), null);
-        // DagNode name = getDagChild(methodInvocationNode.children, mi.getName(), null);
         methodInvocationNode.gvAttributes.put("methodName", mi.getName().toString());
         List<DagNode> argumentDags = getDagChildren(methodInvocationNode.children, mi.arguments(), null);
 
-        // move methodInvocation node after the expression & argument nodes
-        List<DagEdge> inEdges = new ArrayList<>();
-        for (DagEdge e : dag.edges) { if ( e.n2 == methodInvocationNode ) { inEdges.add(e); } }
-        if (inEdges.size() == 0) { throw new IllegalStateException("no inEdges"); }
-
-        // first node is inEdge.n2
-        EntryEdge inEdge = new EntryEdge();
-        
-        // expression is null for method calls within the same object
         List<ExitEdge> prevNodes = null;
-        if (expressionDag != null) {
-            inEdge.n2 = expressionDag;
-            dag.edges.add(inEdge);
-            prevNodes = addExpressionEdges(dag, expressionDag, scope);
-        }
-        for (DagNode a : argumentDags) {
-            if (prevNodes != null) {
-                for (ExitEdge e : prevNodes) {
-                    e.n2 = a;
-                    e.classes.add("invocationArgument");
-                    dag.addEdge(e);
+        if (expressionDag != null || argumentDags.size() > 0) {
+            // move methodInvocation node after the expression & argument nodes
+            Rejigger rejigger = hoistNode(dag, methodInvocationNode, expressionDag != null ? expressionDag : argumentDags.get(0));
+            
+            // expression is null for method calls within the same object
+            if (expressionDag != null) {
+                prevNodes = addExpressionEdges(dag, expressionDag, scope);
+            }
+            for (DagNode a : argumentDags) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = a;
+                        e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
                 }
-            } else {
-                inEdge.n2 = a;
-                dag.edges.add(inEdge);
+                prevNodes = addExpressionEdges(dag, a, scope );
             }
-            prevNodes = addExpressionEdges(dag, a, scope );
+            
+            // what's the opposite of rejiggering ?
+            // hoisting ? petarding ? right I'm just going to say unhoist
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        } else {
+            ExitEdge e = new ExitEdge();
+            e.n1 = methodInvocationNode;
+            prevNodes = Collections.singletonList(e);
         }
-        
-        // move the top node here instead
-        if (prevNodes != null) {
-            // inEdge may have been rejiggered as well though, so the firstNode may no longer be the firstNode
-            for (DagEdge e : inEdges) {
-                e.n2 = inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
-            }
-            for (DagEdge e : prevNodes) {
-                e.n2 = methodInvocationNode;
-                dag.edges.add(e);
-            }
-            dag.edges.remove(inEdge);
-        }
-        ExitEdge e = new ExitEdge();
-        e.n1 = methodInvocationNode;
-        prevNodes = Collections.singletonList(e);
         return prevNodes;
     }   
     
 
-    private List<ExitEdge> addInfixExpressionEdges(Dag dag, DagNode ieNode, LexicalScope scope) {
-        InfixExpression ie = (InfixExpression) ieNode.astNode;
-        DagNode leftDag = getDagChild(ieNode.children, ie.getLeftOperand(), null);
-        DagNode rightDag = getDagChild(ieNode.children, ie.getRightOperand(), null);
-        List<DagNode> extendedDags = getDagChildren(ieNode.children, ie.extendedOperands(), null);
+    private List<ExitEdge> addInfixExpressionEdges(Dag dag, DagNode infixNode, LexicalScope scope) {
+        InfixExpression ie = (InfixExpression) infixNode.astNode;
+        DagNode leftDag = getDagChild(infixNode.children, ie.getLeftOperand(), null);
+        DagNode rightDag = getDagChild(infixNode.children, ie.getRightOperand(), null);
+        List<DagNode> extendedDags = getDagChildren(infixNode.children, ie.extendedOperands(), null);
         
-        ieNode.gvAttributes.put("operator", ie.getOperator().toString());
+        // Operator is a class, not an enum (!)
+        Operator op = ie.getOperator();
+        infixNode.gvAttributes.put("operatorToken", op.toString());
+        infixNode.gvAttributes.put("operatorName", Text.getLastComponent(op.getClass().getName())); // @TODO camelcase
         
         // a + b      becomes a -> b -> +
         // a + b + c  should becomes a -> b -> + -> c -> + , which has two + nodes, even though there's only one in the AST. because you know. eclipse.
         
-        // InfixExpressions also include shortcut || which doesn't evaluate the second parameter if the first is true
-        // so it should be a something a bit more complicated, control-flow wise
-        
-        // a 
-        // true? -N->  b
-        //  :Y         :   
-        //  v          v          
         
         // move infixExpression node after the a and b nodes
-        List<DagEdge> inEdges = new ArrayList<>();
-        for (DagEdge e : dag.edges) { if ( e.n2 == ieNode ) { inEdges.add(e); } }
-        if (inEdges.size() == 0) { throw new IllegalStateException("no inEdges"); }
-
-        // first node is inEdge.n2
-        EntryEdge inEdge = new EntryEdge();
-        
-        // not entirely sure why I deconstructed the list in order to reconstruct it here,
-        // but hey 
-        List<DagNode> allDags = new ArrayList<DagNode>();
-        allDags.add(leftDag);
-        allDags.add(rightDag);
-        allDags.addAll(extendedDags);
-        
-        // expression is null for method calls within the same object
+        Rejigger rejigger = hoistNode(dag, infixNode, leftDag);
         List<ExitEdge> prevNodes = null;
-        for (DagNode a : allDags) {
-            if (prevNodes != null) {
-                for (ExitEdge e : prevNodes) {
-                    e.n2 = a;
-                    // e.classes.add("invocationArgument");
-                    dag.addEdge(e);
+        if (op == Operator.CONDITIONAL_AND || 
+            op == Operator.CONDITIONAL_OR) {
+
+            // InfixExpressions also include shortcut || which doesn't evaluate the second parameter if the first is true
+            // so it should be a something a bit more complicated, control-flow wise
+            
+            // a 
+            // true? -N->  b
+            //  :Y         :   
+            //  v          v          
+            infixNode.classes.add("infixConditional");
+            prevNodes = addExpressionEdges(dag, leftDag, scope);
+
+            
+            prevNodes = rejigger.unhoistNode(dag,  prevNodes);
+
+            // graphviz diagram is a bit mong unless we swap the false and true edge orders. maybe.
+            ExitEdge trueEdge = prevNodes.get(0); 
+            trueEdge.classes.add("infixConditional");
+            trueEdge.classes.add(op == Operator.CONDITIONAL_OR ? "true" : "false");
+            
+            DagEdge falseEdge = dag.addEdge(infixNode, rightDag);
+            falseEdge.classes.add("infixConditional"); // well this is the non-shortcut branch, but hey
+            falseEdge.classes.add(op == Operator.CONDITIONAL_OR ? "false" : "true");
+            List<ExitEdge> lastPrevNodes = addExpressionEdges(dag, rightDag, scope);
+            
+            for (int i=0; i< extendedDags.size(); i++) {
+                // actually probably need to add a new node here
+                DagNode n = extendedDags.get(i);
+                DagNode extInfixNode = new DagNode();
+                extInfixNode.keepNode = true; // hrm
+                extInfixNode.type = "InfixExpression"; // even though it isn't
+                extInfixNode.lineNumber = n.lineNumber; // even though it isn't
+                extInfixNode.classes.add("infixExpression");
+                extInfixNode.classes.add("infixConditional");
+                extInfixNode.astNode = null;
+                extInfixNode.gvAttributes.put("operatorToken", op.toString());
+                extInfixNode.gvAttributes.put("operatorName", Text.getLastComponent(op.getClass().getName())); // @TODO camelcase
+                DagSubgraph sg = dag.dagNodeToSubgraph.get(infixNode);
+                dag.addNode(sg, extInfixNode);
+                // needs to be a child of ieNode as well so it's moved to subgraphs when that node moves
+                infixNode.children.add(extInfixNode);
+                
+                for (ExitEdge e : lastPrevNodes) {
+                    e.n2 = extInfixNode;
+                    dag.edges.add(e);
                 }
-            } else {
-                inEdge.n2 = a;
-                dag.edges.add(inEdge);
+
+                trueEdge = new ExitEdge();
+                trueEdge.n1 = extInfixNode;
+                trueEdge.classes.add("infixConditional");
+                trueEdge.classes.add(op == Operator.CONDITIONAL_OR ? "true" : "false");
+                prevNodes.add(0, trueEdge);
+
+                falseEdge = dag.addEdge(extInfixNode, n);
+                falseEdge.classes.add("infixConditional"); // well this is the non-shortcut branch, but hey
+                falseEdge.classes.add(op == Operator.CONDITIONAL_OR ? "false" : "true");
+                lastPrevNodes = addExpressionEdges(dag, n, scope);
+                
             }
-            prevNodes = addExpressionEdges(dag, a, scope );
+            
+            prevNodes.addAll(lastPrevNodes);
+            
+        } else {
+            // non-shortcut e.g. +, just evaluate in order 
+            for (DagNode a : infixNode.children) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = a;
+                        dag.addEdge(e);
+                    }
+                } 
+                prevNodes = addExpressionEdges(dag, a, scope );
+            }
+            
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+            
         }
-        
-        // move the top node here instead
-        if (prevNodes != null) {
-            // inEdge may have been rejiggered as well though, so the firstNode may no longer be the firstNode
-            for (DagEdge e : inEdges) {
-                e.n2 = inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
-            }
-            for (DagEdge e : prevNodes) {
-                e.n2 = ieNode;
-                dag.edges.add(e);
-            }
-            dag.edges.remove(inEdge);
-        }
-        ExitEdge e = new ExitEdge();
-        e.n1 = ieNode;
-        prevNodes = Collections.singletonList(e);
         return prevNodes;
-        
-        
-        
     }
 
         
