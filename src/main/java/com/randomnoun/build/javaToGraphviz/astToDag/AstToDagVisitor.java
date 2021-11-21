@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
@@ -281,7 +282,7 @@ public class AstToDagVisitor extends ASTVisitor {
 
             } else if (ct instanceof GvLiteralComment) {
                 GvLiteralComment gvlc = (GvLiteralComment) ct;
-                dn.classes.add("literal");
+                dn.classes.add("gv-literal");
                 dn.skipNode = true;
                 
             }
@@ -318,7 +319,8 @@ public class AstToDagVisitor extends ASTVisitor {
         if (node instanceof MethodDeclaration ||
             node instanceof CatchClause ||
             (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
-            node instanceof Expression // inside ExpressionStatements
+            node instanceof Expression || // inside ExpressionStatements
+            node instanceof VariableDeclaration
             ) {
             
             DagNode dn = new DagNode();
