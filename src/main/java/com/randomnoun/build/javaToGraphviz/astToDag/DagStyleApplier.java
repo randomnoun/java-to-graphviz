@@ -38,7 +38,10 @@ public class DagStyleApplier {
     Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
     
     // 'type' is a var in cast & instanceof expressions, but might move that into it's own DagNode later
-    public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name", "operatorToken", "operatorName", "type" };
+    public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name", 
+        "operatorToken", "operatorName", "type", "variableName", "literalValue", "fieldName" };
+    
+    
     public static String[] EDGE_LABEL_VARIABLES = new String[] { "breakLabel", "continueLabel" };
     
     public DagStyleApplier(Dag dag, DagSubgraph root) {
@@ -198,7 +201,7 @@ public class DagStyleApplier {
         List<DagElement> result = new ArrayList<>();
         node.gvStyles = new HashMap<>(); // clear applied styles
         
-        boolean isLiteral = node.classes.contains("literal");
+        boolean isLiteral = node.classes.contains("gv-literal");
         
         DagElement nodeElement = new DagElement(isLiteral ? "literal" : "node", node, node.gvAttributes);
         
