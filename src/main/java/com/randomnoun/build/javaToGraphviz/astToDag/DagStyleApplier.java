@@ -37,7 +37,7 @@ public class DagStyleApplier {
     Document document;
     Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
     
-    public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name", "operator" };
+    public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name", "operatorToken", "operatorName" };
     public static String[] EDGE_LABEL_VARIABLES = new String[] { "breakLabel", "continueLabel" };
     
     public DagStyleApplier(Dag dag, DagSubgraph root) {
