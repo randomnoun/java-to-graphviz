@@ -107,6 +107,23 @@ node.methodInvocation {
 /* expression labels */
 node.simpleName { gv-labelFormat: "${name}"; }
 node.qualifiedName { gv-labelFormat: "${name}"; }
+node.thisExpression { gv-labelFormat: "${name}"; }
+
+node.creationReference,
+node.expressionMethodReference,
+node.superMethodReference,
+node.typeMethodReference { gv-labelFormat: "${name}"; }
+
+node.fieldAccess { gv-labelFormat: "field ${fieldName}"; }
+
+node.booleanLiteral,
+node.numberLiteral,
+node.characterLiteral,
+node.nullLiteral,
+node.typeLiteral,
+node.stringLiteral { gv-labelFormat: "${literalValue}"; }
+
+node.assignment { gv-labelFormat: "${operatorToken}"; } /* maybe put lhs in the label as well ? */ 
 
 node.infixExpression { gv-labelFormat: "${operatorToken}"; }
 node.prefixExpression { gv-labelFormat: "prefixOp ${operatorToken}"; }
@@ -122,6 +139,8 @@ edge.infixConditional.false { gv-labelFormat: "false"; }
 node.conditionalExpression { gv-labelFormat: "?"; shape: diamond; }
 edge.conditionalExpression.true { gv-labelFormat: "Y"; }
 edge.conditionalExpression.false { gv-labelFormat: "N"; }
+
+node.variableDeclarationFragment { gv-labelFormat: "${type} ${variableName}"; }
 
 edge.unknown { color: red; }
 
