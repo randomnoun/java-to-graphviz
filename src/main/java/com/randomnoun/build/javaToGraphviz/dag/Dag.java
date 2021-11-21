@@ -82,7 +82,9 @@ public class Dag {
     
     public void addNode(DagSubgraph root, DagNode n) {
         nodes.add(n);
-        astToDagNode.put(n.astNode, n);
+        if (n.astNode != null) {
+            astToDagNode.put(n.astNode, n);
+        }
         
         dagNodeToSubgraph.put(n,  root);
         root.nodes.add(n);
