@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BreakStatement;
+import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ContinueStatement;
@@ -17,10 +18,13 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
+import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.PostfixExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -59,6 +63,9 @@ public class ControlFlowEdger {
      * @return
      */
 	public List<ExitEdge> addEdges(Dag dag, DagNode node, LexicalScope scope) {
+	    
+	    // guess most of these can contain expressions as well. argh.
+	    
 	    if (node.type.equals("MethodDeclaration")) {
 	        return addMethodDeclarationEdges(dag, node, scope);
 	    } else if (node.type.equals("Block")) {
@@ -714,8 +721,20 @@ public class ControlFlowEdger {
             e.n1 = node;
             return Collections.singletonList(e);
 
+        } else if (node.type.equals("PrefixExpression")) {
+            return addPrefixExpressionEdges(dag, node, scope);
+
+        } else if (node.type.equals("PostfixExpression")) {
+            return addPostfixExpressionEdges(dag, node, scope);
+            
         } else if (node.type.equals("InfixExpression")) {
             return addInfixExpressionEdges(dag, node, scope);
+
+        } else if (node.type.equals("CastExpression")) {
+            return addCastEdges(dag, node, scope);
+
+        } else if (node.type.equals("InstanceofExpression")) {
+            return addInstanceofEdges(dag, node, scope);
 
         } else {
             logger.warn("non-implemented expression " + node.type);
@@ -732,6 +751,7 @@ public class ControlFlowEdger {
         
     }
 
+    
     private void addAstEdges(Dag dag, DagNode node, LexicalScope scope) {
         
         if (node.children != null && node.children.size() > 0) {
@@ -967,5 +987,83 @@ public class ControlFlowEdger {
         e.n1 = nameNode;
         return Collections.singletonList(e);
     }
+    
+    private List<ExitEdge> addPostfixExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
+        PostfixExpression pe = (PostfixExpression) node.astNode;
+
+        DagNode operandDag = getDagChild(node.children, pe.getOperand(), null);
+        PostfixExpression.Operator op = pe.getOperator();
+        node.gvAttributes.put("operatorToken", op.toString());
+        node.gvAttributes.put("operatorName", Text.getLastComponent(op.getClass().getName())); // @TODO camelcase
+        
+        Rejigger rejigger = hoistNode(dag, node, operandDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, operandDag, scope);
+    
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        return prevNodes;
+    }
+    
+    private List<ExitEdge> addPrefixExpressionEdges(Dag dag2, DagNode node, LexicalScope scope) {
+        PrefixExpression pe = (PrefixExpression) node.astNode;
+        DagNode operandDag = getDagChild(node.children, pe.getOperand(), null);
+        PrefixExpression.Operator op = pe.getOperator();
+        node.gvAttributes.put("operatorToken", op.toString());
+        node.gvAttributes.put("operatorName", Text.getLastComponent(op.getClass().getName())); // @TODO camelcase
+
+        Rejigger rejigger = hoistNode(dag, node, operandDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, operandDag, scope);
+    
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        return prevNodes;
+    }
+
+    private List<ExitEdge> addCastEdges(Dag dag, DagNode node, LexicalScope scope) {
+        CastExpression ce = (CastExpression) node.astNode;
+        DagNode expressionDag = getDagChild(node.children, ce.getExpression(), null);
+        DagNode typeDag = getDagChild(node.children, ce.getType(), null);
+        node.gvAttributes.put("type", ce.getType().toString());
+        
+        Rejigger rejigger = hoistNode(dag, node, expressionDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, expressionDag, scope);
+        
+        
+        /*
+        if (typeDag != null) { // types have Names, which are also expressions, but they're inside the ast node so typeDag is null 
+            for (DagEdge e : prevNodes) {
+                e.n2 = typeDag;
+            }
+            ExitEdge e = new ExitEdge();
+            e.n1 = typeDag;
+            prevNodes = Collections.singletonList(e);
+        }
+        */
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        return prevNodes;
+    }
+
+    
+    private List<ExitEdge> addInstanceofEdges(Dag dag, DagNode node, LexicalScope scope) {
+        InstanceofExpression ioe = (InstanceofExpression) node.astNode;
+        DagNode expressionDag = getDagChild(node.children, ioe.getLeftOperand(), null);
+        DagNode typeDag = getDagChild(node.children, ioe.getRightOperand(), null);
+        node.gvAttributes.put("type", ioe.getRightOperand().toString());
+        
+        Rejigger rejigger = hoistNode(dag, node, expressionDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, expressionDag, scope);
+        
+        /*
+        if (typeDag != null) { // types have Names, which are also expressions, but they're inside the ast node so typeDag is null 
+            for (DagEdge e : prevNodes) {
+                e.n2 = typeDag;
+            }
+            ExitEdge e = new ExitEdge();
+            e.n1 = typeDag;
+            prevNodes = Collections.singletonList(e);
+        }
+        */
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        return prevNodes;
+    }
+    
     
 }
