@@ -26,6 +26,12 @@ public class JavaToGraphvizTest {
     @Test
     public void testControlFlowStatements() throws IOException {
         
+        testStatement("com.example.input.Expressions3");
+        
+        // testStatement("com.example.input.Expressions1");
+        // testStatement("com.example.input.Expressions");
+        
+        /*
         testStatement("com.example.input.MethodChain");
         
         
@@ -48,7 +54,7 @@ public class JavaToGraphvizTest {
          testStatement("com.example.input.MultipleGraphs"); 
         testStatement("com.example.input.UserDefinedSubgraphs");
         testStatement("com.example.input.CommentAttribution");
-        
+        */
 
     }
     
