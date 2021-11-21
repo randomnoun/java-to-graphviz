@@ -30,7 +30,13 @@ public class Expressions3 {
         public void qualifiedThis() {
             Expressions3.this.testExpressions();
         }
-        
+        public Long callSuperMethod() {
+            return super.getNumber();
+        }
+        public Long getSuperField() {
+            return super.i;
+        }
+
     }
 
     public void testExpressions() {
@@ -44,7 +50,9 @@ public class Expressions3 {
          .toArray(MyOtherNumber[]::new);
        
        Supplier<Long> aGetter = myNumbers[0]::getNumber;
-       aGetter.get();
+       // aGetter.get();
+       
+       MyNumber arrayAccess = myNumbers[2];
        
     }
     

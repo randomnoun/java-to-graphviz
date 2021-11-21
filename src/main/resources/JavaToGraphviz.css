@@ -100,11 +100,20 @@ node.method.end {
     gv-idFormat: "m_${lineNumber}";
     gv-labelFormat: "return";
 }
-node.methodInvocation {
-	gv-labelFormat: "${methodName}()";
-}
 
 /* expression labels */
+
+/* literal-ish */
+
+node.booleanLiteral,
+node.numberLiteral,
+node.characterLiteral,
+node.nullLiteral,
+node.typeLiteral,
+node.stringLiteral { gv-labelFormat: "${literalValue}"; }
+
+/* name-ish */
+
 node.simpleName { gv-labelFormat: "${name}"; }
 node.qualifiedName { gv-labelFormat: "${name}"; }
 node.thisExpression { gv-labelFormat: "${name}"; }
@@ -114,33 +123,40 @@ node.expressionMethodReference,
 node.superMethodReference,
 node.typeMethodReference { gv-labelFormat: "${name}"; }
 
-node.fieldAccess { gv-labelFormat: "field ${fieldName}"; }
+/* control-flow-ish */
 
-node.booleanLiteral,
-node.numberLiteral,
-node.characterLiteral,
-node.nullLiteral,
-node.typeLiteral,
-node.stringLiteral { gv-labelFormat: "${literalValue}"; }
-
-node.assignment { gv-labelFormat: "${operatorToken}"; } /* maybe put lhs in the label as well ? */ 
-
-node.infixExpression { gv-labelFormat: "${operatorToken}"; }
-node.prefixExpression { gv-labelFormat: "prefixOp ${operatorToken}"; }
-node.postfixExpression { gv-labelFormat: "postfixOp ${operatorToken}"; }
-
-node.castExpression { gv-labelFormat: "cast ${type}"; }
-node.instanceofExpression { gv-labelFormat: "instanceof ${type}"; }
-
-node.infixExpression.infixConditional { shape : diamond; }
-edge.infixConditional.true { gv-labelFormat: "true"; }
-edge.infixConditional.false { gv-labelFormat: "false"; }
-
+node.methodInvocation { gv-labelFormat: "${methodName}()"; }
+node.superMethodInvocation { gv-labelFormat: "${methodName}()"; }
 node.conditionalExpression { gv-labelFormat: "?"; shape: diamond; }
 edge.conditionalExpression.true { gv-labelFormat: "Y"; }
 edge.conditionalExpression.false { gv-labelFormat: "N"; }
 
+/* evaluation-ish */
+
+node.infixExpression { gv-labelFormat: "${operatorToken}"; }
+node.infixExpression.infixConditional { shape : diamond; }
+edge.infixConditional.true { gv-labelFormat: "true"; }
+edge.infixConditional.false { gv-labelFormat: "false"; }
+
+node.prefixExpression { gv-labelFormat: "prefixOp ${operatorToken}"; }
+node.postfixExpression { gv-labelFormat: "postfixOp ${operatorToken}"; }
+/* ParenthesizedExpressions aren't included in the dag */
+node.castExpression { gv-labelFormat: "cast ${type}"; }
+node.instanceofExpression { gv-labelFormat: "instanceof ${type}"; }
+
+/* creation-ish */
+
 node.variableDeclarationFragment { gv-labelFormat: "${type} ${variableName}"; }
+
+/* access-ish */
+
+node.fieldAccess { gv-labelFormat: "field ${fieldName}"; }
+node.superFieldAccess { gv-labelFormat: "field ${fieldName}"; }
+
+/* modification-ish */
+
+node.assignment { gv-labelFormat: "${operatorToken}"; } /* maybe put lhs in the label as well ? */ 
+
 
 edge.unknown { color: red; }
 

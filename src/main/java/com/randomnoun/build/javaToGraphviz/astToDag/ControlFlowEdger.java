@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -34,6 +35,8 @@ import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
@@ -767,6 +770,9 @@ public class ControlFlowEdger {
         if (node.type.equals("MethodInvocation")) {
             return addMethodInvocationEdges(dag, node, scope);
 
+        } else if (node.type.equals("SuperMethodInvocation")) {
+            return addSuperMethodInvocationEdges(dag, node, scope);
+
         } else if (node.type.equals("ConditionalExpression")) {
             return addConditionalExpressionEdges(dag, node, scope);
 
@@ -809,6 +815,12 @@ public class ControlFlowEdger {
         } else if (node.type.equals("FieldAccess")) {
             return addFieldAccessEdges(dag, node, scope);
 
+        } else if (node.type.equals("ArrayAccess")) {
+            return addArrayAccessEdges(dag, node, scope);
+
+        } else if (node.type.equals("SuperFieldAccess")) {
+            return addSuperFieldAccessEdges(dag, node, scope);
+
         } else if (node.type.equals("CreationReference") ||
             node.type.equals("ExpressionMethodReference") ||
             node.type.equals("SuperMethodReference") ||
@@ -831,9 +843,6 @@ public class ControlFlowEdger {
         
     }
 
-    
-    
-    
     private List<ExitEdge> addLiteralExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
         String literalValue = null;
         switch (node.type) {
@@ -945,7 +954,6 @@ public class ControlFlowEdger {
         if (expressionDag != null || argumentDags.size() > 0) {
             // move methodInvocation node after the expression & argument nodes
             Rejigger rejigger = hoistNode(dag, methodInvocationNode, expressionDag != null ? expressionDag : argumentDags.get(0));
-            
             // expression is null for method calls within the same object
             if (expressionDag != null) {
                 prevNodes = addExpressionEdges(dag, expressionDag, scope);
@@ -972,6 +980,38 @@ public class ControlFlowEdger {
         return prevNodes;
     }   
     
+
+    private List<ExitEdge> addSuperMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
+        SuperMethodInvocation smi = (SuperMethodInvocation) methodInvocationNode.astNode;
+        
+        String qualifier = smi.getQualifier() == null ? "" : smi.getQualifier().toString() + ".";
+        // smi.typeArguments(); ?
+            
+        methodInvocationNode.gvAttributes.put("methodName", qualifier + ".super." + smi.getName().toString());
+        List<DagNode> argumentDags = getDagChildren(methodInvocationNode.children, smi.arguments(), null);
+
+        List<ExitEdge> prevNodes = null;
+        if (argumentDags.size() > 0) {
+            // move methodInvocation node after the argument nodes
+            Rejigger rejigger = hoistNode(dag, methodInvocationNode, argumentDags.get(0));
+            for (DagNode a : argumentDags) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = a;
+                        e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
+                }
+                prevNodes = addExpressionEdges(dag, a, scope );
+            }
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        } else {
+            ExitEdge e = new ExitEdge();
+            e.n1 = methodInvocationNode;
+            prevNodes = Collections.singletonList(e);
+        }
+        return prevNodes;
+    }   
 
     private List<ExitEdge> addInfixExpressionEdges(Dag dag, DagNode infixNode, LexicalScope scope) {
         InfixExpression ie = (InfixExpression) infixNode.astNode;
@@ -1264,6 +1304,32 @@ public class ControlFlowEdger {
         return prevNodes;
     }
     
+    private List<ExitEdge> addSuperFieldAccessEdges(Dag dag, DagNode node, LexicalScope scope) {
+        SuperFieldAccess fa = (SuperFieldAccess) node.astNode;
+        // DagNode fieldDag = getDagChild(node.children, fa.getName(), null); // will put the name on the FA node
+        
+        node.gvAttributes.put("fieldName", fa.getName().toString()); // qualified super field
+        
+        ExitEdge e = new ExitEdge();
+        e.n1 = node;
+        return Collections.singletonList(e);
+    }
     
+    private List<ExitEdge> addArrayAccessEdges(Dag dag, DagNode node, LexicalScope scope) {
+        ArrayAccess fa = (ArrayAccess) node.astNode;
+
+        // maybe we evaluate the index first ? not sure. reckon it's probably the array ref
+        DagNode exprDag = getDagChild(node.children, fa.getArray(), null);
+        DagNode indexDag = getDagChild(node.children, fa.getIndex(), null); 
+        // DagNode fieldDag = getDagChild(node.children, fa.getName(), null); // will put the name on the FA node
+        
+        // node.gvAttributes.put("fieldName", fa.getIndex().toString()); 
+        Rejigger rejigger = hoistNode(dag, node, exprDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, exprDag, scope);
+        dag.addEdge(exprDag, indexDag);
+        prevNodes = addExpressionEdges(dag, indexDag, scope);
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        return prevNodes;
+    }    
 }
 
