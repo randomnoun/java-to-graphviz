@@ -107,8 +107,23 @@ node.methodInvocation {
 /* expression labels */
 node.simpleName { gv-labelFormat: "${name}"; }
 node.qualifiedName { gv-labelFormat: "${name}"; }
-node.infixExpression { gv-labelFormat: "${operator}"; }
 
+node.infixExpression { gv-labelFormat: "${operatorToken}"; }
+node.prefixExpression { gv-labelFormat: "prefixOp ${operatorToken}"; }
+node.postfixExpression { gv-labelFormat: "postfixOp ${operatorToken}"; }
+
+node.castExpression { gv-labelFormat: "cast ${type}"; }
+node.instanceofExpression { gv-labelFormat: "instanceof ${type}"; }
+
+node.infixExpression.infixConditional { shape : diamond; }
+edge.infixConditional.true { gv-labelFormat: "true"; }
+edge.infixConditional.false { gv-labelFormat: "false"; }
+
+node.conditionalExpression { gv-labelFormat: "?"; shape: diamond; }
+edge.conditionalExpression.true { gv-labelFormat: "Y"; }
+edge.conditionalExpression.false { gv-labelFormat: "N"; }
+
+edge.unknown { color: red; }
 
 /* node and edges marked 'ast' are temporary until I've written all 20 or so expression node edgers */ 
 node.ast { color: green; }
