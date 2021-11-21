@@ -147,6 +147,9 @@ node.instanceofExpression { gv-labelFormat: "instanceof ${type}"; }
 /* creation-ish */
 
 node.variableDeclarationFragment { gv-labelFormat: "${type} ${variableName}"; }
+node.arrayInitializer { gv-labelFormat: "{ ... }"; }
+node.arrayCreation { gv-labelFormat: "new ${type}"; }
+node.classInstanceCreation { gv-labelFormat: "new ${type}()"; }
 
 /* access-ish */
 
