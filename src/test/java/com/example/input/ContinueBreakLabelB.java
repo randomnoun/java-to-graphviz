@@ -3,9 +3,10 @@ package com.example.input;
 /** named break/continue test cases
  * 
  */
-public class ContinueBreakLabel {
+public class ContinueBreakLabelB {
 
     // gv-style: { @import "JavaToGraphviz.css"; }
+    // gv-option: centralSwitch=true   
     
     public void testAmenBreak() {
         boolean beatBoxing = true;
