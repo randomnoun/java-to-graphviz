@@ -7,7 +7,9 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.AST;
@@ -25,6 +27,7 @@ import com.randomnoun.build.javaToGraphviz.astToDag.DagStyleApplier;
 import com.randomnoun.build.javaToGraphviz.astToDag.LexicalScope;
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
+import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.common.StreamUtil;
@@ -215,8 +218,8 @@ public class JavaToGraphviz {
         }
         */
         
-        for (DagNode methodNode : dag.rootNodes) {
-            if (rootGraph.nodes.contains(methodNode)) {
+        for (DagNode rootNode : dag.rootNodes) {
+            if (rootGraph.nodes.contains(rootNode)) {
                 
                 LexicalScope lexicalScope = new LexicalScope();
 
@@ -224,11 +227,11 @@ public class JavaToGraphviz {
                     if (edgerName.equals("control-flow")) {
                         ControlFlowEdger edger = new ControlFlowEdger(dag);
                         edger.setIncludeThrowEdges(includeThrowEdges);
-                        edger.addEdges(dag, methodNode, lexicalScope);
+                        edger.addEdges(dag, rootNode, lexicalScope);
                     
                     } else if (edgerName.equals("ast")) {
                         AstEdger edger = new AstEdger(dag);
-                        edger.addEdges(dag, methodNode, lexicalScope);
+                        edger.addEdges(dag, rootNode, lexicalScope);
                     
                     // @TODO data-flow
                         
@@ -237,11 +240,29 @@ public class JavaToGraphviz {
                     }
                 }
 
+                // the edgers now move things around so should probably recalc the inEdges and outEdges
+                // as the keepNode thingy relies those on being accurate.
+                // although we've got subgraphs now which is going to make things more exciting, probably.
+                // going to assume that edge don't cross rootNodes, which they don't yet either.
+                Set<DagNode> allEdgedNodes = new HashSet<DagNode>();
+                for (DagEdge e : dag.edges) {
+                    allEdgedNodes.add(e.n1);
+                    allEdgedNodes.add(e.n2);
+                }
+                for (DagNode n : allEdgedNodes) {
+                    n.inEdges = new ArrayList<>();
+                    n.outEdges = new ArrayList<>();
+                    for (DagEdge e : dag.edges) {
+                        if (e.n1 == n) { n.outEdges.add(e); }
+                        if (e.n2 == n) { n.inEdges.add(e); }
+                    }
+                }
+                
                 if (removeNode) {
                     DagNodeFilter filter = new DagNodeFilter(dag);
-                    methodNode.keepNode = false;
-                    filter.setLastKeepNode(methodNode, methodNode);
-                    filter.removeNodes(methodNode);
+                    rootNode.keepNode = true;
+                    filter.setLastKeepNode(rootNode, rootNode);
+                    filter.removeNodes(rootNode);
                 }
             }
         }
