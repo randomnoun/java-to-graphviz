@@ -38,8 +38,16 @@ public class DagNodeFilter {
             lastKeepNode = node;
         }
         node.lastKeepNode = lastKeepNode;
-        for (DagEdge e : outEdges) {
-            setLastKeepNode(e.n2, lastKeepNode);
+        // ok so if we've got any outEdges, follow those
+        if (outEdges.size() > 0) {
+            for (DagEdge e : outEdges) {
+                setLastKeepNode(e.n2, lastKeepNode);
+            }
+        } else {
+            // otherwise descend the AST instead.
+            for (DagNode n : node.children) {
+                setLastKeepNode(n, lastKeepNode);
+            }
         }
     }
 
@@ -217,6 +225,13 @@ public class DagNodeFilter {
                     }
                 } else {
                     // logger.warn("edge " + e + " missing from " + node.name);
+                }
+            }
+            
+            // if there's no outEdges or inEdges, check the children.
+            if (node.inEdges.size() == 0 && node.outEdges.size() == 0) {
+                for (DagNode n : node.children) {
+                    removeNodes(n);
                 }
             }
         }
