@@ -6,6 +6,10 @@ package com.example.input;
 public class CommentAttribution {
 
     // gv-style: { @import "JavaToGraphviz.css"; }
+    
+    // keep all the expressionStatements. Do I really want to do this ? Look I suppose so
+    // gv-keepNode: expressionStatement block
+    
     /* gv-style: {
        }
     */
@@ -13,7 +17,7 @@ public class CommentAttribution {
     /* gv-style: {
     node {
         gv-idFormat: "s_${lineNumber}";
-        // gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}";
+        // gv-labelFormat: "${id}: ${nodeType} lkn: ${lastKeepNodeId}";
         gv-labelFormat: "${lineNumber} (${nodeType})"; 
     }
     */
@@ -38,7 +42,7 @@ public class CommentAttribution {
         System.out.println("s9");   /* gv:<--:this comment is for s9 */  System.out.println("s10");
         System.out.println("s11");  /* gv:-->:this comment is for s12 */ System.out.println("s12");
         
-        System.out.println("s5"); /* gv: this comment is for s5 */  System.out.println("s6"); // gv: this comment is for s6 OR IS IT
+        System.out.println("s13"); /* gv: this comment is for s13 */  System.out.println("s14"); // gv: this comment is for s14 OR IS IT
         
         
         
