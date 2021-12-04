@@ -46,6 +46,7 @@ import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -86,8 +87,10 @@ public class ControlFlowEdger {
 	public List<ExitEdge> addEdges(Dag dag, DagNode node, LexicalScope scope) {
 	    
 	    // guess most of these can contain expressions as well. argh.
-	    
-	    if (node.type.equals("MethodDeclaration")) {
+	    if (node.type.equals("TypeDeclaration")) {
+	        return addTypeDeclarationEdges(dag, node, scope);
+	        
+	    } else if (node.type.equals("MethodDeclaration")) {
 	        return addMethodDeclarationEdges(dag, node, scope);
 	    } else if (node.type.equals("VariableDeclarationFragment")) {
 	        // instance variables; ignore for now
@@ -137,7 +140,6 @@ public class ControlFlowEdger {
           node.type.equals("ConstructorInvocation") ||
           node.type.equals("EmptyStatement") ||
           node.type.equals("SuperConstructorInvocation") ||
-          node.type.equals("TypeDeclaration") ||
           node.type.equals("comment")) { // lower-case c for nodes created from gv comments
             // non-control flow statement
             ExitEdge e = new ExitEdge();
@@ -191,6 +193,35 @@ public class ControlFlowEdger {
         return prevNodes;
     }
 
+    
+    
+    private List<ExitEdge> addTypeDeclarationEdges(Dag dag, DagNode typeNode, LexicalScope scope) {
+        TypeDeclaration td = (TypeDeclaration) typeNode.astNode;
+        // method.label = "method " + md.getName();
+        if (td.isInterface()) {
+            typeNode.classes.add("interface");
+            typeNode.gvAttributes.put("interfaceName", td.getName().toString());
+        } else {
+            typeNode.classes.add("class");
+            typeNode.gvAttributes.put("className", td.getName().toString());
+        }
+        
+        // probably have a new lexical scope here
+        
+        // List<DagNode> something = bodyDeclarations
+        List<DagNode> bodyDeclarationDags = getDagChildren(typeNode.children, td.bodyDeclarations(), null);
+        
+        // allo allo allo
+        // what do we have here then
+        for (DagNode n : bodyDeclarationDags) {
+            // System.out.println(n.type);
+            // other type declarations and method declarations, it looks like
+            addEdges(dag, n, scope);
+        }
+        
+        return Collections.emptyList();
+        
+    }
     
 	// draw lines from each statement to each other
     // returns an empty list

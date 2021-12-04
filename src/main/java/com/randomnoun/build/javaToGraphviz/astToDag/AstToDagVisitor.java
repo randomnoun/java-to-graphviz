@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
@@ -161,7 +162,7 @@ public class AstToDagVisitor extends ASTVisitor {
         return dag;
     }
     
-    void processCommentsToMethodNode(DagNode mn, int line) {
+    void processCommentsToTypeOrMethodNode(DagNode mn, int line) {
         // DagNode lastNode = null;
         while (lastIdx < comments.size() && comments.get(lastIdx).line < line) {
             CommentText ct = comments.get(lastIdx);
@@ -320,7 +321,8 @@ public class AstToDagVisitor extends ASTVisitor {
             node instanceof CatchClause ||
             (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
             node instanceof Expression || // inside ExpressionStatements
-            node instanceof VariableDeclaration
+            node instanceof VariableDeclaration ||
+            node instanceof TypeDeclaration
             ) {
             
             DagNode dn = new DagNode();
@@ -342,9 +344,12 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.parentDagNode = pdn;
             dn.astNode = node;
 
-            if (node instanceof MethodDeclaration) {
+            if (node instanceof TypeDeclaration) {
                 // comments get assigned to this node
-                processCommentsToMethodNode(dn, lineNumber);
+                processCommentsToTypeOrMethodNode(dn, lineNumber);
+            } else if (node instanceof MethodDeclaration) {
+                // comments get assigned to this node
+                processCommentsToTypeOrMethodNode(dn, lineNumber);
             } else {
                 // comments have their own nodes
                 processCommentsToStatementNode(pdn, lineNumber, columnNumber, null);                    
@@ -356,7 +361,7 @@ public class AstToDagVisitor extends ASTVisitor {
             } else {
                 // logger.warn("null pdn on " + node);
                 logger.warn("preVisit: null pdn on " + dn.type + " on line " + dn.lineNumber);
-                // each method is it's own subgraph
+                // each typeDeclaration is it's own subgraph
                 dag.addRootNode(dn);
             }
             

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-/** do loop test cases
+/** method reference and inner class test cases
  * 
  */
 public class Expressions3 {
