@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
@@ -206,13 +207,14 @@ public class ControlFlowEdger {
             typeNode.gvAttributes.put("className", td.getName().toString());
         }
         
-        // probably have a new lexical scope here
+        // should probably have a new lexical scope here
         
-        // List<DagNode> something = bodyDeclarations
         List<DagNode> bodyDeclarationDags = getDagChildren(typeNode.children, td.bodyDeclarations(), null);
-        
-        // allo allo allo
-        // what do we have here then
+
+        // add edges for everything in the class
+        // @TODO check fields don't appear though. unless they initalise things, then maybe. Or maybe that goes into the constructors. 
+        // or not.
+        // yeesh what about the static initializers. what about them indeed.
         for (DagNode n : bodyDeclarationDags) {
             // System.out.println(n.type);
             // other type declarations and method declarations, it looks like
@@ -280,10 +282,12 @@ public class ControlFlowEdger {
         }
         
         // there's no exit edges out of a method
-        // ExitEdge e = new ExitEdge();
-        // e.label = "afterTheReturn";
-        // e.n1 = rn;
-        return Collections.emptyList();
+        // return Collections.emptyList();
+        
+        // maybe there is now so we can draw an edge out of anonymous classes
+        ExitEdge e = new ExitEdge();
+        e.n1 = returnNode;
+        return Collections.singletonList(e);
         
     }
     
@@ -956,9 +960,10 @@ public class ControlFlowEdger {
             }
         }
         
-        // there's no exit edges out of a method
+        // there's no exit edges out of a method, but let's say there is from a lambda
+        // (it's not a real edge, it gets truncated to the subgraph boundary in some css)
         ExitEdge e = new ExitEdge();
-        e.n1 = returnNode; // this gets truncated to the subgraph boundary in some css
+        e.n1 = returnNode; 
         return Collections.singletonList(e);
         
     }
@@ -1457,11 +1462,13 @@ public class ControlFlowEdger {
     private List<ExitEdge> addClassInstanceCreationEdges(Dag dag, DagNode node, LexicalScope scope) {
         ClassInstanceCreation cic = (ClassInstanceCreation) node.astNode;
         
-        // @TODO  cic.getAnonymousClassDeclaration() 
-
         // maybe we evaluate the index first ? not sure. reckon it's probably the array ref
         DagNode expressionDag = getDagChild(node.children, cic.getExpression(), null);
         List<DagNode> argumentDags = getDagChildren(node.children, cic.arguments(), null);
+        DagNode anonClassDag = getDagChild(node.children, cic.getAnonymousClassDeclaration(), "anonymousClass");
+        
+        // AnonymousClassDeclaration
+        
         node.gvAttributes.put("type", cic.getType().toString());
         
         // DagNode indexDag = getDagChild(node.children, fa.getIndex(), null); 
@@ -1491,6 +1498,67 @@ public class ControlFlowEdger {
             e.n1 = node;
             prevNodes = Collections.singletonList(e);
         }
+        
+        // jam the anonymous class in here as if it was a lambda, but with methods like a class
+        if (anonClassDag != null) {
+            for (ExitEdge e : prevNodes) {
+                e.n2 = anonClassDag;
+                dag.addEdge(e);
+            }
+            
+            AnonymousClassDeclaration acdNode = (AnonymousClassDeclaration) anonClassDag.astNode;
+            
+            List<DagNode> bodyDeclarationDags = getDagChildren(anonClassDag.children, acdNode.bodyDeclarations(), null);
+
+            // @TODO these probably need a new lexical scope
+            LexicalScope lexicalScope = scope.newTypeScope(); 
+            
+            // add edges for everything in the class
+            // @TODO check fields don't appear though. unless they initalise things, then maybe. Or maybe that goes into the constructors. 
+            // or not.
+            // yeesh what about the static initializers. what about them indeed.
+            List<ExitEdge> ees = new ArrayList<>();
+            for (DagNode n : bodyDeclarationDags) {
+                // add a transparent edge to each thing defined in this class so that the 'AnonymousClassDeclaration' node appears above them
+                DagEdge e = dag.addEdge(anonClassDag, n);
+                e.classes.add("anonymousClassDeclarationChild");
+                ees.addAll(addEdges(dag, n, lexicalScope));
+            }
+
+            // add an artificial node so we can create an edge out of this thing
+            
+            CompilationUnit cu = ASTResolving.findParentCompilationUnit(acdNode);
+            int endOfAnonClassLine = cu.getLineNumber(acdNode.getStartPosition() + acdNode.getLength());
+            DagNode returnNode = new DagNode();
+            returnNode.keepNode = true; // always keep comments
+            returnNode.type = "artifical"; // hrm
+            returnNode.lineNumber = endOfAnonClassLine;
+            // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
+            returnNode.classes.add("anonymousClassDeclaration");
+            returnNode.classes.add("end");
+            // rn.label = "return";
+            returnNode.astNode = null;
+            anonClassDag.children.add(returnNode); // include the artificial return inside the lambda grouping
+            
+            DagSubgraph sg = dag.dagNodeToSubgraph.get(anonClassDag);
+            dag.addNode(sg, returnNode);
+            
+            
+            for (ExitEdge ee : ees) {
+                // add a transparent edge from each thing defined in this class to the artifical node
+                // so that it appears underneath them
+                ee.n2 = returnNode;
+                ee.classes.add("anonymousClassDeclarationArtifical");
+                dag.addEdge(ee);
+            }
+            
+            // there's no exit edges out of an anonymous class
+            // this gets truncated to the subgraph boundary in some css
+            ExitEdge e = new ExitEdge();
+            e.n1 = returnNode; 
+            prevNodes = Collections.singletonList(e);
+        }
+        
         return prevNodes;
     }
     
