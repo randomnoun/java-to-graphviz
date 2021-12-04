@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -653,7 +654,10 @@ public class ControlFlowEdger {
     // List<ExitEdge> _breakEdges, DagNode continueNode
     private List<ExitEdge> addSwitchEdges(Dag dag, DagNode switchNode, LexicalScope scope) {
      // draw the edges
-        // SwitchStatement ss;
+        SwitchStatement ss = (SwitchStatement) switchNode.astNode;
+        DagNode exprDag = getDagChild(switchNode.children, ss.getExpression(), null);
+        List<DagNode> statementDags = getDagChildren(switchNode.children, ss.statements(), null);
+        
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
         // for (DagNode c : switchNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
         /*
@@ -669,18 +673,18 @@ public class ControlFlowEdger {
 [JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.ExpressionStatement in org.eclipse.jdt.core.dom.SwitchStatement
          */
         // ^ the children of a switchNode interleaves SwitchCases, statements, and break statements
+
+        // hoist switchNode after the expression nodes
+        Rejigger rejigger = hoistNode(dag, switchNode, exprDag);
+        List<ExitEdge> ee = addExpressionEdges(dag, exprDag,  scope);
+        rejigger.unhoistNode(dag,  ee); // create exit edges below
         
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire switch
-        
         List<ExitEdge> casePrevNodes = new ArrayList<>(); // a single case in the switch
-        // List<ExitEdge> caseBreakEdges = new ArrayList<>();
-        
-        // this starts a new 'break' scope but 'continue's continue to do whatever continues did before.
-        // OR DO THEY.
-        LexicalScope newScope = null; // scope.newBreakScope();
+        LexicalScope newScope = null;
         
         boolean hasDefaultCase = false;
-        for (DagNode c : switchNode.children) {
+        for (DagNode c : statementDags) {
             if (c.type.equals("SwitchCase")) {
                 // close off last case
                 if (newScope != null) {
@@ -704,8 +708,8 @@ public class ControlFlowEdger {
                     e.classes.add("fallthrough");
                 }
                 casePrevNodes = new ArrayList<>();
-                // caseBreakEdges = new ArrayList<>();
-                // scope.breakEdges.clear();
+
+                // this starts a new 'break' scope but 'continue's continue to do whatever continues did before.
                 newScope = scope.newBreakScope();
                 
                 hasDefaultCase = hasDefaultCase || isDefaultCase; 
@@ -1402,14 +1406,14 @@ public class ControlFlowEdger {
         node.gvAttributes.put("operatorToken", op.toString());
         node.gvAttributes.put("operatorName", Text.getLastComponent(op.getClass().getName())); // @TODO camelcase
         
-        Rejigger rejigger = hoistNode(dag, node, lhsDag);
-        List<ExitEdge> prevNodes = addExpressionEdges(dag, lhsDag, scope);
+        Rejigger rejigger = hoistNode(dag, node, rhsDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, rhsDag, scope);
         for (DagEdge e : prevNodes) {
-            e.n2 = rhsDag;
+            e.n2 = lhsDag;
             dag.edges.add(e);
         }
         
-        prevNodes = addExpressionEdges(dag, rhsDag, scope);
+        prevNodes = addExpressionEdges(dag, lhsDag, scope);
         prevNodes = rejigger.unhoistNode(dag, prevNodes);
         return prevNodes;
     }
