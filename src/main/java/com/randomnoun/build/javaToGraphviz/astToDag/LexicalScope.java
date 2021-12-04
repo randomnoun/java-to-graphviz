@@ -46,6 +46,18 @@ public class LexicalScope {
         labeledScopes = new HashMap<String, LexicalScope>();
     }
     
+    // new lambda scope
+    public LexicalScope newLambdaScope() {
+        // pretty sure everything's contained in the lambda, control-flow wise
+        LexicalScope next = new LexicalScope();
+        next.continueNode = null;
+        next.breakEdges = new ArrayList<ExitEdge>();
+        next.returnEdges = new ArrayList<ExitEdge>();
+        next.throwEdges = new ArrayList<ExitEdge>();
+        next.labeledScopes = new HashMap<String, LexicalScope>();
+        return next;
+    }
+    
     // scope that bounds statements that can break/continue
     // e.g. for, while, do
     public LexicalScope newBreakContinueScope(DagNode n) {
@@ -86,6 +98,8 @@ public class LexicalScope {
         next.labeledScopes = this.labeledScopes;
         return next;
     }
+
+    
     
     
     // scope for user-defined subgraphs, does not affect nodes and edges.
