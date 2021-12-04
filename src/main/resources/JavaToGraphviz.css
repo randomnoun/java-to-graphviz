@@ -102,6 +102,9 @@ node.method.end {
     gv-labelFormat: "return";
 }
 
+/* handy for finding things in the diagram */
+node.red { color: red; }
+
 /* expression labels */
 
 /* literal-ish */
@@ -224,7 +227,6 @@ node.lambdaExpression:not(.end) {
 	gv-newSubgraph: true; /* create a subgraph element *under* this node, then move child nodes into that subgraph */
 	gv-ohAndTheEdgesConnectToTheSubgraph: true;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
 }
-node.red { color: red; } 
 node.lambdaExpression > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_lambda_${lineNumber}";  /* @TODO the greek symbol there */
@@ -232,6 +234,29 @@ node.lambdaExpression > subgraph {
   pencolor : black;
 }
 
+
+/* each anonymousClassDeclaration has two nodes, one for the definition and an artifical one for the exit edge */ 
+node.anonymousClassDeclaration:not(.end) { 
+	gv-newSubgraph: true; /* create a subgraph element *under* this node, then move child nodes into that subgraph */
+	gv-ohAndTheEdgesConnectToTheSubgraph: true;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
+}
+node.anonymousClassDeclaration > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_anon_${lineNumber}"; 
+  gv-labelFormat : "anonymous class";
+  pencolor : black;
+}
+edge.anonymousClassDeclarationChild {
+	color: transparent; /* transparent edges leading into methods */
+}
+edge.anonymousClassDeclarationArtifical {
+	color: transparent; /* transparent edges leading out of methods to the artifical transparent node at the bottom of the anonymous class declaration */
+}
+node.anonymousClassDeclaration.end {
+	color: transparent; /* transparent edges leading out of methods */
+	fontcolor: transparent;
+	gv-labelFormat : "hidden";
+}
 
 /*
 node.try { gv-newSubgraph: true; }

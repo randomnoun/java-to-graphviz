@@ -207,8 +207,7 @@ public class ControlFlowEdger {
             typeNode.gvAttributes.put("className", td.getName().toString());
         }
         
-        // should probably have a new lexical scope here
-        
+        LexicalScope lexicalScope = scope.newTypeScope();
         List<DagNode> bodyDeclarationDags = getDagChildren(typeNode.children, td.bodyDeclarations(), null);
 
         // add edges for everything in the class
@@ -218,7 +217,7 @@ public class ControlFlowEdger {
         for (DagNode n : bodyDeclarationDags) {
             // System.out.println(n.type);
             // other type declarations and method declarations, it looks like
-            addEdges(dag, n, scope);
+            addEdges(dag, n, lexicalScope);
         }
         
         return Collections.emptyList();
@@ -1510,7 +1509,6 @@ public class ControlFlowEdger {
             
             List<DagNode> bodyDeclarationDags = getDagChildren(anonClassDag.children, acdNode.bodyDeclarations(), null);
 
-            // @TODO these probably need a new lexical scope
             LexicalScope lexicalScope = scope.newTypeScope(); 
             
             // add edges for everything in the class
