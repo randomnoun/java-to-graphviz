@@ -58,6 +58,7 @@ graph {
 	bgcolor: transparent;
 	gv-idFormat: "G";
     gv-labelFormat: unset;
+    compound: true; /* for lambda entry/exit edges */
 }
 /* the styles on graphNode and graphEdge are applied at the graph level, 
    but styles on node and edge are (repeatedly) applied at the node and edges 
@@ -121,7 +122,7 @@ node.thisExpression { gv-labelFormat: "${name}"; }
 node.creationReference,
 node.expressionMethodReference,
 node.superMethodReference,
-node.typeMethodReference { gv-labelFormat: "${name}"; }
+node.typeMethodReference { gv-labelFormat: "${name}"; }g
 
 /* control-flow-ish */
 
@@ -149,7 +150,7 @@ node.instanceofExpression { gv-labelFormat: "instanceof ${type}"; }
 node.variableDeclarationFragment { gv-labelFormat: "${type} ${variableName}"; }
 node.arrayInitializer { gv-labelFormat: "{ ... }"; }
 node.arrayCreation { gv-labelFormat: "new ${type}"; }
-node.classInstanceCreation { gv-labelFormat: "new ${type}()"; }
+node.classInstanceCreation { gv-labelFormat: "new ${type}()"; } /* also control-flow-ish */
 
 /* access-ish */
 
@@ -190,6 +191,7 @@ node.methodDeclaration > subgraph {
   pencolor : white;
 }
 
+
 /* in retrospect I reckon the methodDeclaration node should be *inside* the subgraph, which
 would make the CSS rule something like
   subgraph:has(> .methodDeclaration) { ... }
@@ -197,6 +199,19 @@ instead, assuming jsoup's selector impl supports that.
 maybe it should be a gv-newOuterSubgraph: true
 or something 
 */
+
+/* each lambdaExpression has two nodes, one for the definition and an artifical one for the return value (with an extra .end class) */ 
+node.lambdaExpression:not(.end) { 
+	gv-newSubgraph: true; /* create a subgraph element *under* this node, then move child nodes into that subgraph */
+	gv-ohAndTheEdgesConnectToTheSubgraph: true;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
+}
+node.red { color: red; } 
+node.lambdaExpression > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_lambda_${lineNumber}";  /* @TODO the greek symbol there */
+  gv-labelFormat : "lambda";
+  pencolor : black;
+}
 
 
 /*
