@@ -42,6 +42,8 @@ public class DagNode {
     public boolean hasComment;
     public List<GvComment> gvComments = new ArrayList<>(); // in case we need to bubble these up the AST. although what are the chances of that. I mean really.
     
+    public Map<String, String> options = new HashMap<>(); // options at the time this node was constructed
+    
     public void addChild(DagNode node) {
         children.add(node);
     }

@@ -1,9 +1,12 @@
 package com.randomnoun.build.javaToGraphviz.astToDag;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -26,6 +29,7 @@ import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvKeepNodeComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvLiteralComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvOptionComment;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
@@ -58,6 +62,7 @@ public class AstToDagVisitor extends ASTVisitor {
     List<GvComment> nextLineComments = new ArrayList<>(); 
     List<GvComment> nextDagComments = new ArrayList<>();
     List<String> keepNodeMatch = null;
+    Map<String, String> options = new HashMap<>();
     
     
     // Map of line number -> list of ASTs that start / end on that line
@@ -179,6 +184,7 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.name = dag.getUniqueName("c_" + ct.line);
             dn.label = ct.text;
             dn.astNode = null;
+            dn.options = options;
             */
             if (ct instanceof GvComment) {
                 mn.classes.addAll(((GvComment) ct).classes);
@@ -204,6 +210,11 @@ public class AstToDagVisitor extends ASTVisitor {
             } else if (ct instanceof GvKeepNodeComment) {
                 GvKeepNodeComment knc =  ((GvKeepNodeComment) ct);
                 keepNodeMatch = Arrays.asList(knc.text.trim().split("\\s+"));
+
+            } else if (ct instanceof GvOptionComment) {
+                GvOptionComment oc =  ((GvOptionComment) ct);
+                options = newOptions(oc.text.trim());
+
             }
             
             lastIdx ++; 
@@ -228,6 +239,7 @@ public class AstToDagVisitor extends ASTVisitor {
                 dn.classes.add("comment");
                 dn.label = ct.text;
                 dn.astNode = null;
+                dn.options = options;
             } else {
                 dn = currentLineDn;
             }
@@ -293,10 +305,14 @@ public class AstToDagVisitor extends ASTVisitor {
                 GvLiteralComment gvlc = (GvLiteralComment) ct;
                 dn.classes.add("gv-literal");
                 dn.skipNode = true;
-                
+             
             } else if (ct instanceof GvKeepNodeComment) {
                 GvKeepNodeComment knc =  ((GvKeepNodeComment) ct);
                 keepNodeMatch = Arrays.asList(knc.text.trim().split("\\s+"));
+
+            } else if (ct instanceof GvOptionComment) {
+                GvOptionComment oc =  ((GvOptionComment) ct);
+                options = newOptions(oc.text.trim());
             }
 
 
@@ -318,6 +334,24 @@ public class AstToDagVisitor extends ASTVisitor {
 
 
 
+
+    private Map<String, String> newOptions(String t) {
+        // name=value pairs. probably need some quoting rules
+        options = new HashMap<>(options); // don't affect nodes with existing options
+        
+        Pattern optionPattern = Pattern.compile("([a-zA-Z0-9-_]+)\\s*=\\s*([a-zA-Z0-9-_]+)\\s*");
+        Matcher m = optionPattern.matcher(t);
+        while (m.find()) {
+            String k = m.group(1);
+            String v = m.group(2);
+            if (v.equals("unset")) {
+                options.remove(k);
+            } else {
+                options.put(k, v);
+            }
+        }
+        return options;
+    }
 
     public boolean preVisit2(ASTNode node) {
         DagNode pdn = getClosestDagNode(node);
@@ -357,6 +391,7 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.lineNumber = lineNumber;
             dn.parentDagNode = pdn;
             dn.astNode = node;
+            dn.options = options;
             
             if (keepNodeMatch != null && keepNodeMatch.contains(lowerClass)) {
                 dn.keepNode = true;

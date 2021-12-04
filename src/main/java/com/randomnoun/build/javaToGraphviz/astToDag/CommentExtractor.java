@@ -20,6 +20,7 @@ import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvKeepNodeComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvLiteralComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvOptionComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvStyleComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.dom.RestrictedCssStyleSheetImpl;
@@ -165,6 +166,10 @@ public class CommentExtractor {
                 String s = text.substring(12).trim();
                 comments.add(new GvKeepNodeComment(c, line, column, eolComment, s));
 
+            } else if (text.startsWith("gv-option:")) {
+                String s = text.substring(10).trim();
+                comments.add(new GvOptionComment(c, line, column, eolComment, s));
+                
             } else {
                 Matcher fgm;
                 CommentText gvc = null;
