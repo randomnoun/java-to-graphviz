@@ -26,7 +26,7 @@ public class JavaToGraphvizTest {
     @Test
     public void testControlFlowStatements() throws IOException {
         
-        testStatement("com.example.input.Expressions3");
+        testStatement("com.example.input.Expressions6");
         
         //testStatement("com.example.input.Expressions4");
         //testStatement("com.example.input.Expressions3");

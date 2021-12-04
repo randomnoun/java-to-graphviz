@@ -99,6 +99,18 @@ public class LexicalScope {
         return next;
     }
 
+    // new class, interface, inner class/interface, or anonymous class
+    public LexicalScope newTypeScope() {
+        // pretty sure everything's contained in the lambda, control-flow wise
+        LexicalScope next = new LexicalScope();
+        next.continueNode = null;
+        next.breakEdges = new ArrayList<ExitEdge>();
+        next.returnEdges = new ArrayList<ExitEdge>();
+        next.throwEdges = new ArrayList<ExitEdge>();
+        next.labeledScopes = new HashMap<String, LexicalScope>();
+        return next;
+   }
+
     
     
     
