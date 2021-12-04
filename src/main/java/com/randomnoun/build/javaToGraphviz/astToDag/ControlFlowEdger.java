@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
@@ -656,80 +657,164 @@ public class ControlFlowEdger {
      // draw the edges
         SwitchStatement ss = (SwitchStatement) switchNode.astNode;
         DagNode exprDag = getDagChild(switchNode.children, ss.getExpression(), null);
+        
+        // the statements of a switchNode interleaves SwitchCases, statements, and break statements
         List<DagNode> statementDags = getDagChildren(switchNode.children, ss.statements(), null);
-        
-        // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
-        // for (DagNode c : switchNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
-        /*
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.SwitchCase in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.ExpressionStatement in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.IfStatement in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.SwitchCase in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.ExpressionStatement in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.SwitchCase in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.ExpressionStatement in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.BreakStatement in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.SwitchCase in org.eclipse.jdt.core.dom.SwitchStatement
-[JavaToGraphviz] 08:15:22,452 INFO  com.randomnoun.build.javaToGraphviz.JavaToGraphviz4 - org.eclipse.jdt.core.dom.ExpressionStatement in org.eclipse.jdt.core.dom.SwitchStatement
-         */
-        // ^ the children of a switchNode interleaves SwitchCases, statements, and break statements
 
-        // hoist switchNode after the expression nodes
-        Rejigger rejigger = hoistNode(dag, switchNode, exprDag);
-        List<ExitEdge> ee = addExpressionEdges(dag, exprDag,  scope);
-        rejigger.unhoistNode(dag,  ee); // create exit edges below
-        
+        boolean centralSwitch = "true".equals(switchNode.options.get("centralSwitch"));
         List<ExitEdge> prevNodes = new ArrayList<>(); // the entire switch
         List<ExitEdge> casePrevNodes = new ArrayList<>(); // a single case in the switch
+        boolean hasDefaultCase = false;
         LexicalScope newScope = null;
         
-        boolean hasDefaultCase = false;
-        for (DagNode c : statementDags) {
-            if (c.type.equals("SwitchCase")) {
-                // close off last case
-                if (newScope != null) {
-                    prevNodes.addAll(newScope.breakEdges);
+        if (centralSwitch) {
+            // hoist switchNode after the expression nodes
+            Rejigger rejigger = hoistNode(dag, switchNode, exprDag);
+            List<ExitEdge> ee = addExpressionEdges(dag, exprDag,  scope);
+            rejigger.unhoistNode(dag,  ee); // create exit edges below
+            switchNode.classes.add("centralSwitch");
+            
+            for (DagNode c : statementDags) {
+                if (c.type.equals("SwitchCase")) {
+                    SwitchCase sc = (SwitchCase) c.astNode;
+                    // if apiLevel >= AST.JLS14_INTERNAL
+                    // List<DagNode> exprDags = getDagChildren(c.children, sc.expressions(), null);
+                    List<DagNode> exprDags = new ArrayList<>();
+                    if (sc.getExpression() != null) {
+                        exprDags = Collections.singletonList(getDagChild(c.children, sc.getExpression(), null));
+                    };
+                    boolean isDefaultCase = ((SwitchCase) c.astNode).getExpression() == null;
+                    c.classes.add("centralSwitch");
+                    
+                    // @TODO switchLabeledRule
+                    
+                    // close off last case
+                    if (newScope != null) {
+                        prevNodes.addAll(newScope.breakEdges);
+                    }
+                    // this starts a new 'break' scope but 'continue's continue to do whatever continues did before.
+                    newScope = scope.newBreakScope();
+                    
+                    List<ExitEdge> exprPrevNodes = new ArrayList<>();
+                    
+                    if (exprDags.size() > 0) {
+                        for (DagNode caseExprDag : exprDags) {
+                            DagEdge exprEdge = dag.addEdge(switchNode, caseExprDag);
+                            exprEdge.classes.add("case");
+                            exprPrevNodes = new ArrayList<>(addExpressionEdges(dag, caseExprDag, newScope));
+                            // @TODO link these up with || nodes
+                        }
+                    }
+                    if (isDefaultCase) {
+                        ExitEdge e = new ExitEdge();
+                        e.n1 = switchNode;
+                        e.classes.add("default");
+                        hasDefaultCase = true;
+                        exprPrevNodes.add(e);
+                    }
+                    
+                    for (ExitEdge e : exprPrevNodes) {
+                        e.n2 = c;
+                        dag.addEdge(e);
+                    }
+                    
+                    for (ExitEdge e : casePrevNodes) { // fall-through edges. maybe these should be red instead of the break edges
+                        e.n2 = c;
+                        dag.addEdge(e);
+                        e.classes.add("switch");
+                        e.classes.add("fallthrough");
+                    }
+                    casePrevNodes = new ArrayList<>();
+                    
+                    ExitEdge e = new ExitEdge();
+                    e.n1 = c;
+                    casePrevNodes.add(e);
+                    
+                } else {
+                    // any other statement is linked to the previous one, similar to a BlockStatement
+                    if (casePrevNodes.size() == 0) {
+                        logger.warn("no edges leading to statement in case. Maybe statement after a breakStatement ? ");
+                    }
+                    for (ExitEdge e : casePrevNodes) {
+                        e.n2 = c;
+                        dag.addEdge(e);
+                    }
+                    casePrevNodes = addEdges(dag, c, newScope);
                 }
-
-                // pretty sure default needs to be the last case but maybe not
-                boolean isDefaultCase = ((SwitchCase) c.astNode).getExpression() == null;               
-
-                // start a new one
-                DagEdge caseEdge = dag.addEdge(switchNode, c, null); // case expression
-                caseEdge.classes.add("case");
-                if (isDefaultCase) {
-                    caseEdge.classes.add("default");
-                }
-                
-                for (ExitEdge e : casePrevNodes) { // fall-through edges. maybe these should be red instead of the break edges
-                    e.n2 = c;
-                    dag.addEdge(e);
-                    e.classes.add("switch");
-                    e.classes.add("fallthrough");
-                }
-                casePrevNodes = new ArrayList<>();
-
-                // this starts a new 'break' scope but 'continue's continue to do whatever continues did before.
-                newScope = scope.newBreakScope();
-                
-                hasDefaultCase = hasDefaultCase || isDefaultCase; 
-                
-                
-                ExitEdge e = new ExitEdge();
-                e.n1 = c;
-                casePrevNodes.add(e);
-                
-            } else {
-                // any other statement is linked to the previous one, similar to a BlockStatement
-                if (casePrevNodes.size() == 0) {
-                    logger.warn("no edges leading to statement in case. Maybe statement after a breakStatement ? ");
-                }
-                for (ExitEdge e : casePrevNodes) {
-                    e.n2 = c;
-                    dag.addEdge(e);
-                }
-                casePrevNodes = addEdges(dag, c, newScope);
             }
+            
+        } else {
+                
+            // hoist switchNode after the expression nodes
+            Rejigger rejigger = hoistNode(dag, switchNode, exprDag);
+            List<ExitEdge> ee = addExpressionEdges(dag, exprDag,  scope);
+            List<ExitEdge> noCasePrevNodes = rejigger.unhoistNode(dag,  ee); // create exit edges below
+            
+            
+            for (DagNode c : statementDags) {
+                if (c.type.equals("SwitchCase")) {
+                    SwitchCase sc = (SwitchCase) c.astNode;
+                    // if apiLevel >= AST.JLS14_INTERNAL
+                    // List<DagNode> exprDags = getDagChildren(c.children, sc.expressions(), null);
+                    List<DagNode> exprDags = new ArrayList<>();
+                    if (sc.getExpression() != null) {
+                        exprDags = Collections.singletonList(getDagChild(c.children, sc.getExpression(), null));
+                    };
+                    boolean isDefaultCase = ((SwitchCase) c.astNode).getExpression() == null;
+                    // @TODO switchLabeledRule
+                    
+                    // close off last case
+                    if (newScope != null) {
+                        prevNodes.addAll(newScope.breakEdges);
+                    }
+                    // this starts a new 'break' scope but 'continue's continue to do whatever continues did before.
+                    newScope = scope.newBreakScope();
+                    if (exprDags.size() > 0) {
+                        for (DagNode caseExprDag : exprDags) {
+                            for (ExitEdge e : noCasePrevNodes) {
+                                e.n2 = caseExprDag;
+                                dag.addEdge(e);
+                            }
+                            noCasePrevNodes = new ArrayList<>(addExpressionEdges(dag, caseExprDag, newScope));
+                            // @TODO link these up with || nodes
+                        }
+                    }
+                    for (DagEdge e : noCasePrevNodes) {
+                        e.n2 = c;
+                        dag.addEdge(e);
+                    }
+                    for (ExitEdge e : casePrevNodes) { // fall-through edges from previous case
+                        e.classes.add("switch");
+                        e.classes.add("fallthrough");
+                    }
+                    ExitEdge ce = new ExitEdge();
+                    ce.n1 = c;
+                    ce.classes.add("switchCase");
+                    ce.classes.add("true");
+                    casePrevNodes.add(ce);
+                    
+                    
+                    ExitEdge noCe = new ExitEdge();
+                    noCe.n1 = c;
+                    noCe.classes.add("switchCase");
+                    noCe.classes.add("false");
+                    noCasePrevNodes = new ArrayList<>();
+                    noCasePrevNodes.add(noCe);
+                    
+                } else {
+                    // any other statement is linked to the previous one, similar to a BlockStatement
+                    if (casePrevNodes.size() == 0) {
+                        logger.warn("no edges leading to statement in case. Maybe statement after a breakStatement ? ");
+                    }
+                    for (ExitEdge e : casePrevNodes) {
+                        e.n2 = c;
+                        dag.addEdge(e);
+                    }
+                    casePrevNodes = new ArrayList<>(addEdges(dag, c, newScope));
+                }
+            }
+            // @TODO add noCasePrevNodes to casePrevNodes here ?
+            
         }
         
         // edges out of the final case are also edges out of the switch

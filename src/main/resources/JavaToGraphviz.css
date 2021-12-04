@@ -340,11 +340,22 @@ edge.do.start { } /* into repeating block */
 
 edge.case { gv-labelFormat: "case"; }
 edge.case.default { gv-labelFormat: "default"; }
+
+node.switchCase:not(.centralSwitch) { 
+	gv-idFormat: "case_${lineNumber}";
+	gv-labelFormat: "case ?";
+    gv-wordwrap: 20;
+    shape : diamond; 
+}
+edge.switchCase.true { gv-labelFormat: "Y"; }
+edge.switchCase.false { gv-labelFormat: "N"; } 
+
+
 edge.switch.fallthrough { } /* fall through from case block to next case */
 edge.switch.false { } /* no case conditions match, and no default present */
 
 /** If edges are in a subcluster, use xlabel rather than label otherwise graphviz double-spaces and triple-spaces the nodes */
-
+/*
 subgraph subgraph edge.break { gv-labelFormat: unset; gv-xlabelFormat: "break ${breakLabel}"; }
 subgraph subgraph edge.continue { gv-labelFormat: unset; gv-xlabelFormat: "continue ${continueLabel}"; }
 subgraph subgraph edge.return { gv-labelFormat: unset; gv-xlabelFormat: "return"; }
@@ -358,7 +369,7 @@ subgraph subgraph edge.while.true { gv-labelFormat: unset; gv-xlabelFormat: "Y";
 subgraph subgraph edge.while.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
 subgraph subgraph edge.case { gv-labelFormat: unset; gv-xlabelFormat: "case"; }
 subgraph subgraph edge.case.default { gv-labelFormat: unset; gv-xlabelFormat: "default"; }
-
+*/
 
 
 
