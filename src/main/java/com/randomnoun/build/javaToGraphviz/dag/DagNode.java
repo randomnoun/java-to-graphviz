@@ -81,7 +81,7 @@ public class DagNode {
         String a = "";
         for (Entry<String, String> e : gvStyles.entrySet()) {
             if (!e.getKey().startsWith("gv-")) {  // gv-wordwrap
-                a += "      " + e.getKey() + " = " + e.getValue() + ";\n";
+                a += "    " + e.getKey() + " = " + e.getValue() + ";\n";
             }
         }
         
