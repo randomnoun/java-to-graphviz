@@ -420,7 +420,7 @@ public class DagStyleApplier {
         } else if (labelFormat != null && idFormat != null && idFormat.contains("${label}") && labelFormat.contains("${id}")) {
             throw new IllegalArgumentException("circular dependency between gv-idFormat '" + idFormat + "' and gv-labelFormat '" + labelFormat + "'");
         } else {
-            idFirst = labelFormat == null || !labelFormat.contains("${id}");
+            idFirst = labelFormat == null || labelFormat.contains("${id}");
         }
         
         
@@ -432,7 +432,8 @@ public class DagStyleApplier {
                     throw new IllegalArgumentException("invalid gv-idFormat '" + idFormat + "'; expected double-quoted string");
                 }
                 vars.put("label", label == null ? "NOLABEL" : label );
-                result[0] = dag.getUniqueName(Text.substitutePlaceholders(vars, idFormat));
+                id = dag.getUniqueName(Text.substitutePlaceholders(vars, idFormat));
+                result[0] = id;
             }
             if ((( j==1 ) == idFirst) && (label == null && labelFormat != null)) {
                 if (labelFormat.startsWith("\"") && labelFormat.endsWith("\"")) {
@@ -441,7 +442,8 @@ public class DagStyleApplier {
                     throw new IllegalArgumentException("invalid gv-labelFormat '" + labelFormat + "'; expected double-quoted string");
                 }
                 vars.put("id",  id == null ? "NOID" : id);
-                result[1] = Text.substitutePlaceholders(vars, labelFormat).trim();
+                label = Text.substitutePlaceholders(vars, labelFormat).trim();
+                result[1] = label;
             }
         }
         return result;
