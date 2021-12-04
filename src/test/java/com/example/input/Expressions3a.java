@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 /** method reference and inner class test cases
  * 
  */
-public class Expressions3 {
+public class Expressions3a {
 
     public class MyNumber {
         long i;
@@ -28,7 +28,7 @@ public class Expressions3 {
             return ((Math.random() > 0.5) ? thisGetter : superGetter).get();
         }
         public void qualifiedThis() {
-            Expressions3.this.testExpressions();
+            Expressions3a.this.testExpressions();
         }
         public Long callSuperMethod() {
             return super.getNumber();
