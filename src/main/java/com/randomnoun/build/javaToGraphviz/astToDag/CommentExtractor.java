@@ -18,6 +18,7 @@ import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvKeepNodeComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvLiteralComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvStyleComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
@@ -94,9 +95,11 @@ public class CommentExtractor {
 	/** Return a list of processed comments from the source file. 
 	 * 
 	 * GvStyleComment:    "// gv-style: { xxx }"
+	 * GvKeepNodeComment: "// gv-keepNode: xxx"
+	 * GvLiteralComment:  "// gv-literal:  xxx"
 	 * GvDigraphComment:  "// gv-graph:    xxx"
 	 * GvSubgraphComment: "// gv-subgraph: xxx"
-	 * GvComment:         "// gv.className.className.className: xxx { xxx }"
+	 * GvComment:         "// gv.className.className.className#id: xxx { xxx }"
 	 * 
 	 * @param cu
 	 * @param src
@@ -157,7 +160,11 @@ public class CommentExtractor {
             } else if (text.startsWith("gv-literal:")) {
                 String s = text.substring(11).trim();
                 comments.add(new GvLiteralComment(c, line, column, eolComment, s));
-                    
+
+            } else if (text.startsWith("gv-keepNode:")) {
+                String s = text.substring(12).trim();
+                comments.add(new GvKeepNodeComment(c, line, column, eolComment, s));
+
             } else {
                 Matcher fgm;
                 CommentText gvc = null;

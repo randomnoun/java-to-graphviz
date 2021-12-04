@@ -1,5 +1,6 @@
 package com.randomnoun.build.javaToGraphviz.astToDag;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvKeepNodeComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvLiteralComment;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
@@ -55,6 +57,7 @@ public class AstToDagVisitor extends ASTVisitor {
     int nextLineFromLine = 0;
     List<GvComment> nextLineComments = new ArrayList<>(); 
     List<GvComment> nextDagComments = new ArrayList<>();
+    List<String> keepNodeMatch = null;
     
     
     // Map of line number -> list of ASTs that start / end on that line
@@ -140,6 +143,7 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.hasComment = true;
         }
         dn.gvComments.add(gc);
+        dn.keepNode = true;
     }
     
     
@@ -197,6 +201,9 @@ public class AstToDagVisitor extends ASTVisitor {
             } else if (ct instanceof GvLiteralComment) {
                 logger.warn("gv-literal outside of method");
 
+            } else if (ct instanceof GvKeepNodeComment) {
+                GvKeepNodeComment knc =  ((GvKeepNodeComment) ct);
+                keepNodeMatch = Arrays.asList(knc.text.trim().split("\\s+"));
             }
             
             lastIdx ++; 
@@ -287,7 +294,11 @@ public class AstToDagVisitor extends ASTVisitor {
                 dn.classes.add("gv-literal");
                 dn.skipNode = true;
                 
+            } else if (ct instanceof GvKeepNodeComment) {
+                GvKeepNodeComment knc =  ((GvKeepNodeComment) ct);
+                keepNodeMatch = Arrays.asList(knc.text.trim().split("\\s+"));
             }
+
 
             if (dn != null && dn != currentLineDn) {
                 if (pdn!=null) {
@@ -330,8 +341,9 @@ public class AstToDagVisitor extends ASTVisitor {
             DagNode dn = new DagNode();
             String clazz = Text.getLastComponent(node.getClass().getName());
             if (clazz.endsWith("Statement") && !clazz.equals("ExpressionStatement")) {
-                clazz = clazz.substring(0, clazz.length() - 9);
+                clazz = clazz.substring(0, clazz.length() - 9); // @TODO remove this and update the css to match
             }
+            String lowerClass = Text.toFirstLower(clazz);
             
             // ok we treat all Expressions as DagNodes here so we can edge them up later
             // and then if it turns out that we're not edging them, we bubble up any comments associated with
@@ -340,11 +352,15 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.type = clazz; // "if";
             dn.name = null;
             dn.label = null; // now set by gv-labelFormat
-            dn.classes.add(Text.toFirstLower(clazz));
+            dn.classes.add(lowerClass);
             
             dn.lineNumber = lineNumber;
             dn.parentDagNode = pdn;
             dn.astNode = node;
+            
+            if (keepNodeMatch != null && keepNodeMatch.contains(lowerClass)) {
+                dn.keepNode = true;
+            }
 
             if (node instanceof TypeDeclaration) {
                 // comments get assigned to this node
