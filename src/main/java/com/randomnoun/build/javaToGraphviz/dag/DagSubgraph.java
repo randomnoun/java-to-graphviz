@@ -11,8 +11,9 @@ import java.util.Map.Entry;
 import com.randomnoun.common.Text;
 
 // a DagSubgraph is a graphviz graph ( if container == null)
-// or a graphviz subgraph 
-public class DagSubgraph  {
+// or a graphviz subgraph
+
+public class DagSubgraph {
     public Dag dag; // top-level dag
     public DagSubgraph container; // if null, this is a root graph
     
@@ -26,6 +27,7 @@ public class DagSubgraph  {
     
     // styles after css rules have been applied
     public Map<String, String> gvStyles = new HashMap<>();
+    // gvGraphStyles ?
     public Map<String, String> gvNodeStyles = new HashMap<>();
     public Map<String, String> gvEdgeStyles = new HashMap<>();
 
