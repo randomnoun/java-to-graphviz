@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.LabeledStatement;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.MethodReference;
@@ -212,28 +213,29 @@ public class ControlFlowEdger {
         // CompilationUnit cu = methodBlock.astNode.getParent();
         CompilationUnit cu = ASTResolving.findParentCompilationUnit(methodBlock.astNode);
         int endOfMethodLine = cu.getLineNumber(methodBlock.astNode.getStartPosition() + methodBlock.astNode.getLength());
-        DagNode rn = new DagNode();
-        rn.keepNode = true; // always keep comments
-        rn.type = "return"; // label this 'end' if it's a void method ?
-        rn.lineNumber = endOfMethodLine;
+        DagNode returnNode = new DagNode();
+        returnNode.keepNode = true; // always keep comments
+        returnNode.type = "return"; // label this 'end' if it's a void method ?
+        returnNode.lineNumber = endOfMethodLine;
         // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
-        rn.classes.add("method");
-        rn.classes.add("end");
+        returnNode.classes.add("method");
+        returnNode.classes.add("end");
         // rn.label = "return";
-        rn.astNode = null;
+        returnNode.astNode = null;
+        method.children.add(returnNode); // keep the return node in the method grouping
         
         DagSubgraph sg = dag.dagNodeToSubgraph.get(method);
-        dag.addNode(sg, rn);
+        dag.addNode(sg, returnNode);
         
         for (ExitEdge e : lexicalScope.returnEdges) {
-            e.n2 = rn;
+            e.n2 = returnNode;
             dag.addEdge(e);
         }
         
         // and everything that was thrown connects to this node as well
         if (includeThrowEdges) { 
             for (ExitEdge e : lexicalScope.throwEdges) {
-                e.n2 = rn;
+                e.n2 = returnNode;
                 dag.addEdge(e);
             }
         }
@@ -242,7 +244,7 @@ public class ControlFlowEdger {
         
         // and everything flowing out of the first block connects to this node as well
         for (ExitEdge e : ee) {
-            e.n2 = rn;
+            e.n2 = returnNode;
             dag.addEdge(e);
         }
         
@@ -836,6 +838,8 @@ public class ControlFlowEdger {
         } else if (node.type.equals("ClassInstanceCreation")) {
             return addClassInstanceCreationEdges(dag, node, scope);
 
+        } else if (node.type.equals("LambdaExpression")) {
+            return addLambdaExpressionEdges(dag, node, scope);
             
             
         } else {
@@ -853,6 +857,82 @@ public class ControlFlowEdger {
         
     }
 
+    private List<ExitEdge> addLambdaExpressionEdges(Dag dag, DagNode lambdaNode, LexicalScope scope) {
+        // lambda expression is going to be a big like a method declaration in the middle of a method.
+        // but has an exit edge 
+    
+        LambdaExpression le = (LambdaExpression) lambdaNode.astNode;
+        // method.label = "method " + md.getName();
+        // method.gvAttributes.put("methodName",  md.getName().toString());
+        
+        // we don't create nodes for method parameters yet, so not going to do that for lambdas either
+        // (maybe we should ? )
+        
+        // when a lambda is defined control flow doesn't pass to the block, 
+        // so maybe I skip all of that somehow. OK so let's create an edge so it's grouped together but hide it in the diagram.
+        
+        DagNode blockNode = lambdaNode.children.get(lambdaNode.children.size() - 1);
+        DagEdge lambdaEntryEdge = dag.addEdge(lambdaNode, blockNode);
+        lambdaEntryEdge.classes.add("lambdaEntry");
+
+        // @TODO these probably need a new lexical scope
+        LexicalScope lexicalScope = scope.newLambdaScope(); 
+        
+        List<ExitEdge> ee;
+        if (blockNode.type.equals("Block")) {
+            ee = addBlockEdges(dag, blockNode, lexicalScope);
+        } else if (blockNode.astNode instanceof Expression) {
+            ee = addExpressionEdges(dag, blockNode, lexicalScope);
+        } else {
+            throw new IllegalStateException("expected Block or Expression in lambda");
+        }
+
+        // add a node which all the return edges return to
+        // this is an artificial node so maybe only construct it based on some gv declaration earlier on ?
+        // (whereas all the other nodes are about as concrete as anything else in IT)
+        
+        // CompilationUnit cu = methodBlock.astNode.getParent();
+        CompilationUnit cu = ASTResolving.findParentCompilationUnit(le);
+        int endOfLambdaLine = cu.getLineNumber(le.getStartPosition() + le.getLength());
+        DagNode returnNode = new DagNode();
+        returnNode.keepNode = true; // always keep comments
+        returnNode.type = "return"; // label this 'end' if it's a void method ?
+        returnNode.lineNumber = endOfLambdaLine;
+        // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
+        returnNode.classes.add("lambdaExpression");
+        returnNode.classes.add("end");
+        // rn.label = "return";
+        returnNode.astNode = null;
+        lambdaNode.children.add(returnNode); // include the artificial return inside the lambda grouping
+        
+        DagSubgraph sg = dag.dagNodeToSubgraph.get(lambdaNode);
+        dag.addNode(sg, returnNode);
+        
+        for (ExitEdge e : lexicalScope.returnEdges) {
+            e.n2 = returnNode;
+            dag.addEdge(e);
+        }
+        for (ExitEdge e : ee) {
+            e.n2 = returnNode;
+            dag.addEdge(e);
+        }
+        
+        // and everything that was thrown connects to this node as well
+        if (includeThrowEdges) { 
+            for (ExitEdge e : lexicalScope.throwEdges) {
+                e.n2 = returnNode;
+                dag.addEdge(e);
+            }
+        }
+        
+        // there's no exit edges out of a method
+        ExitEdge e = new ExitEdge();
+        e.n1 = returnNode; // this gets truncated to the subgraph boundary in some css
+        return Collections.singletonList(e);
+        
+    }
+    
+    
     private List<ExitEdge> addLiteralExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
         String literalValue = null;
         switch (node.type) {
