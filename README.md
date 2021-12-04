@@ -5,9 +5,9 @@
 This is the sort of thing you might want to do when you take a look at some piece of code and realise it's a completely 
 unmaintainable mess but it still needs to be documented somehow.
 
-It uses the eclipse parser, so should be able to handle the newer java language features. Probably.
-Haven't tried lambdas or inner classes on this thing yet. That'll be a lark.
-I'm aware inner classes were added back in the java 1.2 era so probably isn't considered a new language feature any more.
+It uses the eclipse parser, so should be able to handle the newer java language features, 
+such as lambdas and inner classes. I'm aware inner classes were added back in the java 1.2 era so 
+probably isn't considered a new language feature any more.
 
 Anyway. You can annotate the generated diagram using specially-formatted comments, because I think annotations
 are an abomination. You can probably use annotations as well later on once I've implemented that.
@@ -124,5 +124,16 @@ So a few things I want to be able to support
 * seeing I"m going to the trouble of creating a DOM to apply styles maybe dump that as well, &/or the AST tree. apply styles to AST nodes vs dag nodes ?
 * bunch up the exit nodes if there's lots of them
 * lambdas, fluent methods
+
+URLs to throw around in the description:
+
+programcreek sample code to extract comments: 
+https://www.programcreek.com/2013/03/get-internal-comments-by-using-eclipse-jdt-astparser/ 
+the good ol' java 1.5 javacc grammar :
+https://github.com/javacc/javacc/blob/master/examples/JavaGrammars/1.5/Java1.5.jj
+a wayback copy of grammars of yesteryear:
+https://web.archive.org/web/20130128033907/http://java.net/projects/javacc/downloads?page=2&path%5B%5D=contrib&path%5B%5D=grammars&theme=java.net
+sketchviz: https://sketchviz.com/new
+
 
 

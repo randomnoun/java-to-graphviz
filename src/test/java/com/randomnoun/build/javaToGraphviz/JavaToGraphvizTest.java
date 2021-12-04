@@ -26,39 +26,33 @@ public class JavaToGraphvizTest {
     @Test
     public void testControlFlowStatements() throws IOException {
         
-        testStatement("com.example.input.Expressions6");
-        
-        //testStatement("com.example.input.Expressions4");
-        //testStatement("com.example.input.Expressions3");
-        //testStatement("com.example.input.Expressions2");
-        
-        // testStatement("com.example.input.Expressions1");
-        // testStatement("com.example.input.Expressions");
-        
-        /*
         testStatement("com.example.input.MethodChain");
-        
-        
         
         testStatement("com.example.input.IfStatementFlip");
         testStatement("com.example.input.ContinueBreakRank");
-        testStatement("com.example.input.TryCatchStatement");
-        
         testStatement("com.example.input.ContinueBreakLabel");
         
         testStatement("com.example.input.DoStatement");
-         testStatement("com.example.input.ForStatement");
-         testStatement("com.example.input.IfStatement");
-         testStatement("com.example.input.IfStatementExternalCss");
-         testStatement("com.example.input.SwitchStatement");
-         testStatement("com.example.input.WhileStatement");
+        testStatement("com.example.input.ForStatement");
+        testStatement("com.example.input.IfStatement");
+        testStatement("com.example.input.IfStatementExternalCss");
+        testStatement("com.example.input.SwitchStatement");
+        testStatement("com.example.input.WhileStatement");
+        testStatement("com.example.input.SynchronizeStatement");
+        testStatement("com.example.input.TryCatchStatement");
         
-         
-         testStatement("com.example.input.SynchronizeStatement");
-         testStatement("com.example.input.MultipleGraphs"); 
+        testStatement("com.example.input.MultipleGraphs"); 
         testStatement("com.example.input.UserDefinedSubgraphs");
         testStatement("com.example.input.CommentAttribution");
-        */
+        
+        testStatement("com.example.input.Expressions");
+        testStatement("com.example.input.Expressions1");
+        testStatement("com.example.input.Expressions2");
+        testStatement("com.example.input.Expressions3a");
+        testStatement("com.example.input.Expressions3b");
+        testStatement("com.example.input.Expressions4");
+        testStatement("com.example.input.Expressions5");
+        testStatement("com.example.input.Expressions6");
 
     }
     
