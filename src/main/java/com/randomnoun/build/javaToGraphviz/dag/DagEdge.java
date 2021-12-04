@@ -18,6 +18,7 @@ public class DagEdge {
     public Set<String> classes = new HashSet<>();
     
     public Map<String, String> gvStyles = new HashMap<>();
+    public Map<String, Object> gvObjectStyles = new HashMap<>();
     public boolean back = false;
 
     public String toGraphviz() {
@@ -28,11 +29,22 @@ public class DagEdge {
                 a += "    " + e.getKey() + " = " + e.getValue() + ";\n";
             }
         }
+        // resolve dag objects to names of those objects
+        for (Entry<String, Object> e : gvObjectStyles.entrySet()) {
+            if (!e.getKey().startsWith("gv-")) {
+                if (e.getValue() instanceof DagSubgraph) {
+                    a += "    " + e.getKey() + " = " + ((DagSubgraph) e.getValue()).name + ";\n";
+                } else {
+                    throw new IllegalStateException("unexpected object " + e.getValue().getClass().getName() + " in gvObjectStyles");
+                }
+            }
+        }
+        
 
         return "  " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
             " -> " + 
             n2.name + // (n2Port == null ? "" : ":" + n2Port) + 
-            (label == null && gvStyles.size() == 0? "" : 
+            (label == null && a.equals("") ? "" : 
                 " [\n" +
                 (label == null ? "" : "    label=\"" + labelText + "\";\n") +
                 a +
