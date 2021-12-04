@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -322,7 +323,8 @@ public class AstToDagVisitor extends ASTVisitor {
             (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
             node instanceof Expression || // inside ExpressionStatements
             node instanceof VariableDeclaration ||
-            node instanceof TypeDeclaration
+            node instanceof TypeDeclaration ||
+            node instanceof AnonymousClassDeclaration
             ) {
             
             DagNode dn = new DagNode();
