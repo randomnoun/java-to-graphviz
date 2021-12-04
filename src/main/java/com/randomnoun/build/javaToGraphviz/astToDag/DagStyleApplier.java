@@ -83,9 +83,13 @@ public class DagStyleApplier {
         resetDomStyles(document);
         applyDomStyles(document, stylesheet);
         List<DagElement> elementsToCreateSubgraphsInside = getElementsWithStyleProperty(document, "gv-newSubgraph", "true");
+        List<DagElement> elementsToCreateSubgraphsInside2 = getElementsWithStyleProperty(document, "gv-ohAndTheEdgesConnectToTheSubgraph", "true");
+        
         List<DagElement> elementsToCreateSubgraphsFrom = getElementsWithStyleProperty(document, "gv-beginOuterSubgraph", "true");
         List<DagElement> elementsToCreateSubgraphsTo = getElementsWithStyleProperty(document, "gv-endOuterSubgraph", "true");
 
+        
+        
         // and construct CSS-defined subgraphs. gv-newSubgraph creates subgraphs under the node so that 
         //   node.method > subgraph 
         // CSS rules match. 
@@ -115,7 +119,30 @@ public class DagStyleApplier {
             outsideEl.appendChild(newSgEl);
 
             // moves the nodes in the dag subgraphs
-            moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, outsideNode);  
+            moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, outsideNode);
+            
+            if (elementsToCreateSubgraphsInside2.contains(outsideEl)) {
+                // outsideEl.addClass("red");
+                // outsideNode.classes.add("red");
+                List<DagEdge> inEdges = new ArrayList<>();
+                List<DagEdge> outEdges = new ArrayList<>();
+                
+                // don't need to check subgraphs of subgraphs
+                // actually maybe I do now
+                for (DagEdge e : dag.edges) {
+                    if (newSg.nodes.contains(e.n1) && !newSg.nodes.contains(e.n2)) { outEdges.add(e); }
+                    if (newSg.nodes.contains(e.n2) && !newSg.nodes.contains(e.n1)) { inEdges.add(e); }
+                }
+                for (DagEdge e : outEdges) {
+                    // e.n1 = newSg; // needs to be node -> node, not subgraph -> node
+                    // instead, outgoing edges need 'ltail' with the name of the source subgraph
+                    e.gvObjectStyles.put("ltail", newSg); // don't know the name of this subgraph yet
+                }
+                for (DagEdge e : inEdges) {
+                    e.gvObjectStyles.put("lhead", newSg); // don't know the name of this subgraph yet
+                }
+                
+            }
         }
         
         
