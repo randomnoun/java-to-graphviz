@@ -361,8 +361,7 @@ public class AstToDagVisitor extends ASTVisitor {
             if (pdn!=null) {
                 pdn.addChild(dn);
             } else {
-                // logger.warn("null pdn on " + node);
-                logger.warn("preVisit: null pdn on " + dn.type + " on line " + dn.lineNumber);
+                logger.debug("preVisit: null pdn on " + dn.type + " on line " + dn.lineNumber);
                 // each typeDeclaration is it's own subgraph
                 dag.addRootNode(dn);
             }

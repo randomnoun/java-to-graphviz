@@ -460,7 +460,7 @@ public class DagStyleApplier {
     public void moveToSubgraph(DagSubgraph sg, DagElement sgEl, Dag dag,  Map<DagNode, DagElement> dagNodesToElements, DagNode node) {
         if (dag.dagNodeToSubgraph.containsKey(node)) {
             // throw new IllegalStateException("subgraph already contains node");
-            logger.warn("moving node to new subgraph");
+            // logger.warn("moving node to new subgraph");
             dag.dagNodeToSubgraph.get(node).nodes.remove(node);
         }
         sg.nodes.add(node);
@@ -512,10 +512,10 @@ public class DagStyleApplier {
     }
     
     private void applyDomStyles(Document document, CSSStyleSheet stylesheet) {
-        logger.info("before styles: " + document.toString());
+        logger.debug("before styles: " + document.toString());
         StylesheetApplier applier = new StylesheetApplier(document, stylesheet);
         applier.apply();
-        logger.info("after styles: " + document.toString());
+        logger.debug("after styles: " + document.toString());
     }
     
     private void setDagStyles(Document document, CSSStyleSheet stylesheet, boolean setIds) {
@@ -545,14 +545,14 @@ public class DagStyleApplier {
                         for (int i=0; i<declaration.getLength(); i++) {
                             String prop = declaration.item(i);
                             if (tagName.equals("graph") || tagName.equals("subgraph")) {
-                                logger.info("setting graph prop " + prop + " to " + declaration.getPropertyValue(prop));
+                                logger.debug("setting graph prop " + prop + " to " + declaration.getPropertyValue(prop));
                                 dagSubgraph.gvStyles.put(prop,  declaration.getPropertyValue(prop));
 
                             } else if (tagName.equals("graphNode")) {
-                                logger.info("setting graphNode prop " + prop + " to " + declaration.getPropertyValue(prop));
+                                logger.debug("setting graphNode prop " + prop + " to " + declaration.getPropertyValue(prop));
                                 dagSubgraph.gvNodeStyles.put(prop,  declaration.getPropertyValue(prop));
                             } else if (tagName.equals("graphEdge")) {
-                                logger.info("setting graphEdge prop " + prop + " to " + declaration.getPropertyValue(prop));
+                                logger.debug("setting graphEdge prop " + prop + " to " + declaration.getPropertyValue(prop));
                                 dagSubgraph.gvEdgeStyles.put(prop,  declaration.getPropertyValue(prop));
                             }
                         }
@@ -563,7 +563,7 @@ public class DagStyleApplier {
                     } else if (dagNode != null) {
                         for (int i=0; i<declaration.getLength(); i++) {
                             String prop = declaration.item(i);
-                            logger.info("setting " + dagNode.name + " prop " + prop + " to " + declaration.getPropertyValue(prop));
+                            logger.debug("setting " + dagNode.name + " prop " + prop + " to " + declaration.getPropertyValue(prop));
                             dagNode.gvStyles.put(prop,  declaration.getPropertyValue(prop));
                         }
                         if (setIds) {
@@ -572,7 +572,7 @@ public class DagStyleApplier {
                     } else if (dagEdge != null) {
                         for (int i=0; i<declaration.getLength(); i++) {
                             String prop = declaration.item(i);
-                            logger.info("setting dagEdge prop " + prop + " to " + declaration.getPropertyValue(prop));
+                            logger.debug("setting dagEdge prop " + prop + " to " + declaration.getPropertyValue(prop));
                             dagEdge.gvStyles.put(prop,  declaration.getPropertyValue(prop));
                         }
                         if (setIds) {

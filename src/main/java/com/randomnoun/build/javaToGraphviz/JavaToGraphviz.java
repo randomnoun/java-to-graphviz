@@ -1,12 +1,9 @@
 package com.randomnoun.build.javaToGraphviz;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,16 +22,12 @@ import com.randomnoun.build.javaToGraphviz.astToDag.CommentExtractor;
 import com.randomnoun.build.javaToGraphviz.astToDag.ControlFlowEdger;
 import com.randomnoun.build.javaToGraphviz.astToDag.DagNodeFilter;
 import com.randomnoun.build.javaToGraphviz.astToDag.DagStyleApplier;
-import com.randomnoun.build.javaToGraphviz.astToDag.ExpressionEdger;
 import com.randomnoun.build.javaToGraphviz.astToDag.LexicalScope;
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
-import com.randomnoun.build.javaToGraphviz.dag.ExitEdge;
 import com.randomnoun.common.StreamUtil;
-import com.randomnoun.common.Text;
-import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 // so the next bit is going to be styling
 // and supporting more types of statements
@@ -232,9 +225,15 @@ public class JavaToGraphviz {
                         ControlFlowEdger edger = new ControlFlowEdger(dag);
                         edger.setIncludeThrowEdges(includeThrowEdges);
                         edger.addEdges(dag, methodNode, lexicalScope);
+                    
                     } else if (edgerName.equals("ast")) {
                         AstEdger edger = new AstEdger(dag);
-                        edger.addEdges(dag,  methodNode, lexicalScope);
+                        edger.addEdges(dag, methodNode, lexicalScope);
+                    
+                    // @TODO data-flow
+                        
+                    } else {
+                        throw new IllegalArgumentException("unknown edgerName '" + edgerName + "'");
                     }
                 }
 
@@ -242,7 +241,7 @@ public class JavaToGraphviz {
                     DagNodeFilter filter = new DagNodeFilter(dag);
                     methodNode.keepNode = false;
                     filter.setLastKeepNode(methodNode, methodNode);
-                    filter.removeNodes(methodNode); // peephole node removal.
+                    filter.removeNodes(methodNode);
                 }
             }
         }

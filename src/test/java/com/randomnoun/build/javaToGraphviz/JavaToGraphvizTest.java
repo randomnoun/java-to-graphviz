@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -20,7 +21,9 @@ public class JavaToGraphvizTest {
     @BeforeClass 
     public static void beforeAllTestMethods() {
         Log4jCliConfiguration lcc = new Log4jCliConfiguration();
-        lcc.init("[JavaToGraphvizTest]", null);
+        Properties props = new Properties();
+        props.put("log4j.rootCategory", "INFO, CONSOLE");
+        lcc.init("[JavaToGraphvizTest]", props);
     }
     
     @Test
@@ -69,7 +72,7 @@ public class JavaToGraphvizTest {
         
         JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
         javaToGraphviz.setBaseCssUrl("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
-        // javaToGraphviz.setRemoveNode(true);
+        javaToGraphviz.setRemoveNode(true);
         javaToGraphviz.parse(fis, "UTF-8");
         fis.close();
         
@@ -79,7 +82,7 @@ public class JavaToGraphvizTest {
         do {
             StringWriter sw = new StringWriter();
             hasNext = javaToGraphviz.writeGraphviz(sw);
-            logger.info(sw.toString());
+            // logger.info(sw.toString());
             
             if (WRITE_EXPECTED_OUTPUT) {
                 File tf = new File("src/test/resources/expected-output/" + className + "-" + idx + ".dot");            

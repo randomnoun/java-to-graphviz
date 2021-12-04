@@ -47,7 +47,7 @@ public class CommentExtractor {
         boolean hasColon = fgm.group(0).endsWith(":");
         boolean eolComment = (c instanceof LineComment);
         String dir = null;
-        logger.info("group0 " + fgm.group(0));
+        logger.debug("group0 " + fgm.group(0));
         if (fgm.group(1)!=null) {
             char ch = fgm.group(1).charAt(0);
             if (ch == '#') {
@@ -247,8 +247,9 @@ public class CommentExtractor {
             }
         }
         
-        
-        logger.info("here's the css: " + css);
+        if (logger.isDebugEnabled()) {
+            logger.debug("here's the css: " + css);
+        }
         
         // pre-process the // comments out of the block comments, which isn't standard CSS
         
@@ -263,7 +264,9 @@ public class CommentExtractor {
         // or provide my own URI handler and set a weird base URI 
         // stylesheetImpl.importImports(true); // recursive = true
         restrictedStylesheetImpl.importImports(true);
-        logger.info("CSS rules: " + restrictedStylesheetImpl.getCssText());
+        if (logger.isDebugEnabled()) {
+            logger.debug("CSS rules: " + restrictedStylesheetImpl.getCssText());
+        }
         
         return restrictedStylesheetImpl;
     }
