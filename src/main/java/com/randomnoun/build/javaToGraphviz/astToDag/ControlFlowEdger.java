@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
@@ -15,6 +14,7 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -26,6 +26,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
@@ -40,6 +41,7 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
@@ -51,6 +53,7 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -130,19 +133,24 @@ public class ControlFlowEdger {
             return addReturnEdges(dag, node, scope);
         } else if (node.type.equals("Throw")) {
             return addThrowEdges(dag, node, scope);
+        } else if (node.type.equals("CatchClause")) {
+            return addCatchClauseEdges(dag, node, scope);
         } else if (node.type.equals("Labeled")) {
             return addLabeledStatementEdges(dag, node, scope);
         } else if (node.type.equals("ExpressionStatement")) {
             return addExpressionStatementEdges(dag, node, scope);
         } else if (node.type.equals("VariableDeclaration")) {
             return addVariableDeclarationStatementEdges(dag, node, scope);
-            
+        } else if (node.type.equals("SingleVariableDeclaration")) {
+            return addSingleVariableDeclarationEdges(dag, node, scope);
+
         // goto will be considered tedious if I have to do that. ho ho ho.
             
         } else if (node.type.equals("Assert") ||
-          node.type.equals("ConstructorInvocation") ||
+          node.type.equals("Empty") ||
+          node.type.equals("ConstructorInvocation") || // @TODO edge these
           node.type.equals("EmptyStatement") ||
-          node.type.equals("SuperConstructorInvocation") ||
+          node.type.equals("SuperConstructorInvocation") || // @TODO and these
           node.type.equals("comment")) { // lower-case c for nodes created from gv comments
             // non-control flow statement
             ExitEdge e = new ExitEdge();
@@ -162,6 +170,7 @@ public class ControlFlowEdger {
 	
 	   
 	
+    
     // draw lines from each statement to each other
 	// exit node is the last statement
 	
@@ -321,10 +330,11 @@ public class ControlFlowEdger {
         return Collections.emptyList();
     }
 
-	// a continue will add an edge back to the continueNode only 
+	// a continue will add an edge back to the continueNode if we have one
+	// or added to the scope's continueEdges collection if we don't
     // (and returns an empty list as we won't have a normal exit edge)
     private List<ExitEdge> addContinueEdges(Dag dag, DagNode continueStatementNode, LexicalScope scope) {
-        if (scope.continueNode == null) { 
+        if (scope.continueNode == null && !scope.continueForward) { 
             throw new IllegalStateException("continue encountered outside of continuable section");
         }
         ContinueStatement cs = (ContinueStatement) continueStatementNode.astNode;
@@ -338,11 +348,23 @@ public class ControlFlowEdger {
             }
         }
         
-        DagEdge e;
-        e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, null); // "continue" + (label==null ? "" : " " + label)
-        // e.gvAttributes.put("color", "red");
-        e.classes.add("continue");
-        e.gvAttributes.put("continueLabel", (label==null ? "" : " " + label));
+        if (namedScope.continueNode != null) { 
+            DagEdge e;
+            e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, null); // "continue" + (label==null ? "" : " " + label)
+            // e.gvAttributes.put("color", "red");
+            e.classes.add("continue");
+            e.gvAttributes.put("continueLabel", (label==null ? "" : " " + label));
+        } else if (namedScope.continueForward) {
+            ExitEdge e = new ExitEdge();
+            e.n1 = continueStatementNode;
+            e.classes.add("continue");
+            e.gvAttributes.put("continueLabel", label == null ? "" : label);
+            namedScope.continueEdges.add(e);
+        } else {
+            // this seems like a bit of an edge-case. ah boom tish.
+            throw new IllegalStateException("named scope is not continuable");
+        }
+        
         return Collections.emptyList();
     }
 
@@ -417,8 +439,14 @@ public class ControlFlowEdger {
 	private List<ExitEdge> addIfEdges(Dag dag, DagNode ifNode, LexicalScope scope) {
         // draw the edges
 	    // now have a node for the condition
-	    
-	    List<ExitEdge> prevNodes = new ArrayList<>();
+        IfStatement is = (IfStatement) ifNode.astNode;
+        DagNode exprDag = getDagChild(ifNode.children, is.getExpression(), null);
+
+        Rejigger rejigger = hoistNode(dag, ifNode, exprDag);
+        List<ExitEdge> ee = addExpressionEdges(dag, exprDag,  scope);
+        /*List<ExitEdge> prevNodes =*/ rejigger.unhoistNode(dag,  ee); // create exit edges below
+
+        List<ExitEdge> prevNodes = new ArrayList<>();
 	    if (ifNode.children.size() == 2) {
 	        DagNode c = ifNode.children.get(1);
             DagEdge trueEdge = dag.addEdge(ifNode, c, null);
@@ -459,7 +487,7 @@ public class ControlFlowEdger {
         
         List<DagNode> resourceDags = getDagChildren(tryNode.children, ts.resources(), "tryResource");
         DagNode bodyDag = getDagChild(tryNode.children, ts.getBody(), "tryBody");
-        List<DagNode> catchClauseDags = getDagChildren(tryNode.children, ts.catchClauses(), "finally");
+        List<DagNode> catchClauseDags = getDagChildren(tryNode.children, ts.catchClauses(), "catch");
         DagNode finallyDag = getDagChild(tryNode.children, ts.getFinally(), "finally");
         
         if (bodyDag == null) {
@@ -482,7 +510,7 @@ public class ControlFlowEdger {
                 dag.addEdge(de);
             }
             
-            List<ExitEdge> ccPrevNodes = addEdges(dag, ccDag, scope);
+            List<ExitEdge> ccPrevNodes = addEdges(dag, ccDag, scope); // original scope
             tryPrevNodes.addAll(ccPrevNodes);
         }
         
@@ -498,6 +526,18 @@ public class ControlFlowEdger {
         return tryPrevNodes;
         // return prevNodes;
     }
+    
+    private List<ExitEdge> addCatchClauseEdges(Dag dag, DagNode catchNode, LexicalScope scope) {
+        CatchClause cc = (CatchClause) catchNode.astNode;
+        catchNode.gvAttributes.put("exceptionSpec", cc.getException().toString());
+        
+        DagNode bodyDag = getDagChild(catchNode.children, cc.getBody(), null);
+        dag.addEdge(catchNode, bodyDag);
+        
+        List<ExitEdge> prevNodes = addEdges(dag, bodyDag, scope);
+        return prevNodes;
+    }
+
     
     private DagNode getDagChild(List<DagNode> children, ASTNode astNode, String className) {
         for (DagNode c : children) {
@@ -526,32 +566,75 @@ public class ControlFlowEdger {
     private List<ExitEdge> addForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
         ForStatement fs = (ForStatement) forNode.astNode;
-        // so could draw this with branches leading back up to the for node from each exit node of repeating block
-        // or branches down from each exit node to an artifical block at the bottom, with a branch up from that.
-        // which might be a bit cleaner if the for block has a lot of exit edges 
-
-        // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
-        // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
         
+        List<DagNode> initialiserDags = getDagChildren(forNode.children, fs.initializers(), "initialiser");
+        DagNode exprDag = getDagChild(forNode.children, fs.getExpression(), "expression");
+        List<DagNode> updaterDags = getDagChildren(forNode.children, fs.updaters(), "updater");
         DagNode repeatingBlock = getDagChild(forNode.children, fs.getBody(), null);
-        dag.addEdge(forNode, repeatingBlock);
-        LexicalScope newScope = scope.newBreakContinueScope(forNode);
-        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope);
+
+        // move forStatement node after the initialisation & expression nodes
+        Rejigger rejigger = hoistNode(dag, forNode, initialiserDags.size() == 0 ? exprDag : initialiserDags.get(0));
         
-        /*
-        if (repeatBlockPrevNodes.size() > bunchUpTheEdgesThreshold) {
-            // add an artificial node to bunch up the edges
+        // expression is null for method calls within the same object
+        List<ExitEdge> prevNodes = null;
+        for (DagNode i : initialiserDags) {
+            if (prevNodes != null) {
+                for (ExitEdge e : prevNodes) {
+                    e.n2 = i;
+                    dag.addEdge(e);
+                }
+            }
+            prevNodes = addExpressionEdges(dag, i, scope );
         }
-        */
+
+        DagEdge firstExpressionEdge = null;
+        if (prevNodes != null) {
+            for (ExitEdge e : prevNodes) {
+                e.n2 = exprDag;
+                dag.addEdge(e);
+                firstExpressionEdge = e;
+            }
+        }
+        prevNodes = addExpressionEdges(dag, exprDag, scope);
         
-        for (ExitEdge e : repeatingBlockPrevNodes) {
-            DagEdge backEdge = dag.addBackEdge(e.n1, forNode, null);
+        // this is the node we loop back to
+        DagNode firstExpressionNode = firstExpressionEdge == null ? rejigger.inEdge.n2 : firstExpressionEdge.n2;
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        
+        
+        
+        DagEdge forTrue = prevNodes.get(0);
+        forTrue.classes.add("for");
+        forTrue.classes.add("true");
+        forTrue.n2 = repeatingBlock;
+        dag.addEdge(forTrue);
+        
+        LexicalScope newScope = scope.newBreakContinueScope(forNode, firstExpressionNode);
+        prevNodes = addEdges(dag, repeatingBlock, newScope);
+        
+        for (DagNode u : updaterDags) {
+            for (ExitEdge e : prevNodes) {
+                e.n2 = u;
+                dag.addEdge(e);
+            }
+            prevNodes = addExpressionEdges(dag, u, scope );
+        }
+        
+        for (ExitEdge e : prevNodes) {
+            DagEdge backEdge = dag.addBackEdge(e.n1, firstExpressionNode, null); // exprDag
             backEdge.classes.add("for");
         }
         
-        List<ExitEdge> prevNodes = new ArrayList<>(); // the entire for
-        prevNodes.addAll(repeatingBlockPrevNodes);
+        prevNodes = new ArrayList<>(); // the entire for
+        // prevNodes.addAll(repeatingBlockPrevNodes);  // could add hidden edges here to force the 'after loop' nodes to appear under the for
         prevNodes.addAll(newScope.breakEdges); // forward edges for any breaks inside the for scoped to this for
+        
+        ExitEdge forFalse = new ExitEdge();
+        forFalse.n1 = forNode;
+        forFalse.classes.add("for");
+        forFalse.classes.add("false");
+        prevNodes.add(forFalse);
+        
         return prevNodes;
     }
 
@@ -559,26 +642,61 @@ public class ControlFlowEdger {
     private List<ExitEdge> addEnhancedForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
         EnhancedForStatement fs = (EnhancedForStatement) forNode.astNode;
-        // so could draw this with branches leading back up to the for node from each exit node of repeating block
-        // or branches down from each exit node to an artifical block at the bottom, with a branch up from that.
-        // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
-        // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
-        // DagNode repeatingBlock = forNode.children.get(0);
+        
+        DagNode initialiserDag = getDagChild(forNode.children, fs.getParameter(), "initialiser");
+        DagNode exprDag = getDagChild(forNode.children, fs.getExpression(), "expression");
         DagNode repeatingBlock = getDagChild(forNode.children, fs.getBody(), null);
-        dag.addEdge(forNode, repeatingBlock);
-        LexicalScope newScope = scope.newBreakContinueScope(forNode);
-        List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope);
-        for (ExitEdge e : repeatingBlockPrevNodes) {
-            DagEdge backEdge = dag.addBackEdge(e.n1, forNode, null);
+
+        // move forStatement node after the initialisation & expression nodes
+        Rejigger rejigger = hoistNode(dag, forNode, initialiserDag);
+        
+        // expression is null for method calls within the same object
+        List<ExitEdge> prevNodes = addEdges(dag, initialiserDag, scope );
+
+        DagEdge firstExpressionEdge = null;
+        if (prevNodes != null) {
+            for (ExitEdge e : prevNodes) {
+                e.n2 = exprDag;
+                dag.addEdge(e);
+                firstExpressionEdge = e;
+            }
+        }
+        prevNodes = addExpressionEdges(dag, exprDag, scope);
+        
+        // this is the node we loop back to
+        DagNode firstExpressionNode = firstExpressionEdge == null ? rejigger.inEdge.n2 : firstExpressionEdge.n2;
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        
+        DagEdge forTrue = prevNodes.get(0);
+        forTrue.classes.add("enhancedFor");
+        forTrue.classes.add("true");
+        forTrue.n2 = repeatingBlock;
+        dag.addEdge(forTrue);
+        
+        LexicalScope newScope = scope.newBreakContinueScope(forNode, firstExpressionNode);
+        prevNodes = addEdges(dag, repeatingBlock, newScope);
+        
+        for (ExitEdge e : prevNodes) {
+            DagEdge backEdge = dag.addBackEdge(e.n1, firstExpressionNode, null); // exprDag
             backEdge.classes.add("enhancedFor");
         }
-
-        List<ExitEdge> prevNodes = new ArrayList<>(); // the entire for
-        prevNodes.addAll(repeatingBlockPrevNodes);
+        
+        prevNodes = new ArrayList<>(); // the entire for
+        // prevNodes.addAll(repeatingBlockPrevNodes);  // could add hidden edges here to force the 'after loop' nodes to appear under the for
         prevNodes.addAll(newScope.breakEdges); // forward edges for any breaks inside the for scoped to this for
-
-        return repeatingBlockPrevNodes;
+        
+        ExitEdge forFalse = new ExitEdge();
+        forFalse.n1 = forNode;
+        forFalse.classes.add("enhancedFor");
+        forFalse.classes.add("false");
+        prevNodes.add(forFalse);
+        
+        return prevNodes;
+        
     }
+    
+    
+    
     
     private List<ExitEdge> addWhileEdges(Dag dag, DagNode whileNode, LexicalScope scope) {
         // draw the edges
@@ -586,7 +704,19 @@ public class ControlFlowEdger {
         
         // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
         // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
+        DagNode exprDag = getDagChild(whileNode.children, ws.getExpression(), null);
         DagNode repeatingBlock = getDagChild(whileNode.children, ws.getBody(), null);
+
+        
+        // move forStatement node after the initialisation & expression nodes
+        Rejigger rejigger = hoistNode(dag, whileNode, exprDag);
+
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, exprDag, scope);
+        
+        // this is the node we loop back to
+        DagNode firstExpressionNode = rejigger.inEdge.n2;
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+
         // DagNode repeatingBlock = whileNode.children.get(0);
         DagEdge whileTrue = dag.addEdge(whileNode, repeatingBlock);
         // whileTrue.label = "Y";
@@ -594,14 +724,14 @@ public class ControlFlowEdger {
         whileTrue.classes.add("true");
         
         // List<ExitEdge> whileBreakEdges = new ArrayList<>();
-        LexicalScope newScope = scope.newBreakContinueScope(whileNode);
+        LexicalScope newScope = scope.newBreakContinueScope(whileNode, firstExpressionNode);
         List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope); // new continue node
         for (ExitEdge e : repeatingBlockPrevNodes) {
-            DagEdge backEdge = dag.addBackEdge(e.n1, whileNode, null);
+            DagEdge backEdge = dag.addBackEdge(e.n1, firstExpressionNode, null);
             backEdge.classes.add("while");
         }
         
-        List<ExitEdge> prevNodes = new ArrayList<>(); // the entire while
+        prevNodes = new ArrayList<>(); // the entire while
         prevNodes.addAll(repeatingBlockPrevNodes);
         prevNodes.addAll(newScope.breakEdges);
         
@@ -611,37 +741,53 @@ public class ControlFlowEdger {
         // e.label = "N";
         e.classes.add("while");
         e.classes.add("false");
+        prevNodes.add(e);
         
         return prevNodes;
            
     }
     
     private List<ExitEdge> addDoEdges(Dag dag, DagNode doNode, LexicalScope scope) {
-        // draw the edges
         DoStatement ds = (DoStatement) doNode.astNode;
-        
-        
-        
-        // org.eclipse.jdt.core.dom.Block in org.eclipse.jdt.core.dom.ForStatement
-        // for (DagNode c : forNode.children) { logger.info(c.astNode.getClass().getName() + " in " + c.astNode.getParent().getClass().getName()); }
         DagNode repeatingBlock = getDagChild(doNode.children, ds.getBody(), null);
-        DagEdge doTrue = dag.addEdge(doNode, repeatingBlock);
-        doTrue.classes.add("do");
-        doTrue.classes.add("start");
+        DagNode exprDag = getDagChild(doNode.children, ds.getExpression(), null);
         
-        // List<ExitEdge> doBreakEdges = new ArrayList<>();
-        LexicalScope newScope = scope.newBreakContinueScope(doNode); // @XXX continueNode here should be the expression at the end 
+        // move doStatement node after the repeatingblock & expression nodes
+        Rejigger rejigger = hoistNode(dag, doNode, repeatingBlock);
+
+        // continue is now a forward edge, and it's a forward edge to something we haven't
+        // edged yet (the exprDag). so we should probably collect these edges in the scope like we do for 
+        // break and throw edges.
+        LexicalScope newScope = scope.newBreakContinueScope(doNode); 
+        
         List<ExitEdge> repeatingBlockPrevNodes = addEdges(dag, repeatingBlock, newScope); // new continue node
         for (ExitEdge e : repeatingBlockPrevNodes) {
-            DagEdge backEdge = dag.addBackEdge(e.n1, doNode, null);
-            backEdge.classes.add("do");
+            // DagEdge backEdge = dag.addBackEdge(e.n1, doNode, null);
+            // backEdge.classes.add("do");
+            dag.addEdge(e.n1, exprDag, null);
+        }
+
+        Rejigger markedExpression = markNode(dag, exprDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, exprDag, scope);
+        markedExpression.unmarkNode(dag);
+
+        DagNode firstExpressionNode = markedExpression.inEdge.n2;
+        
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        DagEdge doFalse = prevNodes.get(0);
+        doFalse.classes.add("do");
+        doFalse.classes.add("false");
+        
+        DagEdge doTrue = dag.addBackEdge(doNode, repeatingBlock, null);
+        doTrue.classes.add("do");
+        doTrue.classes.add("true");
+        
+        for (DagEdge ce : newScope.continueEdges) {
+            ce.n2 = firstExpressionNode;
+            dag.addEdge(ce);
         }
         
-        // @TODO while condition is at the end so could create a node for the evaluation of that as well
-        
-        
-        List<ExitEdge> prevNodes = new ArrayList<>(); // the entire switch
-        prevNodes.addAll(repeatingBlockPrevNodes);
+        // prevNodes.addAll(repeatingBlockPrevNodes);
         prevNodes.addAll(newScope.breakEdges);
         return prevNodes;
            
@@ -884,6 +1030,20 @@ public class ControlFlowEdger {
         
         return prevNodes;
     }
+
+    private List<ExitEdge> addSingleVariableDeclarationEdges(Dag dag, DagNode node, LexicalScope scope) {
+       // modifiers, type, dimensions
+        SingleVariableDeclaration svd = (SingleVariableDeclaration) node.astNode;
+        
+        node.gvAttributes.put("type", svd.getType().toString());
+        node.gvAttributes.put("variableName", svd.getName().toString());
+        
+        ExitEdge e = new ExitEdge();
+        e.n1 = node;
+        List<ExitEdge> prevNodes = Collections.singletonList(e);
+        return prevNodes;
+        
+    }
     
 
     // this will probably go into the ExpressionEdger later
@@ -961,6 +1121,10 @@ public class ControlFlowEdger {
         } else if (node.type.equals("ClassInstanceCreation")) {
             return addClassInstanceCreationEdges(dag, node, scope);
 
+        } else if (node.type.equals("VariableDeclarationExpression")) {
+            return addVariableDeclarationExpressionEdges(dag, node, scope);
+            
+            
         } else if (node.type.equals("LambdaExpression")) {
             return addLambdaExpressionEdges(dag, node, scope);
             
@@ -1132,7 +1296,9 @@ public class ControlFlowEdger {
         }
         
         
-
+        public void unmarkNode(Dag dag) {
+            dag.edges.remove(this.inEdge);
+        }
     }
     
     private Rejigger hoistNode(Dag dag, DagNode node, DagNode newNode) {
@@ -1154,10 +1320,24 @@ public class ControlFlowEdger {
         
         // first node is inEdge.n2
         return rejigger;
-        
     }
     
+    // mark a node which is not yet in the dag, which may be rejiggered
+    // so we can find the first node again later
+    private Rejigger markNode(Dag dag, DagNode node) {
+        EntryEdge inEdge = new EntryEdge();
+        inEdge.n2 = node;
+        dag.edges.add(inEdge);
+        
+        Rejigger rejigger = new Rejigger();
+        rejigger.hoistedNode = node;
+        rejigger.inEdge = inEdge;
+        
+        // first node is inEdge.n2
+        return rejigger;
+    }
 
+    
     private List<ExitEdge> addMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
         MethodInvocation mi = (MethodInvocation) methodInvocationNode.astNode;
         DagNode expressionDag = getDagChild(methodInvocationNode.children, mi.getExpression(), null);
@@ -1719,6 +1899,38 @@ public class ControlFlowEdger {
             e.n1 = node;
             prevNodes = Collections.singletonList(e);
         }
+        return prevNodes;
+    }
+
+    // same as VariableDeclaration, except it's an expression ( e.g. for loop initialisers ) 
+    private List<ExitEdge> addVariableDeclarationExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
+        VariableDeclarationExpression vde = (VariableDeclarationExpression) node.astNode;
+        List<DagNode> fragments = getDagChildren(node.children, vde.fragments(), null);
+        
+        node.gvAttributes.put("type", vde.getType().toString());
+        
+        ExitEdge e = new ExitEdge();
+        e.n1 = node;
+        List<ExitEdge> prevNodes = Collections.singletonList(e);
+        for (DagNode f : fragments) {
+            for (ExitEdge pe : prevNodes) {
+                pe.n2 = f;
+                dag.edges.add(pe);
+            }
+            
+            // name, dimension(s), expression
+            VariableDeclarationFragment vdf = (VariableDeclarationFragment) f.astNode;
+            DagNode expressionDag = getDagChild(f.children, vdf.getInitializer(), null);
+            if (expressionDag != null) {
+                Rejigger rejigger = hoistNode(dag, f, expressionDag);
+                prevNodes = addExpressionEdges(dag, expressionDag, scope);
+                prevNodes = rejigger.unhoistNode(dag, prevNodes);
+            }
+            
+            f.gvAttributes.put("type", vde.getType().toString());
+            f.gvAttributes.put("variableName", vdf.getName().toString());
+        }
+        
         return prevNodes;
     }
     
