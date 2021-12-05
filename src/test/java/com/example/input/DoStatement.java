@@ -23,10 +23,13 @@ public class DoStatement {
         boolean jumpingUpAndDown = true;
         
         // aaa gaaaa
-        do { 
+        OUTER: do { 
             do {
-                do {
+                INNER: do {
                     System.out.println("push pineapple shake the tree");
+                    if (Math.random() > 0.5) {
+                        continue OUTER; // if this is unconditional we never evaluate toTheLeft or toTheRight
+                    }
                 } while (toTheLeft);
             } while (toTheRight);
         } while (jumpingUpAndDown);
