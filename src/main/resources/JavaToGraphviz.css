@@ -94,6 +94,29 @@ node.if {
     gv-wordwrap: 20;
     shape : diamond; 
 }
+node.for {
+	gv-idFormat: "for_${lineNumber}";
+    gv-labelFormat: "for";
+    shape : diamond; 
+}
+node.while {
+	gv-idFormat: "while_${lineNumber}";
+    gv-wordwrap: 20;
+    shape : diamond; 
+}
+node.do {
+	gv-idFormat: "do_${lineNumber}";
+    gv-wordwrap: 20;
+    shape : diamond; 
+}
+
+node.enhancedFor {
+	gv-idFormat: "for_${lineNumber}";
+    gv-wordwrap: 10;
+    gv-labelFormat: "iterable for";
+    shape : diamond; 
+}
+
 node.comment {
     gv-idFormat: "c_${lineNumber}";
 }
@@ -151,6 +174,7 @@ node.instanceofExpression { gv-labelFormat: "instanceof ${type}"; }
 /* creation-ish */
 
 node.variableDeclarationFragment { gv-labelFormat: "${type} ${variableName}"; }
+node.singleVariableDeclaration { gv-labelFormat: "${type} ${variableName}"; }
 node.arrayInitializer { gv-labelFormat: "{ ... }"; }
 node.arrayCreation { gv-labelFormat: "new ${type}"; }
 node.classInstanceCreation { gv-labelFormat: "new ${type}()"; } /* also control-flow-ish */
@@ -333,10 +357,17 @@ edge.back.do { gv-labelFormat: "do"; }
 edge.if.true { gv-labelFormat: "Y"; }
 edge.if.false { gv-labelFormat: "N"; }
 
+edge.for.true { gv-labelFormat: "Y"; }
+edge.for.false { gv-labelFormat: "N"; }
+
+edge.enhancedFor.true { gv-labelFormat: "next"; }
+edge.enhancedFor.false { gv-labelFormat: "end"; }
+
 edge.while.true { gv-labelFormat: "Y"; }
 edge.while.false { gv-labelFormat: "N"; }
 
-edge.do.start { } /* into repeating block */
+edge.do.true { gv-labelFormat: "do"; }
+edge.do.false{ gv-labelFormat: "N"; }  
 
 edge.case { gv-labelFormat: "case"; }
 edge.case.default { gv-labelFormat: "default"; }
