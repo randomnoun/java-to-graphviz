@@ -29,16 +29,12 @@ public class JavaToGraphvizTest {
     @Test
     public void testControlFlowStatements() throws IOException {
         
-        // ok so switch is broken now
-        testStatement("com.example.input.ContinueBreakLabelA");
-        testStatement("com.example.input.ContinueBreakLabelB");
-        
-        /*
         testStatement("com.example.input.MethodChain");
         
         testStatement("com.example.input.IfStatementFlip");
         testStatement("com.example.input.ContinueBreakRank");
-        testStatement("com.example.input.ContinueBreakLabel");
+        testStatement("com.example.input.ContinueBreakLabelA"); // comparisons
+        testStatement("com.example.input.ContinueBreakLabelB"); // centralSwitch
         
         testStatement("com.example.input.DoStatement");
         testStatement("com.example.input.ForStatement");
@@ -61,7 +57,7 @@ public class JavaToGraphvizTest {
         testStatement("com.example.input.Expressions4");
         testStatement("com.example.input.Expressions5");
         testStatement("com.example.input.Expressions6");
-        */
+        
 
     }
     
