@@ -38,7 +38,8 @@ public class DagStyleApplier {
     Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
     
     // 'type' is a var in cast & instanceof expressions, but might move that into it's own DagNode later
-    public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name", 
+    public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name",
+        "exceptionSpec",
         "operatorToken", "operatorName", "type", "variableName", "literalValue", "fieldName" };
     
     
