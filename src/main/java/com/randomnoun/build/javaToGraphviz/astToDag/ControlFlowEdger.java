@@ -538,6 +538,7 @@ public class ControlFlowEdger {
 	// * try body links to finally body
 	// * any throw edge in the try body links to all catch bodies 
 	//   ( ideally it'd just link to the correct catch body, but that requires knowing the class hierarchies, which we don't know yet )
+	// * return edges from the try body lead into the finally
 	// * exit edges are from the finally body, or from the try & catch bodies if there's no finally
 	// in the css, it helps if you put subgraphs with borders around the try, catch and finally bodies.
     private List<ExitEdge> addTryEdges(Dag dag, DagNode tryNode, LexicalScope scope) {
@@ -579,8 +580,7 @@ public class ControlFlowEdger {
         List<ExitEdge> tryPrevNodes = new ArrayList<>(addEdges(dag, bodyDag, throwScope));
 
         for (DagNode ccDag : catchClauseDags) {
-            // if hasResource == true
-            // we could create an artificial node at the top of each catch clause 
+            // if hasResource == true, we could create an artificial node at the top of each catch clause 
             // that closes the Closable resources
             
             for (ExitEdge e : throwScope.throwEdges) {
@@ -592,13 +592,14 @@ public class ControlFlowEdger {
                 dag.addEdge(de);
             }
             
-            List<ExitEdge> ccPrevNodes = addEdges(dag, ccDag, scope); // original scope
+            // original scope for exceptions thrown in exception handlers
+            // @TODO not sure about 'return's here though. feel they should still go through the finally.
+            List<ExitEdge> ccPrevNodes = addEdges(dag, ccDag, scope); 
             tryPrevNodes.addAll(ccPrevNodes);
         }
         
         if (finallyDag != null) {
-            // if hasResource == true
-            // we could create an artificial node at the top of the finally clause 
+            // if hasResource == true, we could create an artificial node at the top of the finally clause 
             // that closes the Closable resources
 
             // returns within the try{} finally{} go through the finally
@@ -618,7 +619,8 @@ public class ControlFlowEdger {
             // if there was a return edge leading into the finally, 
             // then this finally can return as well
             if (returnIntoFinally) {
-                // could put an artifical return node rather than an edge from each prevNode
+                // could add an artifical return node rather than an edge from each prevNode
+                // (as we do for methods)
                 for (ExitEdge e : tryPrevNodes) {
                     ee = new ExitEdge();
                     ee.n1 = e.n1;
@@ -637,9 +639,8 @@ public class ControlFlowEdger {
             scope.returnEdges.addAll(throwScope.returnEdges);
         }
         
-        
         return tryPrevNodes;
-        // return prevNodes;
+
     }
     
     private List<ExitEdge> addCatchClauseEdges(Dag dag, DagNode catchNode, LexicalScope scope) {
@@ -890,7 +891,7 @@ public class ControlFlowEdger {
            
     
     // ye olde switch, not whatever they're doing in java 16 these days
-    // actually those might be here as well, just with switchLabeledRules
+    // actually those might be here as well, just with switchLabeledRules and multiple expressions
     private List<ExitEdge> addSwitchEdges(Dag dag, DagNode switchNode, LexicalScope scope) {
      // draw the edges
         SwitchStatement ss = (SwitchStatement) switchNode.astNode;
