@@ -325,8 +325,8 @@ node.finally > subgraph {
   gv-labelFormat : "finally";
 }
 
-node.synchronized { gv-newSubgraph: true; } 
-node.synchronized > subgraph {
+node.synchronized > .block { gv-newSubgraph: true; } 
+node.synchronized > .block > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_sync_${lineNumber}";
   gv-labelFormat : "synchronized";
