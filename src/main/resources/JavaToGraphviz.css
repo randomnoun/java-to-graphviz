@@ -300,7 +300,6 @@ node.tryResource > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_t_resource_${lineNumber}";
   gv-labelFormat : "resource";
-  pencolor : white;
 }
 
 

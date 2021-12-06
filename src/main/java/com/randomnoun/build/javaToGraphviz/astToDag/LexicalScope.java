@@ -125,13 +125,14 @@ public class LexicalScope {
     }
     
     // scope that bounds statements that can throw
+    // return edges are also captured here so they can get routed into the finally
     public LexicalScope newThrowScope() {
         LexicalScope next = new LexicalScope();
         next.breakEdges = this.breakEdges;
         next.continueNode = this.continueNode;
         next.continueForward = this.continueForward;
         next.continueEdges = this.continueEdges;
-        next.returnEdges = this.returnEdges;
+        next.returnEdges = new ArrayList<>();
         next.throwEdges = new ArrayList<>();
         next.labeledScopes = this.labeledScopes;
         return next;

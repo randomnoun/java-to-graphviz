@@ -21,6 +21,7 @@ public class TryWithResourcesStatement {
             whatTheCompanyTakes = whatTheCompanyWants;
             os.write(null);
             
+            // System.out.println(whatTheCompanyTakes);
             return whatTheCompanyTakes;
         } catch (Exception e) {
             System.out.println("Some have sailed from a distant shore");

@@ -544,28 +544,49 @@ public class ControlFlowEdger {
         // draw the edges
         TryStatement ts = (TryStatement) tryNode.astNode;
         
-        // @TODO resources 
-        
         List<DagNode> resourceDags = getDagChildren(tryNode.children, ts.resources(), "tryResource");
         DagNode bodyDag = getDagChild(tryNode.children, ts.getBody(), "tryBody");
         List<DagNode> catchClauseDags = getDagChildren(tryNode.children, ts.catchClauses(), "catch"); // tryCatch ?
         DagNode finallyDag = getDagChild(tryNode.children, ts.getFinally(), "finally"); // tryFinally ?
+        boolean hasResource = false;
         
         if (bodyDag == null) {
             throw new IllegalStateException("try with no body");
         }
-        
-        dag.addEdge(tryNode,  bodyDag);
-        
         LexicalScope throwScope = scope.newThrowScope();
+        
+        ExitEdge ee = new ExitEdge();
+        ee.n1 = tryNode;
+        List<ExitEdge> prevNodes = Collections.singletonList(ee);
+        for (DagNode rd : resourceDags) {
+            if (prevNodes != null) {
+                for (ExitEdge e : prevNodes) {
+                    e.n2 = rd;
+                    dag.addEdge(e);
+                }
+            }
+            // if exceptions occur here they pass to the exception handler defined here 
+            prevNodes = addExpressionEdges(dag, rd, throwScope);
+            hasResource = true;
+        }
+
+        for (ExitEdge e : prevNodes) {
+            e.n2 = bodyDag;
+            dag.addEdge(e);
+        }
+        // dag.addEdge(tryNode,  bodyDag);
+        
         List<ExitEdge> tryPrevNodes = new ArrayList<>(addEdges(dag, bodyDag, throwScope));
 
         for (DagNode ccDag : catchClauseDags) {
-            // dag.rootNodes.add(ccDag);
-            for (ExitEdge ee : throwScope.throwEdges) {
+            // if hasResource == true
+            // we could create an artificial node at the top of each catch clause 
+            // that closes the Closable resources
+            
+            for (ExitEdge e : throwScope.throwEdges) {
                 // don't know which catch without a type hierarchy so create an edge for each one
                 DagEdge de = new DagEdge();
-                de.n1 = ee.n1;
+                de.n1 = e.n1;
                 de.n2 = ccDag;
                 de.classes.add("throw");
                 dag.addEdge(de);
@@ -576,11 +597,44 @@ public class ControlFlowEdger {
         }
         
         if (finallyDag != null) {
-            for (ExitEdge ee : tryPrevNodes) {
-                ee.n2 = finallyDag;
-                dag.addEdge(ee);
+            // if hasResource == true
+            // we could create an artificial node at the top of the finally clause 
+            // that closes the Closable resources
+
+            // returns within the try{} finally{} go through the finally
+            boolean returnIntoFinally = false, otherIntoFinally = false;;
+            for (ExitEdge e : throwScope.returnEdges) {
+                e.n2 = finallyDag;
+                dag.addEdge(e);
+                returnIntoFinally = true;
+            }
+            for (ExitEdge e : tryPrevNodes) {
+                e.n2 = finallyDag;
+                dag.addEdge(e);
+                otherIntoFinally = true;
             }
             tryPrevNodes = addEdges(dag, finallyDag, scope);
+            
+            // if there was a return edge leading into the finally, 
+            // then this finally can return as well
+            if (returnIntoFinally) {
+                // could put an artifical return node rather than an edge from each prevNode
+                for (ExitEdge e : tryPrevNodes) {
+                    ee = new ExitEdge();
+                    ee.n1 = e.n1;
+                    ee.classes.add("return");
+                    scope.returnEdges.add(ee);
+                }
+                if (!otherIntoFinally) {
+                    // everything returns
+                    tryPrevNodes = Collections.emptyList();
+                }
+            }
+            
+        
+        } else {
+            // no finally block, returns are handled as before 
+            scope.returnEdges.addAll(throwScope.returnEdges);
         }
         
         
@@ -836,8 +890,7 @@ public class ControlFlowEdger {
            
     
     // ye olde switch, not whatever they're doing in java 16 these days
-    // maybe I'm thinking of javascript.
-    // List<ExitEdge> _breakEdges, DagNode continueNode
+    // actually those might be here as well, just with switchLabeledRules
     private List<ExitEdge> addSwitchEdges(Dag dag, DagNode switchNode, LexicalScope scope) {
      // draw the edges
         SwitchStatement ss = (SwitchStatement) switchNode.astNode;
