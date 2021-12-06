@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
@@ -43,6 +44,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
@@ -146,14 +148,15 @@ public class ControlFlowEdger {
             return addVariableDeclarationStatementEdges(dag, node, scope);
         } else if (node.type.equals("SingleVariableDeclaration")) {
             return addSingleVariableDeclarationEdges(dag, node, scope);
+        } else if (node.type.equals("ConstructorInvocation")) {
+            return addConstructorInvocationEdges(dag, node, scope);
+        } else if (node.type.equals("SuperConstructorInvocation")) {
+            return addSuperConstructorInvocationEdges(dag, node, scope);
 
         // goto will be considered tedious if I have to do that. ho ho ho.
             
         } else if (node.type.equals("Assert") ||
           node.type.equals("Empty") ||
-          node.type.equals("ConstructorInvocation") || // @TODO edge these
-          node.type.equals("EmptyStatement") ||
-          node.type.equals("SuperConstructorInvocation") || // @TODO and these
           node.type.equals("comment")) { // lower-case c for nodes created from gv comments
             // non-control flow statement
             ExitEdge e = new ExitEdge();
@@ -1430,6 +1433,69 @@ public class ControlFlowEdger {
         return rejigger;
     }
 
+    private List<ExitEdge> addConstructorInvocationEdges(Dag dag, DagNode constructorInvocationNode, LexicalScope scope) {
+        ConstructorInvocation ci = (ConstructorInvocation) constructorInvocationNode.astNode;
+        // type arguments
+        constructorInvocationNode.gvAttributes.put("methodName", "this");
+        List<DagNode> argumentDags = getDagChildren(constructorInvocationNode.children, ci.arguments(), null);
+
+        List<ExitEdge> prevNodes = null;
+        if (argumentDags.size() > 0) {
+            // move methodInvocation node after the argument nodes
+            Rejigger rejigger = hoistNode(dag, constructorInvocationNode, argumentDags.get(0));
+            // expression is null for method calls within the same object
+            for (DagNode a : argumentDags) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = a;
+                        e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
+                }
+                prevNodes = addExpressionEdges(dag, a, scope );
+            }
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        } else {
+            ExitEdge e = new ExitEdge();
+            e.n1 = constructorInvocationNode;
+            prevNodes = Collections.singletonList(e);
+        }
+        return prevNodes;
+    }
+    
+    private List<ExitEdge> addSuperConstructorInvocationEdges(Dag dag, DagNode superConstructorInvocationNode, LexicalScope scope) {
+        SuperConstructorInvocation mi = (SuperConstructorInvocation) superConstructorInvocationNode.astNode;
+        DagNode expressionDag = getDagChild(superConstructorInvocationNode.children, mi.getExpression(), null);
+        superConstructorInvocationNode.gvAttributes.put("methodName", "super");
+        List<DagNode> argumentDags = getDagChildren(superConstructorInvocationNode.children, mi.arguments(), null);
+
+        List<ExitEdge> prevNodes = null;
+        if (expressionDag != null || argumentDags.size() > 0) {
+            // move methodInvocation node after the expression & argument nodes
+            Rejigger rejigger = hoistNode(dag, superConstructorInvocationNode, expressionDag != null ? expressionDag : argumentDags.get(0));
+            // expression is null for method calls within the same object
+            if (expressionDag != null) {
+                prevNodes = addExpressionEdges(dag, expressionDag, scope);
+            }
+            for (DagNode a : argumentDags) {
+                if (prevNodes != null) {
+                    for (ExitEdge e : prevNodes) {
+                        e.n2 = a;
+                        e.classes.add("invocationArgument");
+                        dag.addEdge(e);
+                    }
+                }
+                prevNodes = addExpressionEdges(dag, a, scope );
+            }
+            prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        } else {
+            ExitEdge e = new ExitEdge();
+            e.n1 = superConstructorInvocationNode;
+            prevNodes = Collections.singletonList(e);
+        }
+        return prevNodes;
+    }  
+    
     
     private List<ExitEdge> addMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
         MethodInvocation mi = (MethodInvocation) methodInvocationNode.astNode;
@@ -1473,7 +1539,6 @@ public class ControlFlowEdger {
         
         String qualifier = smi.getQualifier() == null ? "" : smi.getQualifier().toString() + ".";
         // smi.typeArguments(); ?
-            
         methodInvocationNode.gvAttributes.put("methodName", qualifier + ".super." + smi.getName().toString());
         List<DagNode> argumentDags = getDagChildren(methodInvocationNode.children, smi.arguments(), null);
 
@@ -1498,7 +1563,11 @@ public class ControlFlowEdger {
             prevNodes = Collections.singletonList(e);
         }
         return prevNodes;
-    }   
+    }
+    
+    
+    
+    
 
     private List<ExitEdge> addInfixExpressionEdges(Dag dag, DagNode infixNode, LexicalScope scope) {
         InfixExpression ie = (InfixExpression) infixNode.astNode;

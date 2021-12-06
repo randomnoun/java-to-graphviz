@@ -158,6 +158,11 @@ node.conditionalExpression { gv-labelFormat: "?"; shape: diamond; }
 edge.conditionalExpression.true { gv-labelFormat: "Y"; }
 edge.conditionalExpression.false { gv-labelFormat: "N"; }
 
+/* control-flow-ish statements */
+
+node.constructorInvocation { gv-labelFormat: "${methodName}()"; } /* always this */
+node.superConstructorInvocation { gv-labelFormat: "${methodName}()"; } /* always super */
+
 /* evaluation-ish */
 
 node.infixExpression { gv-labelFormat: "${operatorToken}"; }

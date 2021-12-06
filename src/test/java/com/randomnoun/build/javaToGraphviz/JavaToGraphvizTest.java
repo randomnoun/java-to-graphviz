@@ -30,6 +30,7 @@ public class JavaToGraphvizTest {
     public void testControlFlowStatements() throws IOException {
         
         testStatement("com.example.input.MethodChain");
+        testStatement("com.example.input.Constructor");
         
         testStatement("com.example.input.IfStatementFlip");
         testStatement("com.example.input.ContinueBreakRank");
