@@ -160,8 +160,8 @@ edge.conditionalExpression.false { gv-labelFormat: "N"; }
 
 /* control-flow-ish statements */
 
-node.constructorInvocation { gv-labelFormat: "${methodName}()"; } /* always this */
-node.superConstructorInvocation { gv-labelFormat: "${methodName}()"; } /* always super */
+node.constructorInvocation { gv-labelFormat: "${methodName}()"; } /* methodName is always "this" */
+node.superConstructorInvocation { gv-labelFormat: "${methodName}()"; } /* methodName is always "super" */
 
 /* evaluation-ish */
 
@@ -254,7 +254,7 @@ or something
 /* each lambdaExpression has two nodes, one for the definition and an artifical one for the return value (with an extra .end class) */ 
 node.lambdaExpression:not(.end) { 
 	gv-newSubgraph: true; /* create a subgraph element *under* this node, then move child nodes into that subgraph */
-	gv-ohAndTheEdgesConnectToTheSubgraph: true;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
+	gv-truncateEdges: both;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
 }
 node.lambdaExpression > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
@@ -267,7 +267,8 @@ node.lambdaExpression > subgraph {
 /* each anonymousClassDeclaration has two nodes, one for the definition and an artifical one for the exit edge */ 
 node.anonymousClassDeclaration:not(.end) { 
 	gv-newSubgraph: true; /* create a subgraph element *under* this node, then move child nodes into that subgraph */
-	gv-ohAndTheEdgesConnectToTheSubgraph: true;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
+	gv-truncateEdges: both;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
+	pencolor : black;
 }
 node.anonymousClassDeclaration > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */

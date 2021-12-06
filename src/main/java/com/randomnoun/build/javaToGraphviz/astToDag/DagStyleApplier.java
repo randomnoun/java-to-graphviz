@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,19 +84,20 @@ public class DagStyleApplier {
         // use the gv-newSubgraph CSS properties to add subgraphs into both the Dag and the DOM
         resetDomStyles(document);
         applyDomStyles(document, stylesheet);
-        List<DagElement> elementsToCreateSubgraphsInside = getElementsWithStyleProperty(document, "gv-newSubgraph", "true");
-        List<DagElement> elementsToCreateSubgraphsInside2 = getElementsWithStyleProperty(document, "gv-ohAndTheEdgesConnectToTheSubgraph", "true");
+        Set<DagElement> elementsToCreateSubgraphsInside = getElementsWithStyleProperty(document, "gv-newSubgraph", "true").keySet();
+        Map<DagElement, String> elementsTruncateEdges = getElementsWithStyleProperty(document, "gv-truncateEdges", null);
         
-        List<DagElement> elementsToCreateSubgraphsFrom = getElementsWithStyleProperty(document, "gv-beginOuterSubgraph", "true");
-        List<DagElement> elementsToCreateSubgraphsTo = getElementsWithStyleProperty(document, "gv-endOuterSubgraph", "true");
+        Set<DagElement> elementsToCreateSubgraphsFrom = getElementsWithStyleProperty(document, "gv-beginOuterSubgraph", "true").keySet();
+        Set<DagElement> elementsToCreateSubgraphsTo = getElementsWithStyleProperty(document, "gv-endOuterSubgraph", "true").keySet();
 
         
         
         // and construct CSS-defined subgraphs. gv-newSubgraph creates subgraphs under the node so that 
         //   node.method > subgraph 
         // CSS rules match. 
-        for (int i = 0; i < elementsToCreateSubgraphsInside.size(); i++) {
-            DagElement outsideEl = elementsToCreateSubgraphsInside.get(i);
+        //for (int i = 0; i < elementsToCreateSubgraphsInside.size(); i++) {
+        //    DagElement outsideEl = elementsToCreateSubgraphsInside.get(i);
+        for (DagElement outsideEl : elementsToCreateSubgraphsInside) {
             DagNode outsideNode = outsideEl.dagNode;
             
             
@@ -122,17 +124,32 @@ public class DagStyleApplier {
             // moves the nodes in the dag subgraphs
             moveToSubgraph(newSg, newSgEl, dag, dagNodesToElements, outsideNode);
             
-            if (elementsToCreateSubgraphsInside2.contains(outsideEl)) {
+            String truncateEdges = elementsTruncateEdges.get(outsideEl);
+            if (truncateEdges != null && !truncateEdges.equals("none")) {
                 // outsideEl.addClass("red");
                 // outsideNode.classes.add("red");
+                boolean truncateIncoming = false;
+                boolean truncateOutgoing = false;
+                if (truncateEdges.equals("incoming")) {
+                    truncateIncoming = true;
+                } else if (truncateEdges.equals("outgoing")) {
+                    truncateOutgoing = true;
+                } else if (truncateEdges.equals("both")) {
+                    truncateIncoming = true;
+                    truncateOutgoing = true;
+                } else {
+                    throw new IllegalArgumentException("Invalid 'gv-truncateEdges' property '" + truncateEdges + "'; expected " +
+                      "'none', 'incoming', 'outgoing' or 'both'");
+                }
+                
                 List<DagEdge> inEdges = new ArrayList<>();
                 List<DagEdge> outEdges = new ArrayList<>();
                 
                 // don't need to check subgraphs of subgraphs
                 // actually maybe I do now
                 for (DagEdge e : dag.edges) {
-                    if (newSg.nodes.contains(e.n1) && !newSg.nodes.contains(e.n2)) { outEdges.add(e); }
-                    if (newSg.nodes.contains(e.n2) && !newSg.nodes.contains(e.n1)) { inEdges.add(e); }
+                    if (truncateOutgoing && newSg.nodes.contains(e.n1) && !newSg.nodes.contains(e.n2)) { outEdges.add(e); }
+                    if (truncateIncoming && newSg.nodes.contains(e.n2) && !newSg.nodes.contains(e.n1)) { inEdges.add(e); }
                 }
                 for (DagEdge e : outEdges) {
                     // e.n1 = newSg; // needs to be node -> node, not subgraph -> node
@@ -151,8 +168,9 @@ public class DagStyleApplier {
         //   subgraph:has(> node.method) 
         // CSS rules match
         
-        for (int i = 0; i < elementsToCreateSubgraphsFrom.size(); i++) {
-            DagElement fromEl = elementsToCreateSubgraphsFrom.get(i);
+        //for (int i = 0; i < elementsToCreateSubgraphsFrom.size(); i++) {
+        //    DagElement fromEl = elementsToCreateSubgraphsFrom.get(i);
+        for (DagElement fromEl : elementsToCreateSubgraphsFrom) {
             Element fromParentEl = fromEl.parent();
             DagNode fromNode = fromEl.dagNode;
             
@@ -299,8 +317,8 @@ public class DagStyleApplier {
         
         return graphEl;
     }
-    private List<DagElement> getElementsWithStyleProperty(Document document, final String propertyName, final String propertyValue) {
-        List<DagElement> result = new ArrayList<>();
+    private Map<DagElement, String> getElementsWithStyleProperty(Document document, final String propertyName, final String propertyValue) {
+        Map<DagElement, String> result = new LinkedHashMap<>();
         
         // copy the calculated styles from the DOM back into the gvStyles field
         final CSSOMParser inlineParser = new CSSOMParser();
@@ -319,8 +337,17 @@ public class DagStyleApplier {
                     }
                     DagElement dagElement = (DagElement) node;
                     DagNode dagNode = dagElement.dagNode;
-                    if (dagNode != null && declaration.getPropertyValue(propertyName).equals(propertyValue)) {
-                        result.add(dagElement);
+                    String nodePropertyValue = declaration.getPropertyValue(propertyName);
+                    if (propertyValue != null) {
+                        // match specific value
+                        if (dagNode != null && nodePropertyValue.equals(propertyValue)) {
+                            result.put(dagElement, nodePropertyValue);
+                        }
+                    } else {
+                        // match any value
+                        if (dagNode != null && !Text.isBlank(nodePropertyValue)) {
+                            result.put(dagElement, nodePropertyValue);
+                        }
                     }
                 }
             }
