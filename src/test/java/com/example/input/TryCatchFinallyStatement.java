@@ -3,7 +3,7 @@ package com.example.input;
 /** try / catch / finally test cases
  * 
  */
-public class TryCatchStatement {
+public class TryCatchFinallyStatement {
 
     
     public void testTenthBirthday() {
@@ -18,8 +18,9 @@ public class TryCatchStatement {
         } catch (Exception e) {
             System.out.println("not today");
             System.out.println("I got a lot to do");
-        } 
-        System.out.println("that's okay");
+        } finally {
+            System.out.println("that's okay");
+        }
     }
     
 }

@@ -44,6 +44,8 @@ public class JavaToGraphvizTest {
         testStatement("com.example.input.WhileStatement");
         testStatement("com.example.input.SynchronizeStatement");
         testStatement("com.example.input.TryCatchStatement");
+        testStatement("com.example.input.TryCatchFinallyStatement");
+        testStatement("com.example.input.TryWithResourcesStatement");
         
         testStatement("com.example.input.MultipleGraphs"); 
         testStatement("com.example.input.UserDefinedSubgraphs");
