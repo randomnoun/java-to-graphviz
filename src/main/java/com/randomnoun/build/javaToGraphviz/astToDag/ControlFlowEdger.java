@@ -67,7 +67,10 @@ import com.randomnoun.build.javaToGraphviz.dag.EntryEdge;
 import com.randomnoun.build.javaToGraphviz.dag.ExitEdge;
 import com.randomnoun.common.Text;
 
-// class that adds edges to the dag
+/** Class that adds control-flow edges to the dag.
+ * 
+ * @author knoxg
+ */
 public class ControlFlowEdger {
     Logger logger = Logger.getLogger(ControlFlowEdger.class);
     Dag dag;
@@ -167,8 +170,50 @@ public class ControlFlowEdger {
 	    
 	}
 
-	
-	   
+	/** Utility method to find a child DagNode corresponding to a particular ASTNode.
+	 * 
+	 * <p>If className is non-null, that class is added to the DagNode before it is returned.
+	 *  
+	 * @param children the children of a DagNode
+	 * @param astNode an ASTNode
+	 * @param className an optional className to add to the returned DagNode
+	 * 
+	 * @return the DagNode that matches the astNode, or null if it does not exist
+	 */
+	private DagNode getDagChild(List<DagNode> children, ASTNode astNode, String className) {
+        for (DagNode c : children) {
+            if (astNode == c.astNode) {
+                if (className != null) { 
+                    c.classes.add(className);
+                }
+                return c;
+            }
+        }
+        return null;
+    }
+
+    /** Utility method to find child DagNodes corresponding to a list of ASTNodes.
+     * 
+     * <p>If className is non-null, that class is added to each DagNode in the returned list.
+     *  
+     * @param children the children of a DagNode
+     * @param astNode a collection of ASTNodes
+     * @param className an optional className to add to each returned DagNode
+     * 
+     * @return a list of DagNodes that match the astNodes, or an empty list if there are no matching nodes
+     */
+	private List<DagNode> getDagChildren(List<DagNode> children, List<?> astNodes, String className) {
+        List<DagNode> result = new ArrayList<>();
+        for (DagNode c : children) {
+            if (astNodes.contains(c.astNode)) {
+                result.add(c);
+                if (className != null) { 
+                    c.classes.add(className);
+                }
+            }
+        }
+        return result;
+    }
 	
     
     // draw lines from each statement to each other
@@ -192,16 +237,23 @@ public class ControlFlowEdger {
 	    return prevNodes;
     }
 
+	// in the css you want to put a subgraph around the synchronizedBlock ( the expression is hoisted above this node )
     private List<ExitEdge> addSynchronizedEdges(Dag dag, DagNode synchronizedNode, LexicalScope scope) {
-        // there's an expression and a block but we don't draw expressions yet. OH YES WE DO.t
         SynchronizedStatement ss = (SynchronizedStatement) synchronizedNode.astNode;
         
-
-        // draw an edge to the sync node to the block so that we can put a subgraph around the sync node
-        // DagNode synchronizedBlock = synchronizedNode.children.get(0);
+        DagNode expressionDag = getDagChild(synchronizedNode.children, ss.getExpression(), null);
         DagNode synchronizedBlock = getDagChild(synchronizedNode.children, ss.getBody(), null);
-        dag.addEdge(synchronizedNode, synchronizedBlock);
-        List<ExitEdge> prevNodes = addBlockEdges(dag, synchronizedBlock, scope);  
+        
+        Rejigger rejigger = hoistNode(dag, synchronizedNode, expressionDag);
+        List<ExitEdge> prevNodes = addExpressionEdges(dag, expressionDag, scope);
+        prevNodes = rejigger.unhoistNode(dag, prevNodes);
+        
+        for (ExitEdge e : prevNodes) {
+            e.n2 = synchronizedBlock;
+            dag.addEdge(e);
+        }
+        
+        prevNodes = addBlockEdges(dag, synchronizedBlock, scope);  
         return prevNodes;
     }
 
@@ -235,8 +287,11 @@ public class ControlFlowEdger {
         
     }
     
-	// draw lines from each statement to each other
-    // returns an empty list
+	// draw lines from each statement to each other, with an artifical node at the end
+    // that all the thrown exceptions throw to, and that all the return statements return to.
+    // 
+    // methods don't have any edges leaving them, but we add one anyway so that we can layout
+    // methods inside anonymous classes better in graphviz. ( this edge will be transparent )
     private List<ExitEdge> addMethodDeclarationEdges(Dag dag, DagNode method, LexicalScope scope) {
         MethodDeclaration md = (MethodDeclaration) method.astNode;
         // method.label = "method " + md.getName();
@@ -350,10 +405,9 @@ public class ControlFlowEdger {
         
         if (namedScope.continueNode != null) { 
             DagEdge e;
-            e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, null); // "continue" + (label==null ? "" : " " + label)
-            // e.gvAttributes.put("color", "red");
+            e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, null);
             e.classes.add("continue");
-            e.gvAttributes.put("continueLabel", (label==null ? "" : " " + label));
+            e.gvAttributes.put("continueLabel", label==null ? "" : " " + label);
         } else if (namedScope.continueForward) {
             ExitEdge e = new ExitEdge();
             e.n1 = continueStatementNode;
@@ -369,20 +423,14 @@ public class ControlFlowEdger {
     }
 
     private List<ExitEdge> addLabeledStatementEdges(Dag dag, DagNode labeledStatementNode, LexicalScope scope) {
-        // there's no edges but remember this statement in the lexical scope
-        // or maybe this should create a new lexical scope. maybe it should.
-        // so we can break/continue to it
+        // remember this statement in the lexical scope so we can break/continue to it
         
-        // label, body
-        if (labeledStatementNode.children.size() != 2) {
-            throw new IllegalStateException("expected 2 children; found " + labeledStatementNode.children.size());
-        }
-
-        DagNode c = labeledStatementNode.children.get(1);
+        LabeledStatement ls = (LabeledStatement) labeledStatementNode.astNode;
+        DagNode c = getDagChild(labeledStatementNode.children, ls.getBody(), null);
+        String label = ls.getLabel() == null ? null : ls.getLabel().toString();
+        
         dag.addEdge(labeledStatementNode, c);
 
-        LabeledStatement ls = (LabeledStatement) labeledStatementNode.astNode;
-        String label = ls.getLabel() == null ? null : ls.getLabel().toString();
         c.javaLabel = label;
         
         List<ExitEdge> lsPrevNodes = addEdges(dag, c, scope);
@@ -390,7 +438,6 @@ public class ControlFlowEdger {
         List<ExitEdge> prevNodes = new ArrayList<ExitEdge>();
         prevNodes.addAll(lsPrevNodes); // Y branch
         
-        // break/continue edges here ?
         return prevNodes;
     }
 
@@ -402,6 +449,11 @@ public class ControlFlowEdger {
         ReturnStatement rs = (ReturnStatement) node.astNode;
         DagNode expressionDag = getDagChild(node.children, rs.getExpression(), null);
 
+        // the expressionDag is after the return in the AST, but we want to evaluate it before the 
+        // return statement (which already has edges leading to it), so we 'hoist' it above the 
+        // return node in the DAG. This process is one of the 'rejiggering' operations. 
+        // The opposite process when we add the return node back in is called 'unhoisting'. 
+        
         ExitEdge e;
         if (expressionDag != null) {
             Rejigger rejigger = hoistNode(dag, node, expressionDag);
@@ -480,15 +532,24 @@ public class ControlFlowEdger {
         return prevNodes;
     }
 	
-	// draw branches into and out of try body
+	// draw branches into and out of try statements
+	// try/catch/finally's are weird things to draw; what I've done is:
+	// * try resources link to try body
+	// * try body links to finally body
+	// * any throw edge in the try body links to all catch bodies 
+	//   ( ideally it'd just link to the correct catch body, but that requires knowing the class hierarchies, which we don't know yet )
+	// * exit edges are from the finally body, or from the try & catch bodies if there's no finally
+	// in the css, it helps if you put subgraphs with borders around the try, catch and finally bodies.
     private List<ExitEdge> addTryEdges(Dag dag, DagNode tryNode, LexicalScope scope) {
         // draw the edges
         TryStatement ts = (TryStatement) tryNode.astNode;
         
+        // @TODO resources 
+        
         List<DagNode> resourceDags = getDagChildren(tryNode.children, ts.resources(), "tryResource");
         DagNode bodyDag = getDagChild(tryNode.children, ts.getBody(), "tryBody");
-        List<DagNode> catchClauseDags = getDagChildren(tryNode.children, ts.catchClauses(), "catch");
-        DagNode finallyDag = getDagChild(tryNode.children, ts.getFinally(), "finally");
+        List<DagNode> catchClauseDags = getDagChildren(tryNode.children, ts.catchClauses(), "catch"); // tryCatch ?
+        DagNode finallyDag = getDagChild(tryNode.children, ts.getFinally(), "finally"); // tryFinally ?
         
         if (bodyDag == null) {
             throw new IllegalStateException("try with no body");
@@ -539,29 +600,7 @@ public class ControlFlowEdger {
     }
 
     
-    private DagNode getDagChild(List<DagNode> children, ASTNode astNode, String className) {
-        for (DagNode c : children) {
-            if (astNode == c.astNode) {
-                if (className != null) { 
-                    c.classes.add(className);
-                }
-                return c;
-            }
-        }
-        return null;
-    }
-    private List<DagNode> getDagChildren(List<DagNode> children, List<?> astNodes, String className) {
-        List<DagNode> result = new ArrayList<>();
-        for (DagNode c : children) {
-            if (astNodes.contains(c.astNode)) {
-                result.add(c);
-                if (className != null) { 
-                    c.classes.add(className);
-                }
-            }
-        }
-        return result;
-    }
+    
     // draw branches into and out of for body
     private List<ExitEdge> addForEdges(Dag dag, DagNode forNode, LexicalScope scope) {
         // draw the edges
