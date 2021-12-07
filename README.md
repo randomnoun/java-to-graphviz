@@ -65,9 +65,9 @@ Note it's not strictly a DAG, as we can get loops due to for/while/do constructs
 
 4. **Generate edges**. This recurses through the DAG and adds control flow edges to it. This may involve 'rejigging' the DAG so that nodes that execute before others are located before them in the diagram.
 
-5. **Filter nodes**. This recurses through the DAG and removes unnecessary nodes; e.g. "A -> B -> C" segments can be reduced to "A -> C". The filtering occurs around 'keepNodes' which must be kept in the final diagram.
+5. **Filter nodes**. This recurses through the DAG and removes unnecessary nodes; e.g. "A -> B -> C" segments can be reduced to "A -> C". The filtering occurs around 'keepNodes' which must be kept in the final diagram. Users can control how nodes are filtered and kept using special "gv" comments in the source code.
 
-6. **Create DOM**. The filtered DAG is converted into a HTML-like document object model (DOM). This represents the DAG structure in terms of "graoh", "node" and "edge" elements, with attributes for user-supplied styles and labels.
+6. **Create DOM**. The filtered DAG is converted into a HTML-like document object model (DOM). This represents the DAG structure in terms of "graph", "node" and "edge" elements, with attributes for user-supplied styles and labels, also supplied using special "gv" comments.
 
 7. **Apply styles**. The DOM has a CSS stylesheet applied to it. JavaToGraphviz comes with a few builtin stylesheets, but you can replace or override these in a number of ways. During this step,
 final node and edge IDs, labels, and formatting are determined. Additionally, extra subgraphs can be added into the diagram, which restructures the DOM and adds subgraphs into the DAG.
