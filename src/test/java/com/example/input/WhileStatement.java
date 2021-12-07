@@ -48,7 +48,7 @@ public class WhileStatement {
                 return;
             }
 
-            System.out.println("inspect eyes of other players");
+            System.out.println("who's round is it anyway");
         }
     }
     
