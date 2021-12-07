@@ -186,11 +186,17 @@ public class DagNodeFilter {
             newEdge.n2 = outEdge.n2;
             newEdge.label = inEdge.label;
             newEdge.back = inEdge.back || outEdge.back;
-            if (newEdge.back) { newEdge.classes.add("back"); } 
+            // if (newEdge.back) { newEdge.classes.add("back"); }
+            newEdge.classes.addAll(inEdge.classes);
+            newEdge.classes.addAll(outEdge.classes);
             
             // if either edge was colored (break edges), the merged edge is as well
-            String color = inEdge.gvAttributes.get("color") == null ? outEdge.gvAttributes.get("color") : inEdge.gvAttributes.get("color");
-            if (color != null) { newEdge.gvAttributes.put("color", color); }
+            // String color = inEdge.gvAttributes.get("color") == null ? outEdge.gvAttributes.get("color") : inEdge.gvAttributes.get("color");
+            // if (color != null) { newEdge.gvAttributes.put("color", color); }
+            
+            newEdge.gvAttributes.putAll(inEdge.gvAttributes);
+            newEdge.gvAttributes.putAll(outEdge.gvAttributes);
+            
 
             // TODO: combine styles, probably
             
