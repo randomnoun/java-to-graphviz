@@ -1,3 +1,4 @@
+
 # java-to-graphviz
 
 **java-to-graphviz** takes your java source code and converts it into graphviz diagrams.
@@ -14,7 +15,25 @@ are an abomination. You can probably use annotations as well later on once I've 
 
 So anyway here's the 10 types of statement it can handle:
 
-[images of all of those]
+|  AST node |  Sample code | Diagram |
+|--|--|--|
+| Block | <pre>// gv-graph<br/>{ // gv: Block edges<br/>    a();<br/>    b();<br/>    c();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-0.png) | 
+| If | <pre>// gv-graph<br/>{ // gv: If edges<br/>    before();<br/>    if (condition) {<br/>        truePath();<br/>    } else {<br/>        falsePath();<br/>    }<br/>    after();<br/>}</pre> | |
+| For | <pre>// gv-graph<br/>{ // gv: For edges<br/>    before();<br/>    for (i = 0; i &lt; 10; i++) {<br/>        println(i);<br/>    }<br/>    after();<br/>}</pre> | |
+| EnhancedFor | <pre>// gv-graph<br/>{ // gv: EnhancedFor edges<br/>    before();<br/>    for (int e : elements) {<br/>        println(e);<br/>    }<br/>    after();<br/>}</pre> | |
+| While | <pre>// gv-graph<br/>{ // gv: While Edges<br/>    before();<br/>    while (condition) {<br/>        println(i);<br/>    }<br/>    after();<br/>}</pre> | |
+| Do | <pre>// gv-graph<br/>{ // gv: Do Edges<br/>    before();<br/>    do {<br/>        println(i);<br/>    } while (condition);<br/>    after();<br/>}</pre> | |
+| Switch | <pre>// gv-graph<br/>{ // gv: Switch Edges<br/>    before();<br/>    switch(i) {<br/>        case 0: println(); // fallthrough<br/>        case 1: println(); break; <br/>        default: println();<br/>    }<br/>    after();<br/>}</pre> | |
+| Switch<br/>(alternate)| <pre>// gv-graph<br/>// gv-option: centralSwitch=true<br/>{ // gv: Switch Edges (alternate)<br/>    before();<br/>    switch(i) {<br/>        case 0: println(); // fallthrough<br/>        case 1: println(); break; <br/>        default: println();<br/>    }<br/>    after();<br/>}</pre> | |
+| InfixExpression | <pre>// gv-graph<br/>{ // gv: InfixExpression edges<br/>    println(1 + 2 / 3);<br/>}</pre> | |
+| UnaryExpression | <pre>// gv-graph<br/>{ // gv: UnaryExpression edges<br/>    i++;<br/>}</pre> | |
+| TernaryExpression | <pre>// gv-graph<br/>{ // gv: TernaryExpression edges<br/>    println(condition ? i : j);<br/>}</pre> | |
+
+
+[//]: # (The markdown source for this table is an abomination. I blame github.)
+
+[images of all of those, in a markdown table yeesh]
+![jquery-tabstops](https://raw.githubusercontent.com/randomnoun/jquery-tabstops/master/readme/stocks.png)
 
 and this is what it looks like when you throw that all together:
 
