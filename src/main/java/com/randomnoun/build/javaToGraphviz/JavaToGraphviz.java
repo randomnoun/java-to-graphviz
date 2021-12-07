@@ -179,7 +179,7 @@ public class JavaToGraphviz {
 		comments = ce.getComments(cu, src);
 		styleSheet = ce.getStyleSheet(comments, baseCssUrl, userCssUrls, userCssRules);
 		
-		AstToDagVisitor dv = new AstToDagVisitor(cu, src, comments, includeThrowNodes);
+		AstToDagVisitor dv = new AstToDagVisitor(cu, src, comments, includeThrowNodes, !removeNode);
         cu.accept(dv);
         dag = dv.getDag();
         
@@ -219,7 +219,7 @@ public class JavaToGraphviz {
         */
         
         for (DagNode rootNode : dag.rootNodes) {
-            if (rootGraph.nodes.contains(rootNode)) {
+            if (rootGraph.nodes.contains(rootNode)) {  // nodes are in the wrong graph
                 
                 LexicalScope lexicalScope = new LexicalScope();
 
@@ -258,12 +258,10 @@ public class JavaToGraphviz {
                     }
                 }
                 
-                if (removeNode) {
-                    DagNodeFilter filter = new DagNodeFilter(dag);
-                    rootNode.keepNode = true;
-                    filter.setLastKeepNode(rootNode, rootNode);
-                    filter.removeNodes(rootNode);
-                }
+                DagNodeFilter filter = new DagNodeFilter(dag);
+                rootNode.keepNode = true;
+                filter.setLastKeepNode(rootNode, rootNode);
+                filter.removeNodes(rootNode);
             }
         }
 
