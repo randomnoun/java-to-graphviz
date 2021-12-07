@@ -16,6 +16,7 @@ import org.w3c.dom.css.CSSStyleSheet;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvEndGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvKeepNodeComment;
@@ -155,7 +156,10 @@ public class CommentExtractor {
                     throw new IllegalStateException("gv-style does not start with '{' and end with '}':  '" + text + "'");
                 }
 
-            } else if (text.startsWith("gv-end")) {
+            } else if (text.startsWith("gv-endGraph")) {
+                comments.add(new GvEndGraphComment(c, line, column, eolComment));
+
+            } else if (text.startsWith("gv-endSubgraph")) {
                 comments.add(new GvEndSubgraphComment(c, line, column, eolComment));
                 
             } else if (text.startsWith("gv-literal:")) {
