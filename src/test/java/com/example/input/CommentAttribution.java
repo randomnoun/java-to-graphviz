@@ -7,7 +7,7 @@ public class CommentAttribution {
 
     // gv-style: { @import "JavaToGraphviz.css"; }
     
-    // keep all the expressionStatements. Do I really want to do this ? Look I suppose so
+    // keep all the expressionStatements and the blocks
     // gv-keepNode: expressionStatement block
     
     /* gv-style: {
