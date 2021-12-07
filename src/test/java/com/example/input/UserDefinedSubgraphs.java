@@ -17,7 +17,7 @@ public class UserDefinedSubgraphs {
         System.out.println("I like traffic lights");
         System.out.println("I like");
         
-        // gv-end
+        // gv-endSubgraph
         
         System.out.println("traffic lights");
         
