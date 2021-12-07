@@ -55,7 +55,7 @@ That DOM looks like this
  */
 graph {
 	fontname: "Handlee";
-	bgcolor: transparent;
+	bgcolor: white; /* transparent */
 	gv-idFormat: "G";
     gv-labelFormat: unset;
     compound: true; /* for lambda entry/exit edges */
@@ -87,7 +87,8 @@ subgraph {
 node {
 	gv-idFormat: "s_${lineNumber}";
 	/* gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; */
-	gv-labelFormat: "${lineNumber}: ${nodeType}"; 
+	/* gv-labelFormat: "${lineNumber}: ${nodeType}"; */
+	gv-labelFormat: "${nodeType}";
 }
 node.if {
 	gv-idFormat: "if_${lineNumber}";
@@ -344,7 +345,7 @@ node.lambda { gv-newSubgraph: true; } /* when I get round to those */
 
 /* edge styles */
 
-edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }
+edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }  /* maybe not breaks in switches though */ 
 edge.continue { color: red; gv-labelFormat: "continue ${continueLabel}"; }
 edge.return { color: blue; gv-labelFormat: "return"; }
 
@@ -374,20 +375,20 @@ edge.while.false { gv-labelFormat: "N"; }
 edge.do.true { gv-labelFormat: "do"; }
 edge.do.false{ gv-labelFormat: "N"; }  
 
-edge.case { gv-labelFormat: "case"; }
-edge.case.default { gv-labelFormat: "default"; }
-
 node.switchCase:not(.centralSwitch) { 
 	gv-idFormat: "case_${lineNumber}";
 	gv-labelFormat: "case ?";
     gv-wordwrap: 20;
     shape : diamond; 
 }
+edge.switchCase { gv-labelFormat: "case"; }
+edge.switchCase.default { gv-labelFormat: "default"; }
+
 edge.switchCase.true { gv-labelFormat: "Y"; }
 edge.switchCase.false { gv-labelFormat: "N"; } 
 
 
-edge.switch.fallthrough { } /* fall through from case block to next case */
+edge.switch.fallthrough { color: red; gv-labelFormat: "fallthrough"; } /* fall through from case block to next case */
 edge.switch.false { } /* no case conditions match, and no default present */
 
 /** If edges are in a subcluster, use xlabel rather than label otherwise graphviz double-spaces and triple-spaces the nodes */
