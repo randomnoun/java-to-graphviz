@@ -942,7 +942,7 @@ public class ControlFlowEdger {
                     if (exprDags.size() > 0) {
                         for (DagNode caseExprDag : exprDags) {
                             DagEdge exprEdge = dag.addEdge(switchNode, caseExprDag);
-                            exprEdge.classes.add("case");
+                            exprEdge.classes.add("switchCase");
                             exprPrevNodes = new ArrayList<>(addExpressionEdges(dag, caseExprDag, newScope));
                             // @TODO link these up with || nodes
                         }
@@ -950,6 +950,7 @@ public class ControlFlowEdger {
                     if (isDefaultCase) {
                         ExitEdge e = new ExitEdge();
                         e.n1 = switchNode;
+                        e.classes.add("switchCase");
                         e.classes.add("default");
                         hasDefaultCase = true;
                         exprPrevNodes.add(e);
@@ -1402,7 +1403,8 @@ public class ControlFlowEdger {
         List<DagEdge> inEdges = new ArrayList<>();
         for (DagEdge e : dag.edges) { if ( e.n2 == node ) { inEdges.add(e); } }
         if (inEdges.size() == 0) { 
-            throw new IllegalStateException("no inEdges"); 
+            // throw new IllegalStateException("no inEdges"); // this can happen if a new graph is created inside a method
+            
         }
 
         EntryEdge inEdge = new EntryEdge();
