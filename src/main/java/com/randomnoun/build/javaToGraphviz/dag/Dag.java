@@ -72,13 +72,20 @@ public class Dag {
     public Map<DagNode, DagSubgraph> dagNodeToSubgraph = new HashMap<>(); // convenience map for finding nodes already in subgraphs
     // public List<DagSubgraph> subgraphs = new ArrayList<>();
     
-    
     public List<DagSubgraph> rootGraphs = new ArrayList<>(); // subgraphs which start each diagram
     
     public List<DagSubgraph> getRootGraphs() {
         return rootGraphs;
     }
 
+    public void clear() {
+        rootNodes = new ArrayList<>();
+        dagNodeToSubgraph = new HashMap<>();
+        rootGraphs = new ArrayList<>();
+        
+    }
+
+    
     
     public void addNode(DagSubgraph root, DagNode n) {
         nodes.add(n);
@@ -205,4 +212,6 @@ public class Dag {
         names.add(n + "_" + idx); 
         return n + "_" + idx;
     }
+
+
 }
