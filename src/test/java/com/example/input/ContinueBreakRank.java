@@ -50,7 +50,7 @@ public class ContinueBreakRank {
             
             // gv-literal: { rank = same; case0; case1; case2; case3; case4; case5; case6; case7; case8; case9; case10; case11; case12; case13; case14; case15; caseDefault }
             
-            // gv-end
+            // gv-endSubgraph
             
             
             if (beatBoxing && semiquaver == 0) {
