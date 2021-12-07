@@ -13,7 +13,7 @@ probably isn't considered a new language feature any more.
 Anyway. You can annotate the generated diagram using specially-formatted comments, because I think annotations
 are an abomination. You can probably use annotations as well later on once I've implemented that.
 
-So anyway here's the 10 types of statement it can handle:
+So anyway here's the type of output it can produce:
 
 |  AST node |  Sample code | Diagram |
 |--|--|:--:|
@@ -29,19 +29,16 @@ So anyway here's the 10 types of statement it can handle:
 | UnaryExpression | <pre>// gv-graph<br/>{ // gv: UnaryExpression edges<br/>    i++;<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-9.png) |
 | TernaryExpression | <pre>// gv-graph<br/>{ // gv: TernaryExpression edges<br/>    println(condition ? i : j);<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-10.png) |
 
-
 [//]: # (The markdown source for this table is an abomination. I blame github.)
-
-[images of all of those, in a markdown table yeesh]
-![jquery-tabstops](https://raw.githubusercontent.com/randomnoun/jquery-tabstops/master/readme/stocks.png)
 
 and this is what it looks like when you throw that all together:
 
-[something much more complicated]
+
+![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/example-complicated.png)
 
 You obviously won't want that, so it suppresses nodes by default, to give you just the nodes you're interested in.
 
-[something between those two extremes]
+![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/example-simple.png)
 
 Here's a maven plugin to generate these things during your build process. Include them in your javadoc via
 
@@ -59,8 +56,6 @@ And so on.
 
 # Syntax
 
----Well I haven't sorted that out yet.---
-
 The general gist of the thing is that you can add comments inside your source code in order to shape the diagram that's generated.
 
 Those comments start with "gv:" ( or variations on that ) to differentiate them from your normal run-of-the-mill commentary.
@@ -69,7 +64,7 @@ To change the label on the diagram, supply some text after the "gv:", e.g. "gv: 
 
 [ order some donuts ]
 
-You can include individual style rules on ohe "gv:" comment by putting them in curly braces; e.g. "gv: order some donuts { color: blue }" would appear as 
+You can include individual style rules on the "gv:" comment by putting them in curly braces; e.g. "gv: order some donuts { color: blue }" would appear as 
 
 [ order some donuts ]
 
