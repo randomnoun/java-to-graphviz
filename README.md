@@ -16,7 +16,7 @@ are an abomination. You can probably use annotations as well later on once I've 
 So anyway here's the 10 types of statement it can handle:
 
 |  AST node |  Sample code | Diagram |
-|--|--|--|
+|--|--|:--:|
 | Block | <pre>// gv-graph<br/>{ // gv: Block edges<br/>    a();<br/>    b();<br/>    c();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-0.png) | 
 | If | <pre>// gv-graph<br/>{ // gv: If edges<br/>    before();<br/>    if (condition) {<br/>        truePath();<br/>    } else {<br/>        falsePath();<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-1.png) |
 | For | <pre>// gv-graph<br/>{ // gv: For edges<br/>    before();<br/>    for (i = 0; i &lt; 10; i++) {<br/>        println(i);<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-2.png) |
