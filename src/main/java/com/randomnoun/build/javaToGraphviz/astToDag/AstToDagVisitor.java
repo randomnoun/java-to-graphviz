@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvEndGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvKeepNodeComment;
@@ -54,10 +55,12 @@ public class AstToDagVisitor extends ASTVisitor {
     int lastIdx = 0;
     Dag dag;
     DagSubgraph root;
+    int rootGraphIdx = 0;
     List<CommentText> comments;
     CompilationUnit cu;
     String src;
     boolean includeThrowNode;
+    boolean defaultKeepNode;
     int nextLineFromLine = 0;
     List<GvComment> nextLineComments = new ArrayList<>(); 
     List<GvComment> nextDagComments = new ArrayList<>();
@@ -152,12 +155,13 @@ public class AstToDagVisitor extends ASTVisitor {
     }
     
     
-    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode) {
+    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode, boolean defaultKeepNode) {
         super(true);
         this.cu = cu;
         this.comments = comments;
         this.src = src;
         this.includeThrowNode = includeThrowNode;
+        this.defaultKeepNode = defaultKeepNode;
         dag = new Dag();
         root = new DagSubgraph(dag, null);
         dag.rootGraphs.add(root);
@@ -172,7 +176,7 @@ public class AstToDagVisitor extends ASTVisitor {
         return dag;
     }
     
-    void processCommentsToTypeOrMethodNode(DagNode mn, int line) {
+    void processCommentsToTypeOrMethodNode(DagNode pdn, int line, DagNode mn) {
         // DagNode lastNode = null;
         while (lastIdx < comments.size() && comments.get(lastIdx).line < line) {
             CommentText ct = comments.get(lastIdx);
@@ -186,24 +190,65 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.astNode = null;
             dn.options = options;
             */
+            DagNode dn = null;
             if (ct instanceof GvComment) {
                 mn.classes.addAll(((GvComment) ct).classes);
                 mn.label = ct.text; // last comment wins
+
             } else if (ct instanceof GvGraphComment) {
                 GvGraphComment gc =  ((GvGraphComment) ct);
-                // mn.digraphId = ct.text;
-                
-                // if the previous root doesn't have any nodes in it, apply these classes/styles to that root
-                if (root.nodes.size() > 0) {
+                // if this is the first root graph defined in this file, replace the existing one
+                // to remove the class ast node from the 0th root graph
+                if (rootGraphIdx == 0) {
+                    dag.clear();
+                    root = new DagSubgraph(dag, null);
+                    dag.rootGraphs.add(root);
+                    
+                } else {
                     root = new DagSubgraph(dag, null);
                     dag.rootGraphs.add(root);
                 }
                 root.name = gc.id;
                 root.classes.addAll(gc.classes);
                 root.gvAttributes.put("style", gc.inlineStyleString); // append to existing ?
-                
+                rootGraphIdx++;
+
+            } else if (ct instanceof GvEndGraphComment) {
+                if (rootGraphIdx == 0) {
+                    throw new IllegalStateException("gv-endGraph without gv-graph");
+                } else {
+                    root = null;
+                }
+            
             } else if (ct instanceof GvSubgraphComment) {
-                logger.warn("gv-subgraph outside of method");
+                GvSubgraphComment gvsc = (GvSubgraphComment) ct;
+                dn = new DagNode();
+                // dn.name = dag.getUniqueName("c_" + ct.line);
+                dn.keepNode = true; // always keep gv comments
+                dn.type = "comment";
+                dn.lineNumber = ct.line;
+                dn.classes.add("comment");
+                dn.label = ct.text;
+                dn.astNode = null;
+                dn.options = options;
+                
+                dn.name = gvsc.id;
+                dn.classes.addAll(gvsc.classes);
+                dn.classes.add("beginSubgraph");
+
+            } else if (ct instanceof GvEndSubgraphComment) {
+                dn = new DagNode();
+                // dn.name = dag.getUniqueName("c_" + ct.line);
+                dn.keepNode = true; // always keep gv comments
+                dn.type = "comment";
+                dn.lineNumber = ct.line;
+                dn.classes.add("comment");
+                dn.label = ct.text;
+                dn.astNode = null;
+                dn.options = options;
+                
+                dn.classes.add("endSubgraph");
+
             } else if (ct instanceof GvLiteralComment) {
                 logger.warn("gv-literal outside of method");
 
@@ -215,6 +260,17 @@ public class AstToDagVisitor extends ASTVisitor {
                 GvOptionComment oc =  ((GvOptionComment) ct);
                 options = newOptions(oc.text.trim());
 
+            }
+            
+            if (dn != null) {
+                if (pdn!=null) {
+                    if (root == null) { throw new IllegalStateException("gv comment outside of graph"); }
+                    dag.addNode(root, dn);
+                    pdn.addChild(dn);
+                } else {
+                    // could add as a root node, but let's see how we go
+                    throw new IllegalStateException("null pdn in processCommentsToTypeOrMethodNode");
+                }
             }
             
             lastIdx ++; 
@@ -233,7 +289,7 @@ public class AstToDagVisitor extends ASTVisitor {
             if (currentLineDn == null) {
                 dn = new DagNode();
                 // dn.name = dag.getUniqueName("c_" + ct.line);
-                dn.keepNode = true; // always keep comments
+                dn.keepNode = true; // always keep gv comments
                 dn.type = "comment";
                 dn.lineNumber = ct.line;
                 dn.classes.add("comment");
@@ -290,7 +346,31 @@ public class AstToDagVisitor extends ASTVisitor {
                 }
                 
             } else if (ct instanceof GvGraphComment) {
-                // @TODO something
+                GvGraphComment gc =  ((GvGraphComment) ct);
+                // if this is the first root graph defined in this file, replace the existing one
+                // to remove the class ast node from the 0th root graph
+                if (rootGraphIdx == 0) {
+                    dag.clear();
+                    root = new DagSubgraph(dag, null);
+                    dag.rootGraphs.add(root);
+
+                } else {
+                    root = new DagSubgraph(dag, null);
+                    dag.rootGraphs.add(root);
+                }
+                root.name = gc.id;
+                root.classes.addAll(gc.classes);
+                root.gvAttributes.put("style", gc.inlineStyleString); // append to existing ?
+                rootGraphIdx++;
+                dn = null;
+
+            } else if (ct instanceof GvEndGraphComment) {
+                if (rootGraphIdx == 0) {
+                    throw new IllegalStateException("gv-endGraph without gv-graph");
+                } else {
+                    root = null;
+                }
+                dn = null;
 
             } else if (ct instanceof GvSubgraphComment) {
                 GvSubgraphComment gvsc = (GvSubgraphComment) ct;
@@ -309,15 +389,18 @@ public class AstToDagVisitor extends ASTVisitor {
             } else if (ct instanceof GvKeepNodeComment) {
                 GvKeepNodeComment knc =  ((GvKeepNodeComment) ct);
                 keepNodeMatch = Arrays.asList(knc.text.trim().split("\\s+"));
+                dn = null;
 
             } else if (ct instanceof GvOptionComment) {
                 GvOptionComment oc =  ((GvOptionComment) ct);
                 options = newOptions(oc.text.trim());
+                dn = null;
             }
 
 
             if (dn != null && dn != currentLineDn) {
                 if (pdn!=null) {
+                    if (root == null) { throw new IllegalStateException("gv comment outside of graph"); }
                     dag.addNode(root, dn);
                     pdn.addChild(dn);
                 } else {
@@ -354,7 +437,7 @@ public class AstToDagVisitor extends ASTVisitor {
     }
 
     public boolean preVisit2(ASTNode node) {
-        DagNode pdn = getClosestDagNode(node);
+        DagNode pdn = getClosestDagNodeInRoot(root, node);
         
         int lineNumber = cu.getLineNumber(node.getStartPosition());
         int columnNumber = cu.getColumnNumber(node.getStartPosition());
@@ -393,55 +476,78 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.astNode = node;
             dn.options = options;
             
-            if (keepNodeMatch != null && keepNodeMatch.contains(lowerClass)) {
-                dn.keepNode = true;
+            if (keepNodeMatch != null) {
+                if (keepNodeMatch.contains(lowerClass) ||
+                    keepNodeMatch.contains("+" + lowerClass)) {
+                    dn.keepNode = true;
+                } else if (keepNodeMatch.contains("-" + lowerClass)) {
+                    dn.keepNode = false;
+                } else {
+                    dn.keepNode = defaultKeepNode;
+                }
+            } else {
+                dn.keepNode = defaultKeepNode;
             }
+            
 
+            // these comments may start a new graph, when that happens we need to reset the pdn
+            int beforeRootGraphIdx = rootGraphIdx;
             if (node instanceof TypeDeclaration) {
                 // comments get assigned to this node
-                processCommentsToTypeOrMethodNode(dn, lineNumber);
+                processCommentsToTypeOrMethodNode(pdn, lineNumber, dn); 
             } else if (node instanceof MethodDeclaration) {
                 // comments get assigned to this node
-                processCommentsToTypeOrMethodNode(dn, lineNumber);
+                processCommentsToTypeOrMethodNode(pdn, lineNumber, dn);
             } else {
-                // comments have their own nodes
+                // within methods, comments can have their own nodes
                 processCommentsToStatementNode(pdn, lineNumber, columnNumber, null);                    
             }
-            
-            dag.addNode(root, dn);
-            if (pdn!=null) {
-                pdn.addChild(dn);
-            } else {
-                logger.debug("preVisit: null pdn on " + dn.type + " on line " + dn.lineNumber);
-                // each typeDeclaration is it's own subgraph
-                dag.addRootNode(dn);
+            if (rootGraphIdx != beforeRootGraphIdx) {
+                // new graph, this node is a root node
+                pdn = null;
             }
             
-            // ok. so.
-            // if this line has multiple comments, then attribute them
-            // I'd also like to attribute them using some kind of indicator in the comment; e.g. 
-            //   gv:^: text the statement that ended above this line
-            //   gv:<: text the statement that ended to the left
-            //   gv:>: text the statement that starts to the right
-            //   gv:v: text the statement that starts below
-            // or some other syntax
-            // for nested AST/DagNodes, the outermost AST/DagNode that started/ended on that line
-            
-            if (nextDagComments.size() > 0) {
-                for (GvComment gc : nextDagComments) {
-                    annotateDag(dn, gc);
+            // omit nodes outside of graphs
+            if (root != null) {
+                dag.addNode(root, dn);
+                if (pdn!=null) {
+                    pdn.addChild(dn);
+                } else {
+                    logger.debug("preVisit: null pdn on " + dn.type + " on line " + dn.lineNumber);
+                    // each typeDeclaration is it's own subgraph
+                    
+                    // think these need to go with the rootGraph rather than the dag
+                    // actually maybe there should be a list of dags rather than a list of subgraphs
+                    
+                    dag.addRootNode(dn);
                 }
-                nextDagComments.clear();
-            }
-            if (nextLineComments.size() > 0 && nextLineFromLine != dn.lineNumber) {
-                for (GvComment gc : nextLineComments) {
-                    annotateDag(dn, gc);
-                }
-                nextLineComments.clear();
-                nextLineFromLine = 0;
-            }
             
-            processCommentsToStatementNode(pdn, lineNumber, columnNumber, dn);
+                // ok. so.
+                // if this line has multiple comments, then attribute them
+                // I'd also like to attribute them using some kind of indicator in the comment; e.g. 
+                //   gv:^: text the statement that ended above this line
+                //   gv:<: text the statement that ended to the left
+                //   gv:>: text the statement that starts to the right
+                //   gv:v: text the statement that starts below
+                // or some other syntax
+                // for nested AST/DagNodes, the outermost AST/DagNode that started/ended on that line
+                
+                if (nextDagComments.size() > 0) {
+                    for (GvComment gc : nextDagComments) {
+                        annotateDag(dn, gc);
+                    }
+                    nextDagComments.clear();
+                }
+                if (nextLineComments.size() > 0 && nextLineFromLine != dn.lineNumber) {
+                    for (GvComment gc : nextLineComments) {
+                        annotateDag(dn, gc);
+                    }
+                    nextLineComments.clear();
+                    nextLineFromLine = 0;
+                }
+                
+                processCommentsToStatementNode(pdn, lineNumber, columnNumber, dn);
+            }
 
             /*
             if (lastIdx < comments.size() && comments.get(lastIdx).line == lineNumber) {
@@ -511,10 +617,15 @@ public class AstToDagVisitor extends ASTVisitor {
      * @param node
      * @return
      */
-    public DagNode getClosestDagNode(ASTNode node) {
+    public DagNode getClosestDagNodeInRoot(DagSubgraph root, ASTNode node) {
         while (node != null) {
-            if (dag.astToDagNode.get(node) != null) { 
-                return dag.astToDagNode.get(node);
+            if (dag.astToDagNode.get(node) != null) {
+                DagNode dagNode = dag.astToDagNode.get(node);
+                if (root.nodes.contains(dagNode)) {
+                    return dagNode;
+                } else {
+                    return null;
+                }
             }
             ASTNode parent = node.getParent();
             node = parent;
