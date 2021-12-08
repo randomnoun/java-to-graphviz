@@ -38,6 +38,11 @@ public class DagStyleApplier {
     Document document;
     Map<DagNode, DagElement> dagNodesToElements = new HashMap<>();
     
+    boolean includeIncomingIdAttributes = false;
+    boolean includeOutgoingIdAttributes = false;
+    boolean includeIncomingClassAttributes = false;
+    boolean includeOutgoingClassAttributes = false;
+    
     // 'type' is a var in cast & instanceof expressions, but might move that into it's own DagNode later
     public static String[] NODE_LABEL_VARIABLES = new String[] { "className", "methodName", "name",
         "exceptionSpec",
@@ -49,6 +54,31 @@ public class DagStyleApplier {
     public DagStyleApplier(Dag dag, DagSubgraph root) {
         this.dag = dag;
         this.root = root;
+        if (root.nodes.size() > 0) {
+            // get the options on the first node of this subgraph
+            Map<String, String> options = root.nodes.get(0).options;
+            if (options != null) {
+                String domIdAttributes = options.get("domIdAttributes");
+                if ("incoming".equals(domIdAttributes)) {
+                    includeIncomingIdAttributes = true;
+                } else if ("outgoing".equals(domIdAttributes)) {
+                    includeOutgoingIdAttributes = true;
+                } else if ("both".equals(domIdAttributes)) {
+                    includeIncomingIdAttributes = true;
+                    includeOutgoingIdAttributes = true;
+                }
+                String domClassAttributes = options.get("domClassAttributes");
+                if ("incoming".equals(domClassAttributes)) {
+                    includeIncomingClassAttributes = true;
+                } else if ("outgoing".equals(domClassAttributes)) {
+                    includeOutgoingClassAttributes = true;
+                } else if ("both".equals(domClassAttributes)) {
+                    includeIncomingClassAttributes = true;
+                    includeOutgoingClassAttributes = true;
+                }
+            }
+        }
+        
     }
     
     public Document createDom() {
@@ -277,10 +307,18 @@ public class DagStyleApplier {
                 DagElement edgeElement = new DagElement(edge, edge.gvAttributes);
                 // edges don't have IDs here but could
                 // child.attr("id", edge.name);
-                edgeElement.attr("inNodeId", edge.n1.name);
-                edgeElement.attr("outNodeId", edge.n2.name);
-                edgeElement.attr("inNodeClass", Text.join(edge.n1.classes, " "));
-                edgeElement.attr("outNodeClass", Text.join(edge.n2.classes, " "));
+                if (includeIncomingIdAttributes) {
+                    edgeElement.attr("inNodeId", edge.n1.name);
+                }
+                if (includeOutgoingIdAttributes) {
+                    edgeElement.attr("outNodeId", edge.n2.name);
+                }
+                if (includeIncomingClassAttributes) {
+                    edgeElement.attr("inNodeClass", Text.join(edge.n1.classes, " "));
+                }
+                if (includeOutgoingClassAttributes) {
+                    edgeElement.attr("outNodeClass", Text.join(edge.n2.classes, " "));
+                }
                 outNodeIds = outNodeIds == null ? edge.n2.name : outNodeIds + " " + edge.n2.name;
                 outNodeClasses.addAll(edge.n2.classes);
                 result.add(edgeElement);
@@ -290,10 +328,18 @@ public class DagStyleApplier {
                 inNodeClasses.addAll(edge.n1.classes);
             }
         }
-        nodeElement.attr("inNodeId", inNodeIds);
-        nodeElement.attr("outNodeId", outNodeIds);
-        nodeElement.attr("inNodeClass", Text.join(inNodeClasses,  " "));
-        nodeElement.attr("outNodeClass", Text.join(outNodeClasses,  " "));
+        if (includeIncomingIdAttributes) { 
+            nodeElement.attr("inNodeId", inNodeIds);
+        }
+        if (includeOutgoingIdAttributes) {
+            nodeElement.attr("outNodeId", outNodeIds);
+        }
+        if (includeIncomingClassAttributes) {
+            nodeElement.attr("inNodeClass", Text.join(inNodeClasses,  " "));
+        }
+        if (includeOutgoingClassAttributes) {
+            nodeElement.attr("outNodeClass", Text.join(outNodeClasses,  " "));
+        }
         return result;
     }
 
