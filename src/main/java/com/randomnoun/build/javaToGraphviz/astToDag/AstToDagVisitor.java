@@ -176,6 +176,10 @@ public class AstToDagVisitor extends ASTVisitor {
         return dag;
     }
     
+    public Map<String, String> getOptions() {
+        return options;
+    }
+    
     void processCommentsToTypeOrMethodNode(DagNode pdn, int line, DagNode mn) {
         // DagNode lastNode = null;
         while (lastIdx < comments.size() && comments.get(lastIdx).line < line) {
