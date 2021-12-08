@@ -11,12 +11,15 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.randomnoun.common.ProcessUtil;
+import com.randomnoun.common.ProcessUtil.ProcessException;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 public class JavaToGraphvizTest {
 
     private static boolean WRITE_EXPECTED_OUTPUT = true;
+    private static boolean WRITE_EXPECTED_OUTPUT_PNG = true;
     
     @BeforeClass 
     public static void beforeAllTestMethods() {
@@ -28,7 +31,13 @@ public class JavaToGraphvizTest {
     
     @Test
     public void testControlFlowStatements() throws IOException {
+
         
+        // testStatement("com.example.input.MultipleGraphs");
+        // testStatement("com.example.input.UserDefinedSubgraphs");
+        testStatement("com.example.input.AllTheControlFlowNodes");
+        
+        /*
         testStatement("com.example.input.MethodChain");
         testStatement("com.example.input.Constructor");
         
@@ -48,8 +57,6 @@ public class JavaToGraphvizTest {
         testStatement("com.example.input.TryCatchFinallyStatement");
         testStatement("com.example.input.TryWithResourcesStatement");
         
-        testStatement("com.example.input.MultipleGraphs"); 
-        testStatement("com.example.input.UserDefinedSubgraphs");
         testStatement("com.example.input.CommentAttribution");
         
         testStatement("com.example.input.Expressions");
@@ -60,7 +67,7 @@ public class JavaToGraphvizTest {
         testStatement("com.example.input.Expressions4");
         testStatement("com.example.input.Expressions5");
         testStatement("com.example.input.Expressions6");
-        
+        */
 
     }
     
@@ -68,38 +75,115 @@ public class JavaToGraphvizTest {
         Logger logger = Logger.getLogger(JavaToGraphvizTest.class);
         logger.info(className);
         
-        File f = new File("src/test/java/" + Text.replaceString(className,  ".",  "/") + ".java");
-        FileInputStream fis = new FileInputStream(f);
+        // create 2 diagrams, one with removeNode = true
+        int configCombinations = 2;
+        String dotExe = "C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot.exe";
         
-        // InputStream is = JavaToGraphviz4.class.getResourceAsStream("/test.java");
-        // InputStream is = JavaToGraphviz.class.getResourceAsStream("/Statements.java");
-        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
-        JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
-        javaToGraphviz.setBaseCssUrl("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
-        // javaToGraphviz.setRemoveNode(true);
-        javaToGraphviz.parse(fis, "UTF-8");
-        fis.close();
-        
-        int idx = 0;
-        
-        boolean hasNext;
-        do {
-            StringWriter sw = new StringWriter();
-            hasNext = javaToGraphviz.writeGraphviz(sw);
-            logger.debug(sw.toString());
+        for (int i = 0; i < configCombinations; i++) {
             
-            if (WRITE_EXPECTED_OUTPUT) {
-                File tf = new File("src/test/resources/expected-output/" + className + "-" + idx + ".dot");            
-                FileOutputStream fos = new FileOutputStream(tf);
-                fos.write(sw.toString().getBytes());
-                fos.close();
-                idx++;
+            File f = new File("src/test/java/" + Text.replaceString(className,  ".",  "/") + ".java");
+            FileInputStream fis = new FileInputStream(f);
+            String suffix = "";
+            
+            JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
+            javaToGraphviz.setBaseCssUrl("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
+            if (i == 1) {
+                javaToGraphviz.setRemoveNode(true);
+                suffix = "-compact";
             }
+            javaToGraphviz.parse(fis, "UTF-8");
+            fis.close();
             
-            if (hasNext) { logger.info("==========================="); }
-        } while (hasNext);
-        
+            int idx = 0;
+            
+            boolean hasNext;
+            do {
+                StringWriter sw = new StringWriter();
+                hasNext = javaToGraphviz.writeGraphviz(sw);
+                logger.debug(sw.toString());
+                
+                File tf = new File("src/test/resources/expected-output/" + className + "-" + idx + suffix + ".dot");
+                File tfPng = new File("src/test/resources/expected-output/" + className + "-" + idx + suffix + ".png");
+                if (WRITE_EXPECTED_OUTPUT) {
+                    FileOutputStream fos = new FileOutputStream(tf);
+                    fos.write(sw.toString().getBytes());
+                    fos.close();
+                    idx++;
+                }
+                if (WRITE_EXPECTED_OUTPUT_PNG) {
+                    // call graphviz as well
+                    String output;
+                    try {
+                        output = ProcessUtil.exec(new String[] {
+                            dotExe,
+                            tf.getPath(),
+                            "-Tpng",
+                            "-o" + tfPng.getPath()
+                        });
+                        logger.info("gv output: " + output);
+                    } catch (ProcessException e) {
+                        logger.info("process failed", e);
+                    }
+                    
+                }
+                
+                if (hasNext) { logger.info("==========================="); }
+            } while (hasNext);
+            
+        }
     }
-
+        
+        
+    @Test
+    public void testDom() throws IOException {
+        testDom("com.example.input.ForStatement");
+    }
+    
+    public void testDom(String className) throws IOException {
+        Logger logger = Logger.getLogger(JavaToGraphvizTest.class);
+        logger.info(className);
+        
+        // create 2 files, with and without css applied
+        int configCombinations = 2;
+        
+        for (int i = 0; i < configCombinations; i++) {
+            
+            File f = new File("src/test/java/" + Text.replaceString(className,  ".",  "/") + ".java");
+            FileInputStream fis = new FileInputStream(f);
+            String suffix = "";
+            
+            JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
+            javaToGraphviz.setBaseCssUrl("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
+            if (i == 0) {
+                javaToGraphviz.setFormat("dom1");
+                suffix = "-dom1";
+            } else if (i == 1) {    
+                javaToGraphviz.setFormat("dom2");
+                suffix = "-dom2";
+            }
+    
+            javaToGraphviz.parse(fis, "UTF-8");
+            fis.close();
+            
+            int idx = 0;
+            
+            boolean hasNext;
+            do {
+                StringWriter sw = new StringWriter();
+                hasNext = javaToGraphviz.writeGraphviz(sw);
+                logger.debug(sw.toString());
+                
+                File tf = new File("src/test/resources/expected-output/" + className + "-" + idx + suffix + ".dom");
+                if (WRITE_EXPECTED_OUTPUT) {
+                    FileOutputStream fos = new FileOutputStream(tf);
+                    fos.write(sw.toString().getBytes());
+                    fos.close();
+                    idx++;
+                }
+                if (hasNext) { logger.info("==========================="); }
+            } while (hasNext);
+            
+        }
+    }
+    
 }
