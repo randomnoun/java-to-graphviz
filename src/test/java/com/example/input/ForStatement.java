@@ -26,11 +26,15 @@ public class ForStatement {
         things.add("brown paper packages tied up with string");
         int thingCount = 0;
         for (String t : things) {
-            // NB: inaccurate thing count due to conjunctions in thing list
+            // NB: inaccurate thing count due to plurals and conjunctions in thing list
             // @TODO add NLP processing
             thingCount ++; // gv: in loop  
         }
-        System.out.println(thingCount); // gv: after loop 
+        System.out.println("these are " + 
+            (thingCount == 1 ? "one of" :
+            (thingCount == 2 ? "a couple of " :
+            (thingCount == 3 ? "a few of" :
+            "DOES NOT COMPUTE" ))) + " my favourite things"); // gv: after loop
     }
 
     
