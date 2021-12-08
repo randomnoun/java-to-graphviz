@@ -17,6 +17,7 @@ public class AllTheControlFlowNodes {
     public void println(int i) { };
     public void before() { };
     public void after() { };
+    public void orderDonuts() { };
     
     
     public void testAllTheControlFlowNodes() {
@@ -123,5 +124,12 @@ public class AllTheControlFlowNodes {
         // there's more than this of course
         
     }
+    
+    // gv-graph
+    // gv-keepNode: -methodDeclaration -expressionStatement -block -switchCase
+    public void example() {
+        orderDonuts();  // gv: order some donuts
+    }
+
 
 }
