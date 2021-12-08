@@ -138,15 +138,118 @@ someOtherCode(false); // gv#unique: righteo then
 
 Those styles are applied to a pretend DOM that is created separate from the graphviz diagram; the style rules you create are applied to the imaginary DOM and then the calculated styles are used in the generated diagram.
 
-The DOM looks a little bit like the AST of the program, but different.
+The DOM looks a little bit like the AST of the program, but different. Here's a snippet before styles are applied.
 
-[ the dom ]
+<pre>
+&lt;html&gt;
+ &lt;head&gt;&lt;/head&gt;
+ &lt;body&gt;
+  &lt;graph&gt;
+   &lt;graphNode&gt;&lt;/graphNode&gt;
+   &lt;graphEdge&gt;&lt;/graphEdge&gt;
+   &lt;node id label classname="ForStatement" class="typeDeclaration class"&gt;
+    &lt;node id label class="simpleName"&gt;&lt;/node&gt;
+    &lt;node id label methodname="testFor" class="methodDeclaration"&gt;
+     &lt;node id label class="simpleName"&gt;&lt;/node&gt;
+     &lt;node id label class="block"&gt;
+      &lt;node id label=" start of method" class="comment"&gt;&lt;/node&gt;
+      &lt;edge&gt;&lt;/edge&gt;
+      &lt;node id label class="for"&gt;
+       &lt;node id label type="int" class="initialiser variableDeclarationExpression"&gt;
+        &lt;node id label variablename="i" type="int" class="variableDeclarationFragment"&gt;
+         &lt;node id label class="simpleName"&gt;&lt;/node&gt;
+         &lt;node id label literalvalue="0" class="numberLiteral literal"&gt;&lt;/node&gt;
+         &lt;edge&gt;&lt;/edge&gt;
+        &lt;/node&gt;
+        &lt;edge&gt;&lt;/edge&gt;
+       &lt;/node&gt;
+       &lt;edge&gt;&lt;/edge&gt;
+       &lt;node id label operatortoken="&lt;" operatorname="InfixExpression$Operator" class="expression infixExpression"&gt;
+        &lt;node id label name="i" class="simpleName"&gt;&lt;/node&gt;
+        &lt;edge&gt;&lt;/edge&gt;
+        &lt;node id label literalvalue="12" class="numberLiteral literal"&gt;&lt;/node&gt;
+        &lt;edge&gt;&lt;/edge&gt;
+       &lt;/node&gt;
+</pre>
 
 There are some elements and attributes in that DOM which are created automatically from the Java source, those are:
 
-[ list of those ]
+| Element | Description |
+|--|--|
+| html, head, body | These HTML elements exist solely so that I can use the jsoup CSS selector code to apply CSS rules to the DOM |
+| graph | The `graph` element represents an entire graphviz diagram. Styles applied to this node are set on the graphviz `digraph` |
+| graphNode | The `graphNode` element represents the [default node styles](https://graphviz.org/doc/info/lang.html). Styles applied to this node are set on a `node` object in the `digraph`. <br/>Note you could also apply styles to all nodes by using a `.node` selector in a CSS rule. There's pros and cons to each approach. |
+| graphEdge | The `graphEdge` element represents the [default edge styles](https://graphviz.org/doc/info/lang.html). Styles applied to this node are set on an `edge` object in the `digraph`.  <br/>Note you could also apply styles to all edges by using an `.edge` selector in a CSS rule. There's pros and cons to each approach. |
+| node | Each `node` represents a node in the DAG, which usually represents a node in the AST. `node`s created from AST nodes will have a class attribute containing the AST type ( e.g. `methodDeclaration` for a [MethodDeclaration](https://www.ibm.com/docs/en/rational-soft-arch/9.5?topic=SS8PJ7_9.5.0/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/MethodDeclaration.html) ) |
+| edge | Each `edge` represents an edge in the DAG. Edges may have other classes assigned by the specific Edger implementation ( e.g. the ControlFlowEdger will add 'true' and 'false' classes to edges leading out of 'if' nodes ) |
 
-Meaning you can turn all your 'if' statements to diamonds via
+There are a few standard attributes:
+
+| Attribute | Description |
+|--|--|
+| id | Each node has an id attribute which can be used to select that node from external CSS. If blank, it will be set using `gv-idFormat` rules in the CSS |
+| label | Each node has a label attribute which populates the graphviz 'label' attribute. If blank, it will be set using `gv-labelFormat` rules in the CSS |
+| class | Each node and edge may have additional classes defined by the Edger or by the user in gv comments |
+| style | Each node and edge may have additional styles defined by the user in gv comments |
+| lineNumber | The starting line number of this node in the source code. As these line numbers are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. |
+
+
+And some attributes added to nodes by the ControlFlowEdger:
+
+| Attribute | Applies to | Description |
+|--|--|--|
+| className | classSomething | The name of the Java class or interface |
+| methodName | methodDeclaration | The name of the method |
+| name |  | The name of the variable, usually |
+| exceptionSpec |  | The type and name of the caught exception |
+| operatorToken |  | The operatorToken ( e.g. "*" ) |
+| operatorName |  | a more css-friendly version of the operator token ( e.g. "operatorAsterisk" ) | 
+| type |  | The type of the variable |
+| variableName |  | The name of the variable |
+| literalValue |  | The literal value in the source code |
+| fieldName |  | The name of the field |
+
+And attributes added to edges by the ControlFlowEdger:
+
+| Attribute | Applies to | Description |
+|--|--|--|
+| breakLabel | Break | if a target label was included in the `break`, that target label, otherwise an empty string  |
+| continueLabel |  if a target label was included in the `continue`, that target label, otherwise an empty string  |
+
+The AST classes you're going to get in your DOM are:
+
+[ big list of those ]
+
+Users can create CSS rules based on the values of these elements and attributes, which are then applied to the DOM and merged with the a 'style' attribute.
+
+## Style properties
+
+Most properties correspond to graphviz attributes; see the [Graphviz documentation](https://graphviz.org/doc/info/attrs.html) for a complete list of these.
+
+Some additional properties are handled by JavaToGraphviz itself, these are all namespaced with a "gv-" prefix.
+
+Prefixed properties inculde
+
+| Property |  |  |
+|--|--|--|
+| gv-idFormat | The `gv-idFormat` is used to assign IDs to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram. <br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, <br/>The default `gv-idFormat` specified in `JavaToGraphviz-base.css` is <pre>node {<br/>  gv-idFormat: "s_${lineNumber}";<br/>}</pre> which assigns an ID of `"s_"` followed by the line numebr of the node. <br/>As these `${lineNumber}`s are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. |
+| gv-labelFormat | The `gv-labelFormat` is used to assign labels to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram.
+<br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, similar to the gv-idFormat.
+<br/>The labelFormat may include the id, or the id may include the label, but they may not include each other.
+| gv-wordwrap | The `gv-wordWrap` property can be used to force newlines to be added into the node label. 
+This is useful for some graphviz shape types ( e.g. diamond ), which become overly stretched if their label is wide.
+| gv-newSubgraph | Create a new subgraph 'underneath' the selected element |
+| gv-beginOuterSubgraph | Create a new subgraph 'above' the selected element, then move the selected element and all nodes to gv-endSubgraph into that subgraph |
+| gv-endOuterSubgraph | Marks the end of the subgraph created by `gv-beginOuterSubgraph`. |
+| gv-truncateEdges | Either "incoming", "outgoing", "none" or "both". Will truncate the edges leading into or out of a subgraph. Must be applied to the same element that had the gv-newSubgraph property. Edges will begin/end outside the subgraph boundary |
+| gv-truncateEdges | Either "incoming", "outgoing", "none" or "both". Will truncate the edges leading into or out of a subgraph. Must be applied to the same element that had the gv-newSubgraph property. Edges will begin/end outside the subgraph boundary |
+| gv-xlabelFormat | Similar to `gv-labelFormat` but sets the [`xlabel`](https://graphviz.org/docs/attrs/xlabel/) attribute, which causes the label to be ignored during graphviz edge routing |
+
+Note that gv-newSubgraph style property ( defined in the CSS ) is not the same as the gv-subgraph directive ( defined in the source code ), discussed earlier, although they perform similar tasks.
+
+## Style examples
+
+This combination of elements, attributes and properties means you can turn all your 'if' statements to diamonds via:
 
 /* gv-style: { .if { shape: diamond; } } */
 
@@ -177,20 +280,20 @@ DONE
 * can put literal gv into the diagram
 * few builtin methods/style properties/declarations to make this a bit easier to generate diagrams; e.g. wordwrap, flip logic on if edge labels, probably others
 * comment attribution 
+* bit of flexibility when it comes to how the diagram is generated ( node suppression , artificial nodes, that sort of thing )
+* seeing I"m going to the trouble of creating a DOM to apply styles maybe dump that as well, &/or the AST tree. apply styles to AST nodes vs dag nodes ?
+* lambdas, fluent methods, anonymous classes
 
 TODO
 
 So a few things I want to be able to support
 
-* bit of flexibility when it comes to how the diagram is generated ( node suppression , artificial nodes, that sort of thing )
-* seeing I"m going to the trouble of creating a DOM to apply styles maybe dump that as well, &/or the AST tree. apply styles to AST nodes vs dag nodes ?
 * bunch up the exit nodes if there's lots of them
-* lambdas, fluent methods
 
 URLs to throw around in the description:
 
 programcreek sample code to extract comments: 
-https://www.programcreek.com/2013/03/get-internal-comments-by-using-eclipse-jdt-astparser/ 
+thttps://www.programcreek.com/2013/03/get-internal-comments-by-using-eclipse-jdt-astparser/ 
 the good ol' java 1.5 javacc grammar :
 https://github.com/javacc/javacc/blob/master/examples/JavaGrammars/1.5/Java1.5.jj
 a wayback copy of grammars of yesteryear:
