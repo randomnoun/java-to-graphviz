@@ -1188,10 +1188,10 @@ public class ControlFlowEdger {
             return addInfixExpressionEdges(dag, node, scope);
 
         } else if (node.type.equals("CastExpression")) {
-            return addCastEdges(dag, node, scope);
+            return addCastExpressionEdges(dag, node, scope);
 
         } else if (node.type.equals("InstanceofExpression")) {
-            return addInstanceofEdges(dag, node, scope);
+            return addInstanceofExpressionEdges(dag, node, scope);
             
         } else if (node.type.equals("Assignment")) {
             return addAssignmentEdges(dag, node, scope);
@@ -1778,7 +1778,7 @@ public class ControlFlowEdger {
         return prevNodes;
     }
 
-    private List<ExitEdge> addCastEdges(Dag dag, DagNode node, LexicalScope scope) {
+    private List<ExitEdge> addCastExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
         CastExpression ce = (CastExpression) node.astNode;
         DagNode expressionDag = getDagChild(node.children, ce.getExpression(), null);
         DagNode typeDag = getDagChild(node.children, ce.getType(), null);
@@ -1803,7 +1803,7 @@ public class ControlFlowEdger {
     }
 
     
-    private List<ExitEdge> addInstanceofEdges(Dag dag, DagNode node, LexicalScope scope) {
+    private List<ExitEdge> addInstanceofExpressionEdges(Dag dag, DagNode node, LexicalScope scope) {
         InstanceofExpression ioe = (InstanceofExpression) node.astNode;
         DagNode expressionDag = getDagChild(node.children, ioe.getLeftOperand(), null);
         DagNode typeDag = getDagChild(node.children, ioe.getRightOperand(), null);
