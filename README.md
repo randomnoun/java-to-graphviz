@@ -107,6 +107,8 @@ orderDonuts();  // gv: order some donuts { color: blue; fontcolor: blue; }
 
 ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/style-2.png)
 
+## Style sheets
+
 You can also apply styles to various nodes using the graphviz equivalent of CSS, in which style rules are defined in a "gv-style:" block, and then classes and IDs are assigned to AST nodes in your gv comments to apply those rules. 
 
 I'm using a real CSS parser here, so all the [fiddly bits around specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity) should apply to those rules, assuming you know them, which you should if you're born any time past the 1990s. 
