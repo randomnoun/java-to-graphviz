@@ -1,12 +1,23 @@
 package com.example.input;
 
-/** Multiple graphs */
+/** Multiple graphs 
+ * 
+ * <p>This file creates the diagrams which are in the README.md
+ * 
+ */
 public class AllTheControlFlowNodes {
     
     // gv-style: { @import "JavaToGraphviz.css"; }
-    
+    /* gv-style: {
+        // some rules 
+        .something { color: red; }
+        .special { color: green; }
+        #unique { shape: hexagon; }
+    } 
+    */    
     // keep everything except for the expressionStatements and the blocks
-    // gv-keepNode: -expressionStatement -block -switchCase
+    // g v - o p tion: defaultKeepNode=true
+    // gv-keepNode: startNode -expressionStatement -block -switchCase
 
     public void a() { };
     public void b() { };
@@ -18,6 +29,8 @@ public class AllTheControlFlowNodes {
     public void before() { };
     public void after() { };
     public void orderDonuts() { };
+    public void someCode() { };
+    public void someOtherCode(boolean x) { };
     
     
     public void testAllTheControlFlowNodes() {
@@ -126,10 +139,34 @@ public class AllTheControlFlowNodes {
     }
     
     // gv-graph
-    // gv-keepNode: -methodDeclaration -expressionStatement -block -switchCase
+    // gv-option: defaultKeepNode=false
+    // gv-keepNode: -startNode -methodDeclaration -methodDeclarationEnd -expressionStatement -block
     public void example() {
+        before();  // gv: { color: transparent; fontcolor: transparent; style: unset; }
         orderDonuts();  // gv: order some donuts
+        after();   // gv: { color: transparent; fontcolor: transparent; style: unset; }
     }
 
 
+    // gv-graph
+    // gv-option: defaultKeepNode=false
+    // gv-keepNode: -startNode -methodDeclaration -methodDeclarationEnd -expressionStatement -block
+    public void example2() {
+        before();  // gv: { color: transparent; fontcolor: transparent; style: unset; }
+        orderDonuts();  // gv: order some donuts { shape: oval; color: blue; fontcolor: blue; }
+        after();   // gv: { color: transparent; fontcolor: transparent; style: unset; }
+    }
+
+    // gv-graph
+    // gv-option: defaultKeepNode=false
+    // gv-keepNode: -startNode -methodDeclaration -methodDeclarationEnd -expressionStatement -block
+    public void example3() {
+        before(); // gv: the beginning { fillcolor: grey; } 
+        someCode(); // gv.something: well hello there
+        someOtherCode(true); // gv.something.special: well hello there again
+        someOtherCode(false); // gv#unique: righteo then
+    }
+    
+
+    
 }
