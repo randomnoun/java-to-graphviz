@@ -123,6 +123,11 @@ public class DagNodeFilter {
      * @param node
      * @param mergeEdges
      */
+    
+    // this will probably overflow the stack
+    // and will removeNodes() the same nodes over and over again
+    // maybe keep a stack of nodes to process and iterate over that instead.
+    
 	private void removeNodes(DagNode node, boolean mergeEdges) { // Set<DagNode> seenNodes
 	    
         List<DagEdge> inEdges = node.inEdges;
@@ -139,7 +144,7 @@ public class DagNodeFilter {
         
         if (mergeEdges && inEdges.size() > 0) {
             
-            // if multiple in edges share a keepNode then remove everything back to that keepNode
+            // if multiple in edges share a lastKeepNode then remove everything back to that keepNode
             // and merge the edges
             for (int i = 0; i < inEdges.size() - 1; i++) {
                 for (int j = i + 1; j < inEdges.size(); j++) {
@@ -147,12 +152,12 @@ public class DagNodeFilter {
                     DagEdge inEdge2 = inEdges.get(j);
                     DagNode inEdge1KeepNode = inEdge1.n1.lastKeepNode;
                     DagNode inEdge2KeepNode = inEdge2.n1.lastKeepNode;
-                    if (inEdge1KeepNode == inEdge2KeepNode && inEdge1KeepNode != null) {
+                    if (inEdge1KeepNode == inEdge2KeepNode /*&& inEdge1KeepNode != null*/) {
                         logger.info("on node " + node.name + ", merged edges back to " + inEdge1KeepNode.name + ", i=" + i + ", j=" + j);
                         DagEdge newEdge = new DagEdge();
                         newEdge.n1 = inEdge1KeepNode;
                         newEdge.n2 = node;
-                        newEdge.label = "something";
+                        // newEdge.label = "something";
                         // format the edge a bit ?
                         
                         pruneEdges(inEdge1, node, inEdge1KeepNode);  
@@ -171,12 +176,22 @@ public class DagNodeFilter {
             
         }
 
-        // if there's one edge leading in and one leading out
+        // if there's zero or one edges leading in and one leading out
         // and there's no comment on this node, remove it
         // (and continue tracing from the next node )
         // logger.info("what about " + node.name);
         
-        if (inEdges.size() == 1 && outEdges.size() == 1 && !node.keepNode) {
+        if (inEdges.size() == 0 && outEdges.size() == 1 && !node.keepNode) {
+
+            DagEdge outEdge = outEdges.get(0);
+            DagNode nextNode = outEdge.n2;
+            dag.removeEdge(outEdge);
+            
+            logger.info("removed node " + node.type + ", " + node.lineNumber + ", " + node.name);
+            dag.nodes.remove(node);
+            removeNodes(nextNode, mergeEdges); // seenNodes
+            
+        } else if (inEdges.size() == 1 && outEdges.size() == 1 && !node.keepNode) {
             
             DagEdge inEdge = inEdges.get(0);
             DagEdge outEdge = outEdges.get(0);
