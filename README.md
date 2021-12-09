@@ -28,7 +28,6 @@ Here's the type of output it can produce:
 
 and this is what it looks like when you throw that all together:
 
-
 ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/example-complicated.png)
 
 You obviously won't want that, so it suppresses nodes by default, to give you just the nodes you're interested in.
@@ -90,40 +89,54 @@ Here's all that again in a bit more detail.
 
 ## Labels
 
-To change the label on the diagram, supply some text after the "gv:", e.g. "gv: order some donuts" would appear as
+To change the label on the diagram, supply some text after the "gv:", e.g. 
+<pre>
+orderDonuts();  // gv: order some donuts
+</pre>
+would appear as
 
-[ order some donuts ]
+![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/style-1.png)
 
 ## Styles
 
-You can include individual style rules on the "gv:" comment by putting them in curly braces; e.g. "gv: order some donuts { color: blue }" would appear as 
+You can include individual style rules on the "gv:" comment by putting them in curly braces; e.g. 
 
-[ order some donuts ]
+<pre>
+orderDonuts();  // gv: order some donuts { color: blue; fontcolor: blue; }
+</pre>
 
-You can also apply styles to various nodes using the graphviz equivalent of CSS, in which style rules are defined in a "gv-style:" block,
-and then you can assign classes and IDs in your gv comments to apply those rules. 
+![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/style-2.png)
 
-I'm using a real CSS parser here, so all the fiddly bits around specificity should apply to those rules, assuming you know them, 
-which you should if you're born any time past the 1990s.
+You can also apply styles to various nodes using the graphviz equivalent of CSS, in which style rules are defined in a "gv-style:" block, and then classes and IDs are assigned to AST nodes in your gv comments to apply those rules. 
 
+I'm using a real CSS parser here, so all the [fiddly bits around specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity) should apply to those rules, assuming you know them, which you should if you're born any time past the 1990s. 
+
+e.g.
+<pre>
 /* gv-style: {
-      // some rules 
-      .something { color: blue; }
-      .special { color: red; }
-      #unique { color: green; }
-  } 
+       // some rules 
+       .something { color: red; }
+       .special { color: green; }
+       #unique { shape: hexagon; }
+   } 
 */
 
-begin(); // gv: the beginning { fillcolor: something; } 
+before(); // gv: the beginning { fillcolor: something; } 
 someCode(); // gv.something: well hello there
 someOtherCode(true); // gv.something.special: well hello there again
 someOtherCode(false); // gv#unique: righteo then
+</pre>
+would appear as:
+
+![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/style-3.png)
+
+Note `!important` rules aren't implemented yet.
 
 ## Style DOM
 
 Those styles are applied to a pretend DOM that is created separate from the graphviz diagram; the style rules you create are applied to the imaginary DOM and then the calculated styles are used in the generated diagram.
 
-The DOM looks a little bit like the AST of the program, but different. Here's a snippet before styles are applied.
+The DOM looks a little bit like the AST of the program, but different. Here's a snippet **before** styles are applied.
 
 <pre>
 &lt;html&gt;
@@ -182,7 +195,7 @@ There are a few **standard attributes** on every node / edge:
 
 These attributes can also be referenced within `gv-idFormat` and `gv-labelFormat` style rules using `${xxx}` syntax.
 
-| nodeType | Attribute | Attribute value |
+| className | Attribute | Attribute value |
 |--|--|--|
 | typeDeclaration | className | The name of the Java class |
 | typeDeclaration | interfaceName | The name of the Java interface |
@@ -228,7 +241,7 @@ These attributes can also be referenced within `gv-labelFormat` and `gv-xlabelFo
 
 **Classes** added to various **nodes** and **edges** by the ControlFlowEdger:
 
-| nodeType | Applies to | class | Description |
+| className | Applies to | class | Description |
 |--|--|--|--|
 | typeDeclaration | node | interface | The type declaration is for an interface |
 | typeDeclaration | node | class | The type declaration is for a class |
@@ -275,11 +288,11 @@ These attributes can also be referenced within `gv-labelFormat` and `gv-xlabelFo
 | classInstanceCreation | edge | invocationArgument | the edges between argument expressions in a 'new' expression will have an `invocationArgument` class |
 | arrayInitializer | edge | invocationArgument | the edges between array element expressions in an array initializer |
 | - | node | anonymousClassDeclaration, end | An artifical node is created at the end of each anonymousClassDeclaration, so that we can draw a transparent edge from the end of each method to that node, which helps make the diagram look pretty. |
-| - | edge | anonymousClassDeclarationArtifical | The artificial edge from the end of each method to the artifical node. This isn't a control flow edge, so should be transparent in the CSS. |
-| anonymousClassDeclaration | edge | anonymousClassDeclarationChild | The edge from the anonymous class declaration node to the start of each method/field declaration in that class |
+| - | edge | anonymousClassDeclarationEnd | The artificial edge from the end of each method to the artifical node. This isn't a control flow edge, so should be transparent in the CSS. |
+| anonymousClassDeclaration | edge | anonymousClassDeclarationBegin | The edge from the anonymous class declaration node to the start of each method/field declaration in that class |
 | ast | node | ast | All unrecognised nodes will be edged by the AstEdger, and have an 'ast' class. You shouldn't see any of these in the ControlFlowEdger any more |
 
-The AST classes you're going to get in your DOM are:
+classNames in the DOM that are generated from AST nodes are listed below. These classNames are the eclipse parser AST class name name with the word "Statement" removed and their first letter lower-cased; e.g. IfStatement nodes are given the className 'if'. ExpressionStatements retain the "Statement" suffix, to differentiate ExpressionStatements from Expressions.
 
 * `typeDeclaration`
 * `methodDeclaration`
@@ -309,41 +322,60 @@ The AST classes you're going to get in your DOM are:
 * `empty`
 * `comment`
 
-The expression AST classes you're going to get in your DOM are:
 
-* `methodInvocation`
-* `superMethodInvocation`
-* `conditionalExpression`
-* `simpleName`
-* `qualifiedName`
-* `thisExpression`
-* `booleanLiteral`
-* `characterLiteral`
-* `numberLiteral`
-* `nullLiteral`
-* `typeLiteral`
-* `stringLiteral`
-* `parenthesizedExpression`
-* `prefixExpression`
-* `postfixExpression`
-* `infixExpression`
-* `castExpression`
-* `instanceofExpression`
-* `assignment`
-* `fieldAccess`
-* `arrayAccess`
-* `superFieldAccess`
-* `creationReference`
-* `expressionMethodReference`
-* `superMethodReference`
-* `typeMethodReference`
-* `arrayCreation`
-* `arrayInitializer`
-* `classInstanceCreation`
-* `variableDeclarationExpression`
-* `lambdaExpression`
+All expressions are subclasses of Expression. The expression classNames are:
+
+* literal-ish
+    * `[booleanLiteral]((https://www.ibm.com/docs/en/rational-soft-arch/9.5?topic=SS8PJ7_9.5.0/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/BooleanLiteral.java)`
+    * `characterLiteral`
+    * `numberLiteral`
+    * `nullLiteral`
+    * `typeLiteral`
+    * `stringLiteral`
+* name-ish
+    * `simpleName`
+    * `qualifiedName`
+    * `thisExpression`
+    * `creationReference`
+    * `expressionMethodReference`
+    * `superMethodReference`
+    * `typeMethodReference`
+* control flow-ish
+    * `methodInvocation`
+    * `superMethodInvocation`
+    * `conditionalExpression`
+    * `lambdaExpression`
+* evaluation-ish    
+    * `infixExpression`
+    * `parenthesizedExpression`
+    * `prefixExpression`
+    * `postfixExpression`
+    * `instanceofExpression`
+    * `castExpression`
+* creation-ish
+    * `variableDeclarationExpression`
+    * `arrayCreation`
+    * `arrayInitializer`
+    * `classInstanceCreation` ( also control flow-ish )
+* access-ish    
+    * `fieldAccess`
+    * `arrayAccess`
+    * `superFieldAccess`
+* modification-ish
+    * `assignment`
+
 
 Note this still isn't a complete list of all AST nodes yet, but it's most of them.
+
+Artifical nodes created by the ControlFlowEdger are:
+
+| className | Description |
+|--|--|
+| methodDeclarationEnd | added to the end of methodDeclaration blocks, all return and throw edges will connect to this node |
+| lambdaExpressionEnd | added to the end of lambdaExpression blocks, all return and throw edges will connect to this node |
+| anonymousClassDeclarationEnd | added to the end of anonymousClassDEclarationEnd blocks, all methods within the anonymous class will have an invisible edge connected to this node for layout purposes |
+| infixExpressionCondition | added within shortcut infixExpression nodes to branch the control flow based on the value of the left-hand-side operand |
+
 
 ## Style properties
 
