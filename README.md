@@ -406,6 +406,12 @@ System.out.println("traffic lights");
 CSS doesn't normally allow you do modify the DOM ( ignoring ::content pseudo-elements ), so in order to be able to style the DOM elements that are created by these CSS rules,
 there are multiple passes of the CSS. 
 
+# Builtin CSS
+
+* [JavaToGraphviz-base.css](src/main/resources/JavaToGraphviz.css) - base CSS ; bare minimum to prevent graphviz errors
+* [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz.css) - debugging CSS ; all node labels include lineNumber, nodeType and lastKeepNodeId
+* [JavaToGraphviz.css](src/main/resources/JavaToGraphviz.css) - default CSS ; uses most of the classes and attributes listed above
+
 # Features
 
 DONE
