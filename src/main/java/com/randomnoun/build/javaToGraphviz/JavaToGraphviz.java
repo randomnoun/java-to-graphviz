@@ -219,6 +219,7 @@ public class JavaToGraphviz {
         */
         
         // a rootGraph can now contain multiple rootNodes
+
         int c = 0;
         for (DagNode rootNode : dag.rootNodes) {
             c++;
@@ -247,7 +248,7 @@ public class JavaToGraphviz {
                 // the edgers now move things around so should probably recalc the inEdges and outEdges
                 // as the keepNode thingy relies those on being accurate.
                 // although we've got subgraphs now which is going to make things more exciting, probably.
-                // going to assume that edge don't cross rootNodes, which they don't yet either.
+                // going to assume that edges don't cross rootNodes, which they don't yet either.
                 for (DagNode n : dag.nodes) {
                     n.inEdges = new ArrayList<>();
                     n.outEdges = new ArrayList<>();
@@ -258,8 +259,13 @@ public class JavaToGraphviz {
                 }
                 
                 DagNodeFilter filter = new DagNodeFilter(dag);
-                // rootNode.keepNode = true;
-                // filter.setLastKeepNode(rootNode, rootNode);
+                if (rootNode.keepNodeMatcher.matches("startNode")) {
+                    rootNode.keepNode = true;
+                    filter.setLastKeepNode(rootNode, rootNode);
+                } else {
+                    rootNode.keepNode = false;
+                    
+                }
                 filter.removeNodes(rootNode);
             }
         }
