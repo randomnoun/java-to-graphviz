@@ -487,3 +487,6 @@ So a few things that'd be nice to implement if I get around to it:
 * another plugin which adds in AOP nodes.
 * and so on.
 
+## Licensing
+
+java-to-graphviz is licensed under the BSD 2-clause license.
