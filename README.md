@@ -12,28 +12,28 @@ Here's the type of output it can produce:
 
 |  AST node |  Sample code | Diagram |
 |--|--|:--:|
-| Block | <pre>// gv-graph<br/>{ // gv: Block edges<br/>    a();<br/>    b();<br/>    c();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-0.png) | 
-| If | <pre>// gv-graph<br/>{ // gv: If edges<br/>    before();<br/>    if (condition) {<br/>        truePath();<br/>    } else {<br/>        falsePath();<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-1.png) |
-| For | <pre>// gv-graph<br/>{ // gv: For edges<br/>    before();<br/>    for (i = 0; i &lt; 10; i++) {<br/>        println(i);<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-2.png) |
-| EnhancedFor | <pre>// gv-graph<br/>{ // gv: EnhancedFor edges<br/>    before();<br/>    for (int e : elements) {<br/>        println(e);<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-3.png) |
-| While | <pre>// gv-graph<br/>{ // gv: While Edges<br/>    before();<br/>    while (condition) {<br/>        println(i);<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-4.png) |
-| Do | <pre>// gv-graph<br/>{ // gv: Do Edges<br/>    before();<br/>    do {<br/>        println(i);<br/>    } while (condition);<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-5.png) |
-| Switch | <pre>// gv-graph<br/>{ // gv: Switch Edges<br/>    before();<br/>    switch(i) {<br/>        case 0: println(); // fallthrough<br/>        case 1: println(); break; <br/>        default: println();<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-6.png) |
-| Switch<br/>(alternate)| <pre>// gv-graph<br/>// gv-option: centralSwitch=true<br/>{ // gv: Switch Edges (alternate)<br/>    before();<br/>    switch(i) {<br/>        case 0: println(); // fallthrough<br/>        case 1: println(); break; <br/>        default: println();<br/>    }<br/>    after();<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-7.png) |
-| InfixExpression | <pre>// gv-graph<br/>{ // gv: InfixExpression edges<br/>    println(1 + 2 / 3);<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-8.png) |
-| UnaryExpression | <pre>// gv-graph<br/>{ // gv: UnaryExpression edges<br/>    i++;<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-9.png) |
-| TernaryExpression | <pre>// gv-graph<br/>{ // gv: TernaryExpression edges<br/>    println(condition ? i : j);<br/>}</pre> | ![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/com.example.input.AllTheControlFlowNodes-10.png) |
+| Block | <pre>// gv-graph<br/>{ // gv: Block edges<br/>    a();<br/>    b();<br/>    c();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-0.png) | 
+| If | <pre>// gv-graph<br/>{ // gv: If edges<br/>    before();<br/>    if (condition) {<br/>        truePath();<br/>    } else {<br/>        falsePath();<br/>    }<br/>    after();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-1.png) |
+| For | <pre>// gv-graph<br/>{ // gv: For edges<br/>    before();<br/>    for (i = 0; i &lt; 10; i++) {<br/>        println(i);<br/>    }<br/>    after();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-2.png) |
+| EnhancedFor | <pre>// gv-graph<br/>{ // gv: EnhancedFor edges<br/>    before();<br/>    for (int e : elements) {<br/>        println(e);<br/>    }<br/>    after();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-3.png) |
+| While | <pre>// gv-graph<br/>{ // gv: While Edges<br/>    before();<br/>    while (condition) {<br/>        println(i);<br/>    }<br/>    after();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-4.png) |
+| Do | <pre>// gv-graph<br/>{ // gv: Do Edges<br/>    before();<br/>    do {<br/>        println(i);<br/>    } while (condition);<br/>    after();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-5.png) |
+| Switch | <pre>// gv-graph<br/>{ // gv: Switch Edges<br/>    before();<br/>    switch(i) {<br/>        case 0: println(); // fallthrough<br/>        case 1: println(); break; <br/>        default: println();<br/>    }<br/>    after();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-6.png) |
+| Switch<br/>(alternate)| <pre>// gv-graph<br/>// gv-option: centralSwitch=true<br/>{ // gv: Switch Edges (alternate)<br/>    before();<br/>    switch(i) {<br/>        case 0: println(); // fallthrough<br/>        case 1: println(); break; <br/>        default: println();<br/>    }<br/>    after();<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-7.png) |
+| InfixExpression | <pre>// gv-graph<br/>{ // gv: InfixExpression edges<br/>    println(1 + 2 / 3);<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-8.png) |
+| UnaryExpression | <pre>// gv-graph<br/>{ // gv: UnaryExpression edges<br/>    i++;<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-9.png) |
+| TernaryExpression | <pre>// gv-graph<br/>{ // gv: TernaryExpression edges<br/>    println(condition ? i : j);<br/>}</pre> | ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/com.example.input.AllTheControlFlowNodes-10.png) |
 
 [//]: # (The markdown source for this table is an abomination. I blame github.)
 
 and this is what it looks like when you throw that all together:
 
 
-![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/example-complicated.png)
+![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/example-complicated.png)
 
 You obviously won't want that, so it suppresses nodes by default, to give you just the nodes you're interested in.
 
-![](http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz/raw/master/src/site/readme/example-simple.png)
+![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/example-simple.png)
 
 # Processing
 
