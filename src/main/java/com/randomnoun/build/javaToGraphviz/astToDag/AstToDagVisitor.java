@@ -65,7 +65,7 @@ public class AstToDagVisitor extends ASTVisitor {
     List<GvComment> nextLineComments = new ArrayList<>(); 
     List<GvComment> nextDagComments = new ArrayList<>();
     KeepNodeMatcher keepNodeMatcher = null;
-    Map<String, String> options = new HashMap<>();
+    Map<String, String> options = null;
     
     
     // Map of line number -> list of ASTs that start / end on that line
@@ -89,6 +89,9 @@ public class AstToDagVisitor extends ASTVisitor {
         cu.accept(lv);
         startLineNumberAsts = lv.getStartLineNumberAstsMap();
         endLineNumberAsts = lv.getEndLineNumberAstsMap();
+        
+        this.options = new HashMap<>();
+        options.put("defaultKeepNode", defaultKeepNode ? "true" : "false");
     }
     
     public Dag getDag() { 

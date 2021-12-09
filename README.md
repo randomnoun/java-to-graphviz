@@ -124,7 +124,7 @@ e.g.
 before(); // gv: the beginning { fillcolor: something; } 
 someCode(); // gv.something: well hello there
 someOtherCode(true); // gv.something.special: well hello there again
-someOtherCode(false); // gv#unique: righteo then
+someOtherCode(false); // gv#unique.something: righteo then
 </pre>
 would appear as:
 

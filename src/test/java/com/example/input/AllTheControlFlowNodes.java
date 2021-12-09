@@ -16,7 +16,6 @@ public class AllTheControlFlowNodes {
     } 
     */    
     // keep everything except for the expressionStatements and the blocks
-    // g v - o p tion: defaultKeepNode=true
     // gv-keepNode: startNode -expressionStatement -block -switchCase
 
     public void a() { };
@@ -40,14 +39,14 @@ public class AllTheControlFlowNodes {
         int[] elements = new int[5];
         
         // gv-graph
-        { // gv: Block edges
+        {
             a();
             b();
             c();
         }
         
         // gv-graph
-        { // gv: If edges
+        {
             before();
             if (condition) {
                 truePath();
@@ -58,7 +57,7 @@ public class AllTheControlFlowNodes {
         }
         
         // gv-graph
-        { // gv: For edges
+        {
             before();
             for (i = 0; i < 10; i++) {
                 println(i);
@@ -67,7 +66,7 @@ public class AllTheControlFlowNodes {
         }
         
         // gv-graph
-        { // gv: EnhancedFor edges
+        {
             before();
             for (int e : elements) {
                 println(e);
@@ -76,7 +75,7 @@ public class AllTheControlFlowNodes {
         }
         
         // gv-graph
-        { // gv: While Edges
+        {
             before();
             while (condition) {
                 println(i);
@@ -85,7 +84,7 @@ public class AllTheControlFlowNodes {
         }
 
         // gv-graph
-        { // gv: Do Edges
+        {
             before();
             do {
                 println(i);
@@ -94,7 +93,7 @@ public class AllTheControlFlowNodes {
         }
 
         // gv-graph
-        { // gv: Switch Edges
+        {
             before();
             switch(i) {
                 case 0: println(); // fallthrough
@@ -106,7 +105,7 @@ public class AllTheControlFlowNodes {
 
         // gv-graph
         // gv-option: centralSwitch=true
-        { // gv: Switch Edges (alternate)
+        {
             before();
             switch(i) {
                 case 0: println(); // fallthrough
@@ -118,17 +117,17 @@ public class AllTheControlFlowNodes {
 
         
         // gv-graph
-        { // gv: InfixExpression edges
+        {
             println(1 + 2 / 3);
         }
 
         // gv-graph
-        { // gv: UnaryExpression edges
+        {
             i++;
         }
 
         // gv-graph
-        { // gv: TernaryExpression edges
+        {
             println(condition ? i : j);
         }
         
@@ -164,7 +163,7 @@ public class AllTheControlFlowNodes {
         before(); // gv: the beginning { fillcolor: grey; } 
         someCode(); // gv.something: well hello there
         someOtherCode(true); // gv.something.special: well hello there again
-        someOtherCode(false); // gv#unique: righteo then
+        someOtherCode(false); // gv#unique.something: righteo then
     }
     
 
