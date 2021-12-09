@@ -102,7 +102,7 @@ would appear as
 You can include individual style rules on the "gv:" comment by putting them in curly braces; e.g. 
 
 <pre>
-orderDonuts();  // gv: order some donuts { color: blue; fontcolor: blue; }
+orderDonuts();  // gv: order some donuts { shape: oval; color: blue; fontcolor: blue; }
 </pre>
 
 ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/style-2.png)
