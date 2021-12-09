@@ -328,7 +328,7 @@ classNames in the DOM that are generated from AST nodes are listed below. These 
 All expressions are subclasses of Expression. The expression classNames are:
 
 * literal-ish
-    * `[booleanLiteral](https://www.ibm.com/docs/en/rational-soft-arch/9.5?topic=SS8PJ7_9.5.0/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/BooleanLiteral.java)`
+    * [`booleanLiteral`](https://www.ibm.com/docs/en/rational-soft-arch/9.5?topic=SS8PJ7_9.5.0/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/BooleanLiteral.java)
     * `characterLiteral`
     * `numberLiteral`
     * `nullLiteral`
