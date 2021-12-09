@@ -64,7 +64,7 @@ public class AstToDagVisitor extends ASTVisitor {
     int nextLineFromLine = 0;
     List<GvComment> nextLineComments = new ArrayList<>(); 
     List<GvComment> nextDagComments = new ArrayList<>();
-    List<String> keepNodeMatch = null;
+    KeepNodeMatcher keepNodeMatcher = null;
     Map<String, String> options = new HashMap<>();
     
     
@@ -72,7 +72,35 @@ public class AstToDagVisitor extends ASTVisitor {
     Map<Integer, List<ASTNode>> startLineNumberAsts;
     Map<Integer, List<ASTNode>> endLineNumberAsts;
     
-    public DagNode getStartingDagNodeAboveLine(int originalLine) {
+    
+    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode, boolean defaultKeepNode) {
+        super(true);
+        this.cu = cu;
+        this.comments = comments;
+        this.src = src;
+        this.includeThrowNode = includeThrowNode;
+        this.defaultKeepNode = defaultKeepNode;
+        this.keepNodeMatcher = new KeepNodeMatcher(defaultKeepNode);
+        dag = new Dag();
+        root = new DagSubgraph(dag, null);
+        dag.rootGraphs.add(root);
+        
+        AstToLineVisitor lv = new AstToLineVisitor(cu, src, comments, includeThrowNode);
+        cu.accept(lv);
+        startLineNumberAsts = lv.getStartLineNumberAstsMap();
+        endLineNumberAsts = lv.getEndLineNumberAstsMap();
+    }
+    
+    public Dag getDag() { 
+        return dag;
+    }
+    
+    public Map<String, String> getOptions() {
+        return options;
+    }
+    
+    
+    private DagNode getStartingDagNodeAboveLine(int originalLine) {
         // find the first ast node above this line which has a dag node
         int line = originalLine;
         line--;
@@ -155,32 +183,9 @@ public class AstToDagVisitor extends ASTVisitor {
     }
     
     
-    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode, boolean defaultKeepNode) {
-        super(true);
-        this.cu = cu;
-        this.comments = comments;
-        this.src = src;
-        this.includeThrowNode = includeThrowNode;
-        this.defaultKeepNode = defaultKeepNode;
-        dag = new Dag();
-        root = new DagSubgraph(dag, null);
-        dag.rootGraphs.add(root);
-        
-        AstToLineVisitor lv = new AstToLineVisitor(cu, src, comments, includeThrowNode);
-        cu.accept(lv);
-        startLineNumberAsts = lv.getStartLineNumberAstsMap();
-        endLineNumberAsts = lv.getEndLineNumberAstsMap();
-    }
+   
     
-    public Dag getDag() { 
-        return dag;
-    }
-    
-    public Map<String, String> getOptions() {
-        return options;
-    }
-    
-    void processCommentsToTypeOrMethodNode(DagNode pdn, int line, DagNode mn) {
+    private void processCommentsToTypeOrMethodNode(DagNode pdn, int line, DagNode mn) {
         // DagNode lastNode = null;
         while (lastIdx < comments.size() && comments.get(lastIdx).line < line) {
             CommentText ct = comments.get(lastIdx);
@@ -235,6 +240,7 @@ public class AstToDagVisitor extends ASTVisitor {
                 dn.label = ct.text;
                 dn.astNode = null;
                 dn.options = options;
+                dn.keepNodeMatcher = keepNodeMatcher;
                 
                 dn.name = gvsc.id;
                 dn.classes.addAll(gvsc.classes);
@@ -250,6 +256,7 @@ public class AstToDagVisitor extends ASTVisitor {
                 dn.label = ct.text;
                 dn.astNode = null;
                 dn.options = options;
+                dn.keepNodeMatcher = keepNodeMatcher;
                 
                 dn.classes.add("endSubgraph");
 
@@ -258,7 +265,8 @@ public class AstToDagVisitor extends ASTVisitor {
 
             } else if (ct instanceof GvKeepNodeComment) {
                 GvKeepNodeComment knc =  ((GvKeepNodeComment) ct);
-                keepNodeMatch = Arrays.asList(knc.text.trim().split("\\s+"));
+                boolean defaultKeepNode = "true".equals(options.get("defaultKeepNode")); 
+                keepNodeMatcher = keepNodeMatcher.getModifiedKeepNodeMatcher(defaultKeepNode, knc.text.trim()); 
 
             } else if (ct instanceof GvOptionComment) {
                 GvOptionComment oc =  ((GvOptionComment) ct);
@@ -281,7 +289,7 @@ public class AstToDagVisitor extends ASTVisitor {
         }
     }
     
-    void processCommentsToStatementNode(DagNode pdn, int line, int column, DagNode currentLineDn) {
+    private void processCommentsToStatementNode(DagNode pdn, int line, int column, DagNode currentLineDn) {
         // DagNode lastNode = null;
         while (lastIdx < comments.size() && 
             (comments.get(lastIdx).line < line || 
@@ -300,6 +308,8 @@ public class AstToDagVisitor extends ASTVisitor {
                 dn.label = ct.text;
                 dn.astNode = null;
                 dn.options = options;
+                dn.keepNodeMatcher = keepNodeMatcher;
+                
             } else {
                 dn = currentLineDn;
             }
@@ -392,7 +402,8 @@ public class AstToDagVisitor extends ASTVisitor {
              
             } else if (ct instanceof GvKeepNodeComment) {
                 GvKeepNodeComment knc =  ((GvKeepNodeComment) ct);
-                keepNodeMatch = Arrays.asList(knc.text.trim().split("\\s+"));
+                boolean defaultKeepNode = "true".equals(options.get("defaultKeepNode")); 
+                keepNodeMatcher = keepNodeMatcher.getModifiedKeepNodeMatcher(defaultKeepNode, knc.text.trim()); 
                 dn = null;
 
             } else if (ct instanceof GvOptionComment) {
@@ -440,6 +451,7 @@ public class AstToDagVisitor extends ASTVisitor {
         return options;
     }
 
+    @Override 
     public boolean preVisit2(ASTNode node) {
         DagNode pdn = getClosestDagNodeInRoot(root, node);
         
@@ -479,20 +491,11 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.parentDagNode = pdn;
             dn.astNode = node;
             dn.options = options;
-            
-            if (keepNodeMatch != null) {
-                if (keepNodeMatch.contains(lowerClass) ||
-                    keepNodeMatch.contains("+" + lowerClass)) {
-                    dn.keepNode = true;
-                } else if (keepNodeMatch.contains("-" + lowerClass)) {
-                    dn.keepNode = false;
-                } else {
-                    dn.keepNode = defaultKeepNode;
-                }
-            } else {
-                dn.keepNode = defaultKeepNode;
+            dn.keepNodeMatcher = keepNodeMatcher;
+
+            if (keepNodeMatcher.matches(lowerClass)) {
+                dn.keepNode = true;
             }
-            
 
             // these comments may start a new graph, when that happens we need to reset the pdn
             int beforeRootGraphIdx = rootGraphIdx;
@@ -597,7 +600,8 @@ public class AstToDagVisitor extends ASTVisitor {
         
         return true;
     }
-    
+
+    @Override
     public void postVisit(ASTNode node) {
         // DagNode pdn = getClosestDagNode(node);
 
@@ -621,7 +625,7 @@ public class AstToDagVisitor extends ASTVisitor {
      * @param node
      * @return
      */
-    public DagNode getClosestDagNodeInRoot(DagSubgraph root, ASTNode node) {
+    private DagNode getClosestDagNodeInRoot(DagSubgraph root, ASTNode node) {
         while (node != null) {
             if (dag.astToDagNode.get(node) != null) {
                 DagNode dagNode = dag.astToDagNode.get(node);

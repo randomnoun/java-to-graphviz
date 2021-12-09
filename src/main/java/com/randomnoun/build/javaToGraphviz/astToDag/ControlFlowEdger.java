@@ -311,12 +311,14 @@ public class ControlFlowEdger {
         // this is an artificial node so maybe only construct it based on some gv declaration earlier on ?
         // (whereas all the other nodes are about as concrete as anything else in IT)
         
+        
+        
         // CompilationUnit cu = methodBlock.astNode.getParent();
         CompilationUnit cu = ASTResolving.findParentCompilationUnit(methodBlock.astNode);
         int endOfMethodLine = cu.getLineNumber(methodBlock.astNode.getStartPosition() + methodBlock.astNode.getLength());
         DagNode returnNode = new DagNode();
-        returnNode.keepNode = true; // always keep comments
-        returnNode.type = "return"; // label this 'end' if it's a void method ?
+        returnNode.keepNode = method.keepNodeMatcher.matches("methodDeclarationEnd"); 
+        returnNode.type = "methodDeclarationEnd"; // label this 'end' if it's a void method ?
         returnNode.lineNumber = endOfMethodLine;
         // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
         returnNode.classes.add("method");
@@ -410,7 +412,7 @@ public class ControlFlowEdger {
             DagEdge e;
             e = dag.addBackEdge(continueStatementNode, namedScope.continueNode, null);
             e.classes.add("continue");
-            e.gvAttributes.put("continueLabel", label==null ? "" : " " + label);
+            e.gvAttributes.put("continueLabel", label == null ? "" : " " + label);
         } else if (namedScope.continueForward) {
             ExitEdge e = new ExitEdge();
             e.n1 = continueStatementNode;
@@ -1279,8 +1281,8 @@ public class ControlFlowEdger {
         CompilationUnit cu = ASTResolving.findParentCompilationUnit(le);
         int endOfLambdaLine = cu.getLineNumber(le.getStartPosition() + le.getLength());
         DagNode returnNode = new DagNode();
-        returnNode.keepNode = true; // always keep comments
-        returnNode.type = "return"; // label this 'end' if it's a void method ?
+        returnNode.keepNode = lambdaNode.keepNodeMatcher.matches("lambdaExpressionEnd");
+        returnNode.type = "lambdaExpressionEnd"; // label this 'end' if it has no return value ?
         returnNode.lineNumber = endOfLambdaLine;
         // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
         returnNode.classes.add("lambdaExpression");
@@ -1619,8 +1621,8 @@ public class ControlFlowEdger {
                 // actually probably need to add a new node here
                 DagNode n = extendedDags.get(i);
                 DagNode extInfixNode = new DagNode();
-                extInfixNode.keepNode = true; // hrm
-                extInfixNode.type = "InfixExpression"; // even though it isn't
+                extInfixNode.keepNode = infixNode.keepNodeMatcher.matches("infixExpressionCondition");
+                extInfixNode.type = "infixExpressionCondition"; // even though it isn't
                 extInfixNode.lineNumber = n.lineNumber; // even though it isn't
                 extInfixNode.classes.add("infixExpression");
                 extInfixNode.classes.add("infixConditional");
@@ -1952,7 +1954,7 @@ public class ControlFlowEdger {
             for (DagNode n : bodyDeclarationDags) {
                 // add a transparent edge to each thing defined in this class so that the 'AnonymousClassDeclaration' node appears above them
                 DagEdge e = dag.addEdge(anonClassDag, n);
-                e.classes.add("anonymousClassDeclarationChild");
+                e.classes.add("anonymousClassDeclarationBegin");
                 ees.addAll(addEdges(dag, n, lexicalScope));
             }
 
@@ -1961,8 +1963,8 @@ public class ControlFlowEdger {
             CompilationUnit cu = ASTResolving.findParentCompilationUnit(acdNode);
             int endOfAnonClassLine = cu.getLineNumber(acdNode.getStartPosition() + acdNode.getLength());
             DagNode returnNode = new DagNode();
-            returnNode.keepNode = true; // always keep comments
-            returnNode.type = "artifical"; // hrm
+            returnNode.keepNode = anonClassDag.keepNodeMatcher.matches("anonymousClassDeclarationEnd");
+            returnNode.type = "anonymousClassDeclarationEnd";
             returnNode.lineNumber = endOfAnonClassLine;
             // rn.name = dag.getUniqueName("m_" + endOfMethodLine);
             returnNode.classes.add("anonymousClassDeclaration");
@@ -1979,7 +1981,7 @@ public class ControlFlowEdger {
                 // add a transparent edge from each thing defined in this class to the artifical node
                 // so that it appears underneath them
                 ee.n2 = returnNode;
-                ee.classes.add("anonymousClassDeclarationArtifical");
+                ee.classes.add("anonymousClassDeclarationEnd");
                 dag.addEdge(ee);
             }
             

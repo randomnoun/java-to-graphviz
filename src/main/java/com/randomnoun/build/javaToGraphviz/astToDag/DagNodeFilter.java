@@ -176,21 +176,31 @@ public class DagNodeFilter {
             
         }
 
-        // if there's zero or one edges leading in and one leading out
+        // if there's zero or one edges leading in and zero or one leading out
         // and there's no comment on this node, remove it
         // (and continue tracing from the next node )
         // logger.info("what about " + node.name);
         
         if (inEdges.size() == 0 && outEdges.size() == 1 && !node.keepNode) {
 
+            // if this was a rootNode, then the rootNode is now the next node 
+            
             DagEdge outEdge = outEdges.get(0);
             DagNode nextNode = outEdge.n2;
             dag.removeEdge(outEdge);
             
-            logger.info("removed node " + node.type + ", " + node.lineNumber + ", " + node.name);
+            logger.info("removed start node " + node.type + ", " + node.lineNumber + ", " + node.name);
             dag.nodes.remove(node);
             removeNodes(nextNode, mergeEdges); // seenNodes
+
+        } else if (inEdges.size() == 1 && outEdges.size() == 0 && !node.keepNode) {
+
+            DagEdge inEdge = inEdges.get(0);
+            dag.removeEdge(inEdge);
             
+            logger.info("removed terminal node " + node.type + ", " + node.lineNumber + ", " + node.name);
+            dag.nodes.remove(node);
+
         } else if (inEdges.size() == 1 && outEdges.size() == 1 && !node.keepNode) {
             
             DagEdge inEdge = inEdges.get(0);

@@ -10,39 +10,48 @@ import java.util.Map.Entry;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import com.randomnoun.build.javaToGraphviz.astToDag.KeepNodeMatcher;
 import com.randomnoun.build.javaToGraphviz.comment.GvComment;
 import com.randomnoun.common.Text;
 
 public class DagNode {
+
+    // set at parse time
     
     public DagNode parentDagNode;
     public List<DagNode> children = new ArrayList<>();
+
+    public Map<String, String> options = new HashMap<>(); // options in effect at parse time
+    public KeepNodeMatcher keepNodeMatcher; // keepNode settings in effect at parse time
     
+    public ASTNode astNode;
+    public String type;      // astNode class, or one of a couple of extra artificial node types (comment, doExpression)
+    public String javaLabel; // if this is a labeledStatement, the name of that label ( should be an attribute now ? ) 
+    public int lineNumber;
+    public boolean hasComment;
+    public List<GvComment> gvComments = new ArrayList<>(); // in case we need to bubble these up the AST. although what are the chances of that. I mean really.
+
     public boolean keepNode = false;
     public boolean skipNode = false; // true for literal nodes only
+
+    // set during edging
+    
+    public Map<String, String> gvAttributes = new HashMap<>(); // graphviz formatting attributes (also set during styling)
+    public Set<String> classes = new HashSet<>();
+    
+    // set during filtering
+    
     public DagNode lastKeepNode = null;
     public List<DagEdge> inEdges = new ArrayList<>();
     public List<DagEdge> outEdges = new ArrayList<>();
 
-    // graphviz formatting attributes
-    public Map<String, String> gvAttributes = new HashMap<>();
-    public Set<String> classes = new HashSet<>();
+    // set during styling
     
     // styles after css rules have been applied
     // clear this after every diagram is generated
     public Map<String, String> gvStyles = new HashMap<>();
-    
-    public ASTNode astNode;
-    public String type;      // astNode class, or one of a couple of extra artificial node types (comment, doExpression)
-    public String javaLabel; // if this is a labeledStatement, the name of that label 
-    public int lineNumber;
-    
     public String name;  // graphviz name
     public String label; // graphviz label
-    public boolean hasComment;
-    public List<GvComment> gvComments = new ArrayList<>(); // in case we need to bubble these up the AST. although what are the chances of that. I mean really.
-    
-    public Map<String, String> options = new HashMap<>(); // options at the time this node was constructed
     
     public void addChild(DagNode node) {
         children.add(node);
