@@ -375,7 +375,7 @@ Artifical nodes created by the ControlFlowEdger are:
 |--|--|
 | methodDeclarationEnd | added to the end of methodDeclaration blocks, all return and throw edges will connect to this node |
 | lambdaExpressionEnd | added to the end of lambdaExpression blocks, all return and throw edges will connect to this node |
-| anonymousClassDeclarationEnd | added to the end of anonymousClassDEclarationEnd blocks, all methods within the anonymous class will have an invisible edge connected to this node for layout purposes |
+| anonymousClassDeclarationEnd | added to the end of anonymousClassDeclaration blocks, all methods within the anonymous class will have an invisible edge connected to this node for layout purposes  ( these should be styled as transparent or invisible as they're not part of the control flow diagram ) |
 | infixExpressionCondition | added within shortcut infixExpression nodes to branch the control flow based on the value of the left-hand-side operand |
 
 
@@ -391,13 +391,12 @@ Prefixed properties include:
 
 | Property | Description |
 |--|--|
-| gv-idFormat | The `gv-idFormat` is used to assign IDs to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram. <br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, <br/>The default `gv-idFormat` specified in `JavaToGraphviz-base.css` is <pre>node {<br/>  gv-idFormat: "s_${lineNumber}";<br/>}</pre> which assigns an ID of `"s_"` followed by the line number of the node. <br/>As these `${lineNumber}`s are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. |
+| gv-idFormat | The `gv-idFormat` is used to assign IDs to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram. <br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, <br/>For example, the stylesheet <pre>node {<br/>  gv-idFormat: "s_${lineNumber}";<br/>}<br/>node.if {<br/>  gv-idFormat: "if_${lineNumber}";<br/>}</pre> will assign an ID of `"s_"` followed by the line number of the node, or `"if_"` for nodes representing 'if' statements. <br/>As these `${lineNumber}`s are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. |
 | gv-labelFormat | The `gv-labelFormat` is used to assign labels to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram. <br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, similar to the gv-idFormat. <br/>The labelFormat may include the id, or the id may include the label, but they may not include each other.
 | gv-wordwrap | The `gv-wordWrap` property can be used to force newlines to be added into the node label. <br/>This is useful for some graphviz shape types ( e.g. diamond ), which become overly stretched if their label is wide. |
 | gv-newSubgraph | Create a new subgraph 'underneath' the selected element |
 | gv-beginOuterSubgraph | Create a new subgraph 'above' the selected element, then move the selected element and all nodes to gv-endSubgraph into that subgraph |
 | gv-endOuterSubgraph | Marks the end of the subgraph created by `gv-beginOuterSubgraph`. |
-| gv-truncateEdges | Either "incoming", "outgoing", "none" or "both". Will truncate the edges leading into or out of a subgraph. Must be applied to the same element that had the gv-newSubgraph property. Edges will begin/end outside the subgraph boundary |
 | gv-truncateEdges | Either "incoming", "outgoing", "none" or "both". Will truncate the edges leading into or out of a subgraph. Must be applied to the same element that had the gv-newSubgraph property. Edges will begin/end outside the subgraph boundary |
 | gv-xlabelFormat | Similar to `gv-labelFormat` but sets the [`xlabel`](https://graphviz.org/docs/attrs/xlabel/) attribute, which causes the label to be ignored during graphviz edge routing |
 
@@ -411,15 +410,29 @@ This combination of elements, attributes and properties means you can turn all y
 /* gv-style: { .if { shape: diamond; } } */
 </pre>
 
-You can create multiple graphs per source file, and multiple subgraphs per graph, by using some special CSS rules which affect the DOM. 
+## Subgraphs
 
-So you could put all your try/catch statements in subgraphs via
+Typically each method in a class is graphed as it's own subgraph. 
+
+You can also construct subgraphs within methods to highlight or separate various nodes in the diagram. These subgraphs are created using some special CSS rules which affect the DOM. 
+
+So for example, you could put all your try/catch statements in subgraphs via
 
 <pre>
-/* gv-style: { .try { something; } } */
+/* gv-style: { 
+    node.try { gv-newSubgraph: true; }
+    node.try > subgraph {
+      gv-idFormat : "cluster_t_${lineNumber}";
+      gv-labelFormat : "try";
+      pencolor : black; 
+      labeljust : "l"; 
+    }
+} */
 </pre>
 
-Or a subgraph around a particularly exciting bit of code via
+but you probably want to put the 'tryResources', 'tryBody', 'catchClause' and 'finally' classes in subgraphs instead; see [JavaToGraphviz.css](src/main/resources/JavaToGraphviz.css)
+
+You can also create subgraphs to highlight a particularly exciting bit of Java source code; e.g. 
 
 <pre>
 System.out.println("I like traffic lights");
