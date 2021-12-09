@@ -355,9 +355,9 @@ Some additional properties are handled by JavaToGraphviz itself, these are all n
 
 Prefixed properties include:
 
-| Property |  |  |
-|--|--|--|
-| gv-idFormat | The `gv-idFormat` is used to assign IDs to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram. <br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, <br/>The default `gv-idFormat` specified in `JavaToGraphviz-base.css` is <pre>node {<br/>  gv-idFormat: "s_${lineNumber}";<br/>}</pre> which assigns an ID of `"s_"` followed by the line numebr of the node. <br/>As these `${lineNumber}`s are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. |
+| Property | Description |
+|--|--|
+| gv-idFormat | The `gv-idFormat` is used to assign IDs to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram. <br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, <br/>The default `gv-idFormat` specified in `JavaToGraphviz-base.css` is <pre>node {<br/>  gv-idFormat: "s_${lineNumber}";<br/>}</pre> which assigns an ID of `"s_"` followed by the line number of the node. <br/>As these `${lineNumber}`s are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. |
 | gv-labelFormat | The `gv-labelFormat` is used to assign labels to nodes. These IDs are visible in the DOM, and in the generated graphviz diagram.
 <br/>Other attributes can be included in the idFormat by specifying their name in curly brackets, similar to the gv-idFormat.
 <br/>The labelFormat may include the id, or the id may include the label, but they may not include each other.
@@ -370,25 +370,29 @@ This is useful for some graphviz shape types ( e.g. diamond ), which become over
 | gv-truncateEdges | Either "incoming", "outgoing", "none" or "both". Will truncate the edges leading into or out of a subgraph. Must be applied to the same element that had the gv-newSubgraph property. Edges will begin/end outside the subgraph boundary |
 | gv-xlabelFormat | Similar to `gv-labelFormat` but sets the [`xlabel`](https://graphviz.org/docs/attrs/xlabel/) attribute, which causes the label to be ignored during graphviz edge routing |
 
-Note that `gv-newSubgraph` style property ( defined in the CSS ) is not the same as the `gv-subgraph` directive discussed earlier ( defined in the source code ), although they perform similar tasks. The `gv-newSubgraph` CSS property allows subgraphs to be created by matching style rules ( e.g. enclosing all try/catch/finallys in a subgraph rectangle ) whereas the `gv-subgraph` directive allows the user to specify one-off subgraphs in their source code to highlight specific blocks of code.
+Note that the `gv-newSubgraph` style property ( defined in the CSS ) is not the same as the `gv-subgraph` directive discussed earlier ( defined in the source code ), although they perform similar tasks. The `gv-newSubgraph` CSS property allows subgraphs to be created by matching style rules ( e.g. enclosing all try/catch/finallys in a subgraph rectangle ) whereas the `gv-subgraph` directive allows the user to specify one-off subgraphs in their source code to highlight specific blocks of code.
 
 ## Style examples
 
 This combination of elements, attributes and properties means you can turn all your 'if' statements to diamonds via:
 
+<pre>
 /* gv-style: { .if { shape: diamond; } } */
+</pre>
 
 You can create multiple graphs per source file, and multiple subgraphs per graph, by using some special CSS rules which affect the DOM. 
 
 So you could put all your try/catch statements in subgraphs via
 
+<pre>
 /* gv-style: { .try { something; } } */
+</pre>
 
 Or a subgraph around a particularly exciting bit of code via
 
 // that
 
-CSS doesn't normally do this ( if you ignore ::content pseudo-elements ), so in order to be able to style the DOM elements that are created by these CSS rules,
+CSS doesn't normally do this ( ignoring ::content pseudo-elements ), so in order to be able to style the DOM elements that are created by these CSS rules,
 there are multiple passes of the CSS. 
 
 
