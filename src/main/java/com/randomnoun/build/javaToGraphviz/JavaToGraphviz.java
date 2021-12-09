@@ -218,8 +218,12 @@ public class JavaToGraphviz {
         }
         */
         
+        // a rootGraph can now contain multiple rootNodes
+        int c = 0;
         for (DagNode rootNode : dag.rootNodes) {
+            c++;
             if (rootGraph.nodes.contains(rootNode)) {  // nodes are in the wrong graph
+                logger.info("including rootNode " + c);
                 
                 LexicalScope lexicalScope = new LexicalScope();
 
@@ -244,23 +248,18 @@ public class JavaToGraphviz {
                 // as the keepNode thingy relies those on being accurate.
                 // although we've got subgraphs now which is going to make things more exciting, probably.
                 // going to assume that edge don't cross rootNodes, which they don't yet either.
-                Set<DagNode> allEdgedNodes = new HashSet<DagNode>();
-                for (DagEdge e : dag.edges) {
-                    allEdgedNodes.add(e.n1);
-                    allEdgedNodes.add(e.n2);
-                }
-                for (DagNode n : allEdgedNodes) {
+                for (DagNode n : dag.nodes) {
                     n.inEdges = new ArrayList<>();
                     n.outEdges = new ArrayList<>();
-                    for (DagEdge e : dag.edges) {
-                        if (e.n1 == n) { n.outEdges.add(e); }
-                        if (e.n2 == n) { n.inEdges.add(e); }
-                    }
+                }
+                for (DagEdge e : dag.edges) {
+                    e.n1.outEdges.add(e);
+                    e.n2.inEdges.add(e);
                 }
                 
                 DagNodeFilter filter = new DagNodeFilter(dag);
-                rootNode.keepNode = true;
-                filter.setLastKeepNode(rootNode, rootNode);
+                // rootNode.keepNode = true;
+                // filter.setLastKeepNode(rootNode, rootNode);
                 filter.removeNodes(rootNode);
             }
         }
@@ -296,7 +295,9 @@ public class JavaToGraphviz {
         // probably need to restyle things again
          */
         
-        if (format.equals("dom2")) {
+        if (format.equals("dom1")) {
+            // already generated output
+        } else if (format.equals("dom2")) {
             doc = dsa.getDocument();
             pw.println(doc.toString());
         } else {
