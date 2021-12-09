@@ -176,7 +176,7 @@ There are some elements and attributes in that DOM which are created automatical
 
 | Element | Description |
 |--|--|
-| html, head, body | These HTML elements exist solely so that I can use the jsoup CSS selector code to apply CSS rules to the DOM |
+| html, head, body | These HTML elements exist solely so that I can use the [jsoup CSS selector code](https://jsoup.org/cookbook/extracting-data/selector-syntax) to apply CSS rules to the DOM |
 | graph | The `graph` element represents an entire graphviz diagram. Styles applied to this node are set on the graphviz `digraph` |
 | graphNode | The `graphNode` element represents the [default node styles](https://graphviz.org/doc/info/lang.html). Styles applied to this node are set on a `node` object in the `digraph`. <br/>Note you could also apply styles to all nodes by using a `.node` selector in a CSS rule. There's pros and cons to each approach. |
 | graphEdge | The `graphEdge` element represents the [default edge styles](https://graphviz.org/doc/info/lang.html). Styles applied to this node are set on an `edge` object in the `digraph`.  <br/>Note you could also apply styles to all edges by using an `.edge` selector in a CSS rule. There's pros and cons to each approach. |
@@ -328,7 +328,7 @@ classNames in the DOM that are generated from AST nodes are listed below. These 
 All expressions are subclasses of Expression. The expression classNames are:
 
 * literal-ish
-    * `[booleanLiteral]((https://www.ibm.com/docs/en/rational-soft-arch/9.5?topic=SS8PJ7_9.5.0/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/BooleanLiteral.java)`
+    * `[booleanLiteral](https://www.ibm.com/docs/en/rational-soft-arch/9.5?topic=SS8PJ7_9.5.0/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/BooleanLiteral.java)`
     * `characterLiteral`
     * `numberLiteral`
     * `nullLiteral`
