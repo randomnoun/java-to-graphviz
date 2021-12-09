@@ -197,7 +197,7 @@ These attributes can also be referenced within `gv-idFormat` and `gv-labelFormat
 | superConstructorInvocation | methodName | "super" |
 | methodInvocation | methodName | the method name |
 | superMethodInvocation | methodName | qualifier + ".super." + method name |
-| infixExpression | operatorToken | the operator token ( wip, will be "*", "/", "||" etc ) |
+| infixExpression | operatorToken | the operator token ( wip, will be "*", "/", "\|\|" etc ) |
 | infixExpression | operatorName |  a more css-friendly operator name ( wip, will be "times", "divide", "conditionalOr" etc  ) |
 | postfixExpression | operatorToken | the operator token ( wip, will be "++" etc ) |
 | postfixExpression | operatorName |  a more css-friendly operator name ( wip, will be "increment" etc  ) |
@@ -265,9 +265,9 @@ These attributes can also be referenced within `gv-labelFormat` and `gv-xlabelFo
 | superConstructorInvocation | edge | invocationArgument | the edges between argument expressions in a super constructor will have an `invocationArgument` class |
 | methodInvocation | edge | invocationArgument | the edges between argument expressions in a method call will have an `invocationArgument` class |
 | superMethodInvocation | edge | invocationArgument | the edges between argument expressions in a super method call will have an `invocationArgument` class |
-| infixExpression ( &&, || ) | node | infixConditional | shortcut infix expressions (that may not evaluate the second expression) have an `infixConditional` class |
-| infixExpression ( || ) | edge | infixConditional, true | for shortcut 'or' expressions, the 'true' edge that shortcuts the next expression |
-| infixExpression ( || ) | edge | infixConditional, false | for shortcut 'or' expressions, the 'false' edge that evaluates the next expression |
+| infixExpression ( &&, \|\| ) | node | infixConditional | shortcut infix expressions (that may not evaluate the second expression) have an `infixConditional` class |
+| infixExpression ( \|\| ) | edge | infixConditional, true | for shortcut 'or' expressions, the 'true' edge that shortcuts the next expression |
+| infixExpression ( \|\| ) | edge | infixConditional, false | for shortcut 'or' expressions, the 'false' edge that evaluates the next expression |
 | infixExpression ( && ) | edge | infixConditional, true | for shortcut 'and' expressions, the 'true' edge that evaluates the next expression |
 | infixExpression ( && ) | edge | infixConditional, false | for shortcut 'and' expressions, the 'false' edge that shortcuts the next expression |
 | conditionalExpression ( ? ) | edge | conditionalExpression, true | for '?' expressions, the 'true' edge connecting the condition to the true expression |
