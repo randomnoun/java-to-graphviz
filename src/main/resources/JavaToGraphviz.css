@@ -55,7 +55,7 @@ That DOM looks like this
  */
 graph {
 	fontname: "Handlee";
-	bgcolor: white; /* transparent */
+	bgcolor: transparent;
 	gv-idFormat: "G";
     gv-labelFormat: unset;
     compound: true; /* for lambda entry/exit edges */
@@ -89,6 +89,8 @@ node {
 	/* gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; */
 	/* gv-labelFormat: "${lineNumber}: ${nodeType}"; */
 	gv-labelFormat: "${nodeType}";
+	fillcolor: white; 
+	style: filled;
 }
 node.if {
 	gv-idFormat: "if_${lineNumber}";
@@ -240,7 +242,7 @@ node.methodDeclaration > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
   gv-idFormat : "cluster_m_${lineNumber}";
   gv-labelFormat : "method ${methodName}";
-  pencolor : white;
+  pencolor : transparent;
 }
 
 
@@ -277,10 +279,10 @@ node.anonymousClassDeclaration > subgraph {
   gv-labelFormat : "anonymous class";
   pencolor : black;
 }
-edge.anonymousClassDeclarationChild {
+edge.anonymousClassDeclarationBegin {
 	color: transparent; /* transparent edges leading into methods */
 }
-edge.anonymousClassDeclarationArtifical {
+edge.anonymousClassDeclarationEnd {
 	color: transparent; /* transparent edges leading out of methods to the artifical transparent node at the bottom of the anonymous class declaration */
 }
 node.anonymousClassDeclaration.end {
