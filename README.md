@@ -168,7 +168,7 @@ There are some elements and attributes in that DOM which are created automatical
 | node | Each `node` represents a node in the DAG, which usually represents a node in the AST. `node`s created from AST nodes will have a class attribute containing the AST type ( e.g. `methodDeclaration` for a [MethodDeclaration](https://www.ibm.com/docs/en/rational-soft-arch/9.5?topic=SS8PJ7_9.5.0/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/MethodDeclaration.html) ) |
 | edge | Each `edge` represents an edge in the DAG. Edges may have other classes assigned by the specific Edger implementation ( e.g. the ControlFlowEdger will add 'true' and 'false' classes to edges leading out of 'if' nodes ) |
 
-There are a few standard attributes:
+There are a few **standard attributes** on every node / edge:
 
 | Attribute | Description |
 |--|--|
@@ -178,10 +178,11 @@ There are a few standard attributes:
 | style | Each node and edge may have additional styles defined by the user in gv comments |
 | lineNumber | The starting line number of this node in the source code. As these line numbers are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. e.g. "100", "100_2", "100_3" etc |
 
+**Attributes** added to various **nodes** by the ControlFlowEdger. 
 
-Attributes added to **nodes** by the ControlFlowEdger. These attributes can also be referenced within `gv-idFormat` and `gv-labelFormat` style rules using `${xxx}` syntax.
+These attributes can also be referenced within `gv-idFormat` and `gv-labelFormat` style rules using `${xxx}` syntax.
 
-| nodeType | Attribute | Description |
+| nodeType | Attribute | Attribute value |
 |--|--|--|
 | typeDeclaration | className | The name of the Java class |
 | typeDeclaration | interfaceName | The name of the Java interface |
@@ -213,16 +214,19 @@ Attributes added to **nodes** by the ControlFlowEdger. These attributes can also
 | variableDeclarationExpression | type | The type of the variable |
 | name | name | the fully qualified name |
 | thisExpression | name | qualified this |
-| methodReference | name | method reference name |
+| creationReference, expressionMethodReference, superMethodReference, typeMethodReference | name | reference name |
 
-Attributes added to **edges** by the ControlFlowEdger. These attributes can also be referenced within `gv-labelFormat` and `gv-xlabelFormat` style rules using `${xxx}` syntax.
+
+**Attributes** added to various **edges** by the ControlFlowEdger. 
+
+These attributes can also be referenced within `gv-labelFormat` and `gv-xlabelFormat` style rules using `${xxx}` syntax.
 
 | Attribute | Applies to | Description |
 |--|--|--|
 | breakLabel | Break | if a target label was included in the `break` statement, that target label, otherwise an empty string  |
 | continueLabel |  if a target label was included in the `continue` statement, that target label, otherwise an empty string  |
 
-There's also a bunch of classes added by the edger on specific nodes and edges, which are
+**Classes** added to various **nodes** and **edges** by the ControlFlowEdger:
 
 | nodeType | Applies to | class | Description |
 |--|--|--|--|
@@ -275,22 +279,81 @@ There's also a bunch of classes added by the edger on specific nodes and edges, 
 | anonymousClassDeclaration | edge | anonymousClassDeclarationChild | The edge from the anonymous class declaration node to the start of each method/field declaration in that class |
 | ast | node | ast | All unrecognised nodes will be edged by the AstEdger, and have an 'ast' class. You shouldn't see any of these in the ControlFlowEdger any more |
 
-
-
-
 The AST classes you're going to get in your DOM are:
 
-[ big list of those ]
+* `typeDeclaration`
+* `methodDeclaration`
+* `variableDeclarationFragment`
+* `block`
+* `synchronized`
+* `if`
+* `try`
+* `for`
+* `enhancedFor`
+* `switch`
+* `switchCase`
+* `break`
+* `while`
+* `continue`
+* `do`
+* `return`
+* `throw`
+* `catchClause`
+* `labeled`
+* `expressionStatement`
+* `variableDeclaration`
+* `singleVariableDeclaration`
+* `constructorInvocation`
+* `superConstructorInvocation`
+* `assert`
+* `empty`
+* `comment`
 
-Users can create CSS rules based on the values of these elements and attributes, which are then applied to the DOM and merged with the a 'style' attribute.
+The expression AST classes you're going to get in your DOM are:
+
+* `methodInvocation`
+* `superMethodInvocation`
+* `conditionalExpression`
+* `simpleName`
+* `qualifiedName`
+* `thisExpression`
+* `booleanLiteral`
+* `characterLiteral`
+* `numberLiteral`
+* `nullLiteral`
+* `typeLiteral`
+* `stringLiteral`
+* `parenthesizedExpression`
+* `prefixExpression`
+* `postfixExpression`
+* `infixExpression`
+* `castExpression`
+* `instanceofExpression`
+* `assignment`
+* `fieldAccess`
+* `arrayAccess`
+* `superFieldAccess`
+* `creationReference`
+* `expressionMethodReference`
+* `superMethodReference`
+* `typeMethodReference`
+* `arrayCreation`
+* `arrayInitializer`
+* `classInstanceCreation`
+* `variableDeclarationExpression`
+* `lambdaExpression`
+
+Note this still isn't a complete list of all AST nodes yet, but it's most of them.
 
 ## Style properties
+
+Users can create CSS rules based on the values of these elements, attributes and classes, which are then applied to the DOM and merged with the any 'style' attributes.
 
 Most properties correspond to graphviz attributes; see the [Graphviz documentation](https://graphviz.org/doc/info/attrs.html) for a complete list of these.
 
 Some additional properties are handled by JavaToGraphviz itself, these are all namespaced with a "gv-" prefix.
 
-Prefixed properties inculde
+Prefixed properties include:
 
 | Property |  |  |
 |--|--|--|
@@ -307,7 +370,7 @@ This is useful for some graphviz shape types ( e.g. diamond ), which become over
 | gv-truncateEdges | Either "incoming", "outgoing", "none" or "both". Will truncate the edges leading into or out of a subgraph. Must be applied to the same element that had the gv-newSubgraph property. Edges will begin/end outside the subgraph boundary |
 | gv-xlabelFormat | Similar to `gv-labelFormat` but sets the [`xlabel`](https://graphviz.org/docs/attrs/xlabel/) attribute, which causes the label to be ignored during graphviz edge routing |
 
-Note that gv-newSubgraph style property ( defined in the CSS ) is not the same as the gv-subgraph directive ( defined in the source code ), discussed earlier, although they perform similar tasks.
+Note that `gv-newSubgraph` style property ( defined in the CSS ) is not the same as the `gv-subgraph` directive discussed earlier ( defined in the source code ), although they perform similar tasks. The `gv-newSubgraph` CSS property allows subgraphs to be created by matching style rules ( e.g. enclosing all try/catch/finallys in a subgraph rectangle ) whereas the `gv-subgraph` directive allows the user to specify one-off subgraphs in their source code to highlight specific blocks of code.
 
 ## Style examples
 
