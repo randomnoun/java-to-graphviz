@@ -22,6 +22,9 @@ public class DagEdge {
     public boolean back = false;
 
     public String toGraphviz() {
+        if (n1==null) { throw new IllegalStateException("null n1"); }
+        if (n2==null) { throw new IllegalStateException("null n2"); }
+        
         String labelText = label == null ? null : Text.replaceString(label, "\"",  "\\\"");
         String a = "";
         for (Entry<String, String> e : gvStyles.entrySet()) {
@@ -39,7 +42,6 @@ public class DagEdge {
                 }
             }
         }
-        
 
         return "  " + n1.name + // (n1Port == null ? "" : ":" + n1Port) + 
             " -> " + 

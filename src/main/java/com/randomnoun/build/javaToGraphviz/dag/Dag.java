@@ -137,6 +137,11 @@ public class Dag {
         return false;
     }
     public void addEdge(DagEdge e) {
+        if (e.n1 == null) { throw new NullPointerException("null n1"); }
+        if (e.n2 == null) { throw new NullPointerException("null n2"); }
+        if (edges.contains(e)) {
+            throw new IllegalStateException("edge already in collection");
+        }
         edges.add(e);
         e.n1.outEdges.add(e);
         e.n2.inEdges.add(e);
