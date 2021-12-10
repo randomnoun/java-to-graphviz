@@ -378,7 +378,7 @@ Artifical nodes created by the ControlFlowEdger are:
 
 **Debug attributes** added to various **nodes** by the DagStyleApplier. 
 
-These attributes can be referenced within `gv-idFormat`, `gv-labelFormat` and `gv-xlabelFormat` style rules using `${xxx}` syntax, but can't be used in CSS selectors. Most of these are only appear in the [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz.css) stylesheet, apart from ${lineNumber} which is used in all stylesheets.
+These attributes can be referenced within `gv-idFormat`, `gv-labelFormat` and `gv-xlabelFormat` style rules using `${xxx}` syntax, but can't be used in CSS selectors. Most of these are only appear in the [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz-debug.css) stylesheet, apart from ${lineNumber} which is used in all stylesheets.
 
 | Attribute | Description |
 |--|--|
@@ -431,6 +431,7 @@ So for example, you could put all your try/catch statements in subgraphs via
 /* gv-style: { 
     node.try { gv-newSubgraph: true; }
     node.try > subgraph {
+      // subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph
       gv-idFormat : "cluster_t_${lineNumber}";
       gv-labelFormat : "try";
       pencolor : black; 
@@ -464,8 +465,8 @@ there are multiple passes of the CSS.
 
 # Builtin CSS
 
-* [JavaToGraphviz-base.css](src/main/resources/JavaToGraphviz.css) - base CSS ; bare minimum to prevent graphviz errors
-* [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz.css) - debugging CSS ; all node labels include lineNumber, nodeType and lastKeepNodeId
+* [JavaToGraphviz-base.css](src/main/resources/JavaToGraphviz-base.css) - base CSS ; bare minimum to prevent graphviz errors
+* [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz-debug.css) - debugging CSS ; all node labels include lineNumber, nodeType and lastKeepNodeId
 * [JavaToGraphviz.css](src/main/resources/JavaToGraphviz.css) - default CSS ; uses most of the classes and attributes listed above
 
 # Features

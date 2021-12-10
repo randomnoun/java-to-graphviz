@@ -1,6 +1,6 @@
 /* JavaToGraphviz.css
 
-Righteo here's the default CSS then.
+Righteo here's the default CSS.
 
 When we're generating the GV diagram, we create a completely separate DOM just for the purpose of styling the diagram.
 Because I'm using jsoup to do the CSS selectors, it's a HTML DOM, but ignore the outermost html/body elements.
@@ -15,21 +15,6 @@ That DOM looks like this
       'label' is special HTML attribute for the 'label' graphviz attribute; use [label="xxxx"] in CSS rules
       'class' contains classes created by the AST ( 'if', 'expression' ) + some others created by the DAG ( 'break', 'continue' edges )
         will make a list of those somewhere.
-      
-      node attributes  
-        'inNodeId' contains IDs of the nodes connected to those edges; use [inEdges~="abc"] to select a node with a particular inEdge
-        'outNodeId' contains IDs of the nodes connected to those edges
-        'inNodeClass', 'outNodeClass', same but for classes
-
-      going to assign these after node/edge removal, doesn't include css-defined IDs yet
-      
-      edge attributes
-        'inNodeId' contains start node ID 
-        'outNodeId' contains end node ID
-        'inNodeClass' contains start node class
-        'outNodeClass' contains end node class
-		      
-        
     -->
     <graph>
         
@@ -48,11 +33,27 @@ That DOM looks like this
     </graph>		    
   </body>
 </body>
+
+To create even more complicated style selectors, you can enable some additional attributes by setting the domIdAttributes and domClassAttributes options
+
+  // gv-option: domIdAttributes=none         (default)
+  // gv-option: domIdAttributes=incoming     create inNodeId attribute
+  // gv-option: domIdAttributes=outgoing     create outNodeId attribute
+  // gv-option: domIdAttributes=both         create inNodeId and outNodeId attribute
+  // gv-option: domClassAttributes=incoming  create inNodeClass attribute
+  // gv-option: domClassAttributes=outgoing  create outNodeClass attribute
+  // gv-option: domClassAttributes=both      create inNodeClass outNodeClass attribute
+  
+ These attributes contain the space-separated IDs and classes if incoming and outgoing nodes; so you could use e.g. 
+    node[inNodeId~="abc"] to select all nodes that have 'abc' on an incoming edge, or
+    edge[inNodeId~="abc"] to select all edges that are sourced from 'abc'
+     
+
+ Graph defaults are from sketchviz.
+ The properties in these CSS rules are graphviz attribute names, not CSS property names.
+ There's also a handful of internal properties which are used during the diagram generation process; those are prefixed with "gv-"
 */
-/* sketchviz defaults
-   the properties in these CSS rules are graphviz attribute names, not CSS property names.
-   there's also a handful of internal properties which are used during the diagram generation process; those are prefixed with "gv-"
- */
+
 graph {
 	fontname: "Handlee";
 	bgcolor: transparent;
@@ -81,13 +82,8 @@ subgraph {
 }
 
 
-/* ok let's have some label formats as well */
-/* node { gv-labelFormat : "${nodeType}"; } */
-
 node {
 	gv-idFormat: "s_${lineNumber}";
-	/* gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; */
-	/* gv-labelFormat: "${lineNumber}: ${nodeType}"; */
 	gv-labelFormat: "${nodeType}";
 	fillcolor: white; 
 	style: filled;
@@ -211,6 +207,7 @@ node.endSubgraph { gv-endOuterSubgraph: true; }
 /* hmm. subgraph:has(node.beginSubgraph) doesn't match here, but I think it should */
 subgraph:has(node) { gv-idFormat : "cluster_uds_${lineNumber}"; gv-labelFormat : ""; }
 
+
 /* this double-spaces everything inside the expression, but I don't think it should 
 node.expressionStatement { gv-newSubgraph: true; }  */
 
@@ -302,8 +299,6 @@ node.try > subgraph {
 }
 */
 
-/* these subgraphs are created by the code, not by CSS. Actually maybe I could do this in CSS. */
-
 node.tryResource { gv-newSubgraph: true; } 
 node.tryResource > subgraph {
   /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
@@ -341,13 +336,9 @@ node.synchronized > .block > subgraph {
 }
 
 
-
-
-node.lambda { gv-newSubgraph: true; } /* when I get round to those */
-
 /* edge styles */
 
-edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }  /* maybe not breaks in switches though */ 
+edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }  /* maybe not breaks in switches though ? */ 
 edge.continue { color: red; gv-labelFormat: "continue ${continueLabel}"; }
 edge.return { color: blue; gv-labelFormat: "return"; }
 
@@ -360,8 +351,6 @@ edge.back.enhancedFor { gv-labelFormat: "for"; }
 edge.back.while { gv-labelFormat: "while"; }
 edge.back.do { gv-labelFormat: "do"; }
 
-
-/** @TODO  */
 edge.if.true { gv-labelFormat: "Y"; }
 edge.if.false { gv-labelFormat: "N"; }
 
