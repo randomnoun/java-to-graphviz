@@ -1,68 +1,17 @@
-/* JavaToGraphviz.css
+/* JavaToGraphviz-debug.css
 
-Righteo here's the default CSS then.
+This CSS stylehseet is used for debugging JavaToGraphviz itself.
+It adds a few data structure internals into each graph node label so I can see what's going wrong a bit more clearly. 
 
-When we're generating the GV diagram, we create a completely separate DOM just for the purpose of styling the diagram.
-Because I'm using jsoup to do the CSS selectors, it's a HTML DOM, but ignore the outermost html/body elements.
- 
-That DOM looks like this
-
-<html>
-  <body>
-    <!-- CSS properties are converted to graphviz attributes by applying the CSS rules, and then extracting the calculated styles.
-      In this DOM,
-      'id' is used for the node name, so we can refer to it as #id in the CSS rules
-      'label' is special HTML attribute for the 'label' graphviz attribute; use [label="xxxx"] in CSS rules
-      'class' contains classes created by the AST ( 'if', 'expression' ) + some others created by the DAG ( 'break', 'continue' edges )
-        will make a list of those somewhere.
-      
-      node attributes  
-        'inNodeId' contains IDs of the nodes connected to those edges; use [inEdges~="abc"] to select a node with a particular inEdge
-        'outNodeId' contains IDs of the nodes connected to those edges
-        'inNodeClass', 'outNodeClass', same but for classes
-
-      going to assign these after node/edge removal, doesn't include css-defined IDs yet
-      
-      edge attributes
-        'inNodeId' contains start node ID 
-        'outNodeId' contains end node ID
-        'inNodeClass' contains start node class
-        'outNodeClass' contains end node class
-		      
-        
-    -->
-    <graph>
-        
-        <!-- the calculated CSS properties for graphNode gets applied to the default graphviz node attributes -->
-        <graphNode style="shape: rect;"></graphNode>
-        <!-- same for graphEdge -->
-        <graphEdge style="shape: rect;"></graphEdge>
-        
-	    <subgraph>
-	        <!-- the calculated CSS properties for a node gets applied to that specific node in the graphviz diagram -->
-		    <node id="id" label="label" style="shape: rect;"></node> 
-		    
-		    <!-- same for edges -->
-		    <edge id="id" label="label" style="shape: rect;"></node>
-		</subgraph>
-    </graph>		    
-  </body>
-</body>
 */
-/* sketchviz defaults
-   the properties in these CSS rules are graphviz attribute names, not CSS property names.
-   there's also a handful of internal properties which are used during the diagram generation process; those are prefixed with "gv-"
- */
+
 graph {
 	fontname: "Handlee";
 	bgcolor: transparent;
 	gv-idFormat: "G";
     gv-labelFormat: unset;
-    compound: true; /* for lambda entry/exit edges */
+    compound: true;
 }
-/* the styles on graphNode and graphEdge are applied at the graph level, 
-   but styles on node and edge are (repeatedly) applied at the node and edges 
-*/   
 graphNode {
     fontname: "Handlee";
     shape : rect; 
@@ -71,19 +20,9 @@ graphEdge {
     fontname: "Handlee"
 }
 subgraph {
-  pencolor : black; 
-  labeljust : "l";
-
-  /* the ranksep here is an attempt to remove whitespace in the subgraph. 
-     turns out this attribute is disregarded if there are any edge labels in the subgraph. which is a bit annoying. 
-     xlabels don't add extra ranking whitespace, but the labels look a bit crap. */ 
-  ranksep : 0.5;
+    pencolor : black; 
+    labeljust : "l";
 }
-
-
-/* ok let's have some label formats as well */
-/* node { gv-labelFormat : "${nodeType}"; } */
-
 node {
 	gv-idFormat: "s_${lineNumber}";
 	gv-labelFormat: "${id}: ${nodeType} #comments=${numComments} kn: ${keepNode} lkn: ${lastKeepNodeId}"; 
@@ -102,10 +41,6 @@ node.method.end {
 }
 
 /* handy for finding things in the diagram */
-node.red { color: red; }
-
-/* expression labels */
-
-/* literal-ish */
-
-
+node.red { 
+	color: red; 
+}
