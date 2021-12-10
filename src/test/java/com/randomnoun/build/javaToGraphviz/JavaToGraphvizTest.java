@@ -32,12 +32,10 @@ public class JavaToGraphvizTest {
     @Test
     public void testControlFlowStatements() throws IOException {
 
-        
-        // testStatement("com.example.input.MultipleGraphs");
-        // testStatement("com.example.input.UserDefinedSubgraphs");
         testStatement("com.example.input.AllTheControlFlowNodes");
+        testStatement("com.example.input.MultipleGraphs");
+        testStatement("com.example.input.UserDefinedSubgraphs");
         
-        /*
         testStatement("com.example.input.MethodChain");
         testStatement("com.example.input.Constructor");
         
@@ -67,7 +65,6 @@ public class JavaToGraphvizTest {
         testStatement("com.example.input.Expressions4");
         testStatement("com.example.input.Expressions5");
         testStatement("com.example.input.Expressions6");
-        */
 
     }
     
@@ -98,10 +95,12 @@ public class JavaToGraphvizTest {
             
             boolean hasNext;
             do {
+                logger.info("=========================== " + className + "-" + idx + suffix );
+                
                 StringWriter sw = new StringWriter();
                 hasNext = javaToGraphviz.writeGraphviz(sw);
                 logger.debug(sw.toString());
-                
+
                 File tf = new File("src/test/resources/expected-output/" + className + "-" + idx + suffix + ".dot");
                 File tfPng = new File("src/test/resources/expected-output/" + className + "-" + idx + suffix + ".png");
                 if (WRITE_EXPECTED_OUTPUT) {
@@ -127,15 +126,14 @@ public class JavaToGraphvizTest {
                     
                 }
                 
-                if (hasNext) { logger.info("==========================="); }
             } while (hasNext);
             
         }
     }
         
         
-    @Test
-    public void testDom() throws IOException {
+    //@Test
+    public void notestDom() throws IOException {
         testDom("com.example.input.ForStatement");
     }
     
