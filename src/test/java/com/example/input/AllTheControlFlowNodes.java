@@ -7,7 +7,6 @@ package com.example.input;
  */
 public class AllTheControlFlowNodes {
     
-    // gv-style: { @import "JavaToGraphviz.css"; }
     /* gv-style: {
         // some rules 
         .something { color: red; }
