@@ -1113,6 +1113,9 @@ public class ControlFlowEdger {
                 pe.n2 = f;
                 dag.edges.add(pe);
             }
+            e = new ExitEdge();
+            e.n1 = f;
+            prevNodes = Collections.singletonList(e);
             
             // name, dimension(s), expression
             VariableDeclarationFragment vdf = (VariableDeclarationFragment) f.astNode;
