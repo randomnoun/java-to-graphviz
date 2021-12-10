@@ -86,7 +86,7 @@ subgraph {
 
 node {
 	gv-idFormat: "s_${lineNumber}";
-	gv-labelFormat: "${lineNumber}: ${nodeType} lkn: ${lastKeepNodeId}"; 
+	gv-labelFormat: "${id}: ${nodeType} #comments=${numComments} kn: ${keepNode} lkn: ${lastKeepNodeId}"; 
 }
 node.if {
 	gv-idFormat: "if_${lineNumber}";

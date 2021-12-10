@@ -414,6 +414,9 @@ public class DagStyleApplier {
         vars.put("lineNumber", String.valueOf(node.lineNumber));
         vars.put("nodeType", node.type);
         vars.put("lastKeepNodeId",  node.lastKeepNode == null ? "" : node.lastKeepNode.name);
+        vars.put("keepNode",  node.keepNode ? "true" : "false");
+        vars.put("numComments",  String.valueOf(node.gvComments.size()));
+        
         for (String v : NODE_LABEL_VARIABLES) {
             vars.put(v,  node.gvAttributes.get(v) == null ? "" : node.gvAttributes.get(v));
         }
@@ -482,8 +485,8 @@ public class DagStyleApplier {
     private String[] getIdLabel(String idFormat, String labelFormat, String id, String label, Map<String, String> vars) {
         String[] result = new String[] { id, label };
         
-        if ("unset".equals(idFormat)) { idFormat = null; }
-        if ("unset".equals(labelFormat)) { labelFormat = null; }
+        if ("unset".equals(idFormat) || id!=null) { idFormat = null; }
+        if ("unset".equals(labelFormat) || label!=null) { labelFormat = null; }
         
         // id can refer to label, or label can refer to id, but not both
         boolean idFirst = true; 
