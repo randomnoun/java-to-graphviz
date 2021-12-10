@@ -191,7 +191,6 @@ There are a few **standard attributes** on every node / edge:
 | label | Each node has a label attribute which populates the graphviz 'label' attribute. If blank, it will be set using `gv-labelFormat` rules in the CSS |
 | class | Each node and edge may have additional classes defined by the Edger or by the user in gv comments |
 | style | Each node and edge may have additional styles defined by the user in gv comments |
-| lineNumber | The starting line number of this node in the source code. As these line numbers are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. e.g. "100", "100_2", "100_3" etc |
 
 **Attributes** added to various **nodes** by the ControlFlowEdger. 
 
@@ -230,7 +229,6 @@ These attributes can also be referenced within `gv-idFormat` and `gv-labelFormat
 | name | name | the fully qualified name |
 | thisExpression | name | qualified this |
 | creationReference, expressionMethodReference, superMethodReference, typeMethodReference | name | reference name |
-
 
 **Attributes** added to various **edges** by the ControlFlowEdger. 
 
@@ -378,6 +376,17 @@ Artifical nodes created by the ControlFlowEdger are:
 | anonymousClassDeclarationEnd | added to the end of anonymousClassDeclaration blocks, all methods within the anonymous class will have an invisible edge connected to this node for layout purposes  ( these should be styled as transparent or invisible as they're not part of the control flow diagram ) |
 | infixExpressionCondition | added within shortcut infixExpression nodes to branch the control flow based on the value of the left-hand-side operand |
 
+**Debug attributes** added to various **nodes** by the DagStyleApplier. 
+
+These attributes can be referenced within `gv-idFormat`, `gv-labelFormat` and `gv-xlabelFormat` style rules using `${xxx}` syntax, but can't be used in CSS selectors. Most of these are only appear in the [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz.css) stylesheet, apart from ${lineNumber} which is used in all stylesheets.
+
+| Attribute | Description |
+|--|--|
+| lineNumber | The starting line number of this node in the source code. As these line numbers are used to generate default IDs, they are suffixed with an incrementing integer to allow multiple nodes on the same source line. e.g. "100", "100_2", "100_3" etc |
+| nodeType | The AST node type |
+| keepNode | "true" if this node is a keeper, "false" otherwise |
+| lastKeepNodeId | the id of the last seen node connected to this node with keepNode="true" |
+| numComments | the number of gv comments attributed to this node |
 
 ## Style properties
 
