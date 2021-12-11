@@ -493,12 +493,6 @@ public class AstToDagVisitor extends ASTVisitor {
             dn.lineNumber = lineNumber;
             dn.parentDagNode = pdn;
             dn.astNode = node;
-            dn.options = options;
-            dn.keepNodeMatcher = keepNodeMatcher;
-
-            if (keepNodeMatcher.matches(lowerClass)) {
-                dn.keepNode = true;
-            }
 
             // these comments may start a new graph, when that happens we need to reset the pdn
             int beforeRootGraphIdx = rootGraphIdx;
@@ -515,6 +509,14 @@ public class AstToDagVisitor extends ASTVisitor {
             if (rootGraphIdx != beforeRootGraphIdx) {
                 // new graph, this node is a root node
                 pdn = null;
+            }
+
+            // options and keepNodeMatcher may be affected by gv comments
+            dn.options = options;
+            dn.keepNodeMatcher = keepNodeMatcher;
+
+            if (keepNodeMatcher.matches(lowerClass)) {
+                dn.keepNode = true;
             }
             
             // omit nodes outside of graphs
