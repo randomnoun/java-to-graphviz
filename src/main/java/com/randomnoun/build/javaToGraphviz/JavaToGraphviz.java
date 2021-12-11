@@ -258,16 +258,19 @@ public class JavaToGraphviz {
                     e.n2.inEdges.add(e);
                 }
                 
-                DagNodeFilter filter = new DagNodeFilter(dag);
-                if (rootNode.keepNodeMatcher.matches("startNode")) {
-                    rootNode.keepNode = true;
-                    filter.setLastKeepNode(rootNode, rootNode);
-                } else {
-                    rootNode.keepNode = false;
-                    
+                if (!"false".equals(rootNode.options.get("removeNodes"))) {
+                    DagNodeFilter filter = new DagNodeFilter(dag);
+                    if (rootNode.keepNodeMatcher.matches("startNode")) {
+                        rootNode.keepNode = true;
+                        filter.setLastKeepNode(rootNode, rootNode);
+                    } else {
+                        rootNode.keepNode = false;
+                        
+                    }
+                    filter.removeNodes(rootNode);
                 }
-                filter.removeNodes(rootNode);
             }
+            
         }
 
         // subgraphs are now defined in the Dag from the stylesheet
