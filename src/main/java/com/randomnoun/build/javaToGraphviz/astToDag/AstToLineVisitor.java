@@ -8,11 +8,15 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 import com.randomnoun.build.javaToGraphviz.comment.CommentText;
 
@@ -53,8 +57,12 @@ public class AstToLineVisitor extends ASTVisitor {
     public boolean preVisit2(ASTNode node) {
         if (node instanceof MethodDeclaration ||
             node instanceof CatchClause ||
-            (node instanceof Statement &&
-            (includeThrowNode || !(node instanceof ThrowStatement)) )) {
+            (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
+            node instanceof Expression || // inside ExpressionStatements
+            node instanceof VariableDeclaration ||
+            node instanceof TypeDeclaration ||
+            node instanceof AnonymousClassDeclaration
+            ) {
             
             int lineNumber = cu.getLineNumber(node.getStartPosition());
             // int columnNumber = cu.getColumnNumber(node.getStartPosition());
@@ -73,8 +81,12 @@ public class AstToLineVisitor extends ASTVisitor {
     public void postVisit(ASTNode node) {
         if (node instanceof MethodDeclaration ||
             node instanceof CatchClause ||
-            (node instanceof Statement &&
-            (includeThrowNode || !(node instanceof ThrowStatement)) )) {
+            (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
+            node instanceof Expression || // inside ExpressionStatements
+            node instanceof VariableDeclaration ||
+            node instanceof TypeDeclaration ||
+            node instanceof AnonymousClassDeclaration
+            ) {
             
             int lineNumber = cu.getLineNumber(node.getStartPosition() + node.getLength());
             // int columnNumber = cu.getColumnNumber(node.getStartPosition());
