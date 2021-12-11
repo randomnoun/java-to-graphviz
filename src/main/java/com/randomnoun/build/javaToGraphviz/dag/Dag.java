@@ -147,15 +147,11 @@ public class Dag {
         e.n2.inEdges.add(e);
     }
     public DagEdge addEdge(DagNode n1, DagNode n2) {
-        return addEdge(n1, n2, null);
-    }
-    public DagEdge addEdge(DagNode n1, DagNode n2, String label) {
         if (n1 == null) { throw new NullPointerException("null n1"); }
         if (n2 == null) { throw new NullPointerException("null n2"); }
         DagEdge e = new DagEdge();
         e.n1 = n1;
         e.n2 = n2;
-        e.label = label;
         edges.add(e);
         e.n1.outEdges.add(e);
         e.n2.inEdges.add(e);
