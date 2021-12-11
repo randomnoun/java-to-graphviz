@@ -499,6 +499,11 @@ So a few things that'd be nice to implement if I get around to it:
 * create a stylesheet with no labels and shaded nodes. Maybe use whatever colouring scratch uses.
 * and so on.
 
+## More reading
+
+[Here's the writeup on the blog](http://www.randomnoun.com/wp/2021/12/11/flowcharts-r-us/). 
+
 ## Licensing
 
 java-to-graphviz is licensed under the BSD 2-clause license.
+
