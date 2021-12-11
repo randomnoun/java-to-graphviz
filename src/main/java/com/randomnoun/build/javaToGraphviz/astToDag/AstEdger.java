@@ -1,6 +1,7 @@
 package com.randomnoun.build.javaToGraphviz.astToDag;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jdt.core.dom.Name;
 
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
@@ -30,6 +31,12 @@ public class AstEdger {
      */
     public void addEdges(Dag dag, DagNode node, LexicalScope scope) {
         
+        if (node.type.equals("SimpleName") ||
+            node.type.equals("QualifiedName")) {
+            addNameAttributes(dag, node, scope);
+        }
+
+        
         if (node.children != null && node.children.size() > 0) {
             for (DagNode c : node.children) {
                 DagEdge ce = dag.addEdge(node, c);
@@ -37,6 +44,11 @@ public class AstEdger {
                 addEdges(dag, c, scope);
             }
         }
+    }
+    
+    private void addNameAttributes(Dag dag, DagNode nameNode, LexicalScope scope) {
+        Name n = (Name) nameNode.astNode; // SimpleName or QualifiedName
+        nameNode.gvAttributes.put("name", n.getFullyQualifiedName());
     }
   
 }
