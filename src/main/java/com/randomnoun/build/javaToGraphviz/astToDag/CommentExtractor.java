@@ -82,14 +82,18 @@ public class CommentExtractor {
             inlineStyleString = cm.group(1).trim();
             text = text.substring(0, cm.start()) + text.substring(cm.end());
         }
-        if (!hasColon) { 
+        if (!hasColon) {
+            if (text.length() > 0 && !Character.isWhitespace(text.charAt(0)) ) {
+                logger.warn("ignoring unknown gv directive '" + type + text + "'");
+                return null;
+            }
             // hrm
             text = null; 
         }
         
-        return "node".equals(type) ? new GvComment(c, lineNumber, column, eolComment, id, classes, dir, text, inlineStyleString) :
-            "graph".equals(type) ? new GvGraphComment(c, lineNumber, column, eolComment, id, classes, text, inlineStyleString) :
-            "subgraph".equals(type) ? new GvSubgraphComment(c, lineNumber, column, eolComment, id, classes, text, inlineStyleString) :
+        return "gv".equals(type) ? new GvComment(c, lineNumber, column, eolComment, id, classes, dir, text, inlineStyleString) :
+            "gv-graph".equals(type) ? new GvGraphComment(c, lineNumber, column, eolComment, id, classes, text, inlineStyleString) :
+            "gv-subgraph".equals(type) ? new GvSubgraphComment(c, lineNumber, column, eolComment, id, classes, text, inlineStyleString) :
              null;
         
     }
@@ -179,18 +183,18 @@ public class CommentExtractor {
                 CommentText gvc = null;
                 fgm = gvGraphClassPattern.matcher(text);
                 if (fgm.find()) {
-                    gvc = getGvComment("graph", c, line, column, fgm, text);
+                    gvc = getGvComment("gv-graph", c, line, column, fgm, text);
                     
                 } else {
                     fgm = gvSubgraphClassPattern.matcher(text);
                     if (fgm.find()) {
-                        gvc = getGvComment("subgraph", c, line, column, fgm, text);
+                        gvc = getGvComment("gv-subgraph", c, line, column, fgm, text);
                     
                     } else {
                         fgm = gvNodeClassPattern.matcher(text);
 
                         if (fgm.find()) {
-                            gvc = getGvComment("node", c, line, column, fgm, text);
+                            gvc = getGvComment("gv", c, line, column, fgm, text);
                             
                         } else {
                             // regular comment, ignore
