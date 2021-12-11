@@ -76,7 +76,6 @@ import com.randomnoun.common.Text;
 public class ControlFlowEdger {
     Logger logger = Logger.getLogger(ControlFlowEdger.class);
     Dag dag;
-    boolean includeThrowEdges;
     
     // set this to false to create the ast+cf diagram
     // could make this a gv-option later I guess
@@ -85,11 +84,6 @@ public class ControlFlowEdger {
     public ControlFlowEdger(Dag dag) {
         this.dag = dag;
     }
-    public void setIncludeThrowEdges(boolean includeThrowEdges) {
-        this.includeThrowEdges = includeThrowEdges;
-    }
-
-    
     // every edge added by this class should have a 'cf' class
     public void addEdge(DagEdge e) {
         e.classes.add("cf");
@@ -358,11 +352,9 @@ public class ControlFlowEdger {
         }
         
         // and everything that was thrown connects to this node as well
-        if (includeThrowEdges) { 
-            for (ExitEdge e : lexicalScope.throwEdges) {
-                e.n2 = returnNode;
-                addEdge(e);
-            }
+        for (ExitEdge e : lexicalScope.throwEdges) {
+            e.n2 = returnNode;
+            addEdge(e);
         }
         
         // could possibly draw a line from every single node to this node for OOMs etc
@@ -1329,11 +1321,9 @@ public class ControlFlowEdger {
         }
         
         // and everything that was thrown connects to this node as well
-        if (includeThrowEdges) { 
-            for (ExitEdge e : lexicalScope.throwEdges) {
-                e.n2 = returnNode;
-                addEdge(e);
-            }
+        for (ExitEdge e : lexicalScope.throwEdges) {
+            e.n2 = returnNode;
+            addEdge(e);
         }
         
         // there's no exit edges out of a method, but let's say there is from a lambda

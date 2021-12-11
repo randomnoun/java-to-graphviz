@@ -1,8 +1,7 @@
 package com.randomnoun.build.javaToGraphviz.astToDag;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,7 +17,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 
@@ -28,9 +26,9 @@ import com.randomnoun.build.javaToGraphviz.comment.GvEndGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvEndSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvGraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvKeepNodeComment;
-import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvLiteralComment;
 import com.randomnoun.build.javaToGraphviz.comment.GvOptionComment;
+import com.randomnoun.build.javaToGraphviz.comment.GvSubgraphComment;
 import com.randomnoun.build.javaToGraphviz.dag.Dag;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
@@ -59,7 +57,6 @@ public class AstToDagVisitor extends ASTVisitor {
     List<CommentText> comments;
     CompilationUnit cu;
     String src;
-    boolean includeThrowNode;
     boolean defaultKeepNode;
     int nextLineFromLine = 0;
     List<GvComment> nextLineComments = new ArrayList<>(); 
@@ -73,19 +70,18 @@ public class AstToDagVisitor extends ASTVisitor {
     Map<Integer, List<ASTNode>> endLineNumberAsts;
     
     
-    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode, boolean defaultKeepNode) {
+    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean defaultKeepNode) {
         super(true);
         this.cu = cu;
         this.comments = comments;
         this.src = src;
-        this.includeThrowNode = includeThrowNode;
         this.defaultKeepNode = defaultKeepNode;
         this.keepNodeMatcher = new KeepNodeMatcher(defaultKeepNode);
         dag = new Dag();
         root = new DagSubgraph(dag, null);
         dag.rootGraphs.add(root);
         
-        AstToLineVisitor lv = new AstToLineVisitor(cu, src, comments, includeThrowNode);
+        AstToLineVisitor lv = new AstToLineVisitor(cu, src, comments);
         cu.accept(lv);
         startLineNumberAsts = lv.getStartLineNumberAstsMap();
         endLineNumberAsts = lv.getEndLineNumberAstsMap();
@@ -467,7 +463,7 @@ public class AstToDagVisitor extends ASTVisitor {
 
         if (node instanceof MethodDeclaration ||
             node instanceof CatchClause ||
-            (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
+            node instanceof Statement ||
             node instanceof Expression || // inside ExpressionStatements
             node instanceof VariableDeclaration ||
             node instanceof TypeDeclaration ||

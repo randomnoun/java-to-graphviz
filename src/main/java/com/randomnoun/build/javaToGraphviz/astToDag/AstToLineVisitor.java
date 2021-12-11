@@ -37,14 +37,12 @@ public class AstToLineVisitor extends ASTVisitor {
     List<CommentText> comments;
     CompilationUnit cu;
     String src;
-    boolean includeThrowNode;
     
-    public AstToLineVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean includeThrowNode) {
+    public AstToLineVisitor(CompilationUnit cu, String src, List<CommentText> comments) {
         super(true);
         this.cu = cu;
         this.comments = comments;
         this.src = src;
-        this.includeThrowNode = includeThrowNode;
     }
     
     public Map<Integer, List<ASTNode>> getStartLineNumberAstsMap() { 
@@ -57,7 +55,7 @@ public class AstToLineVisitor extends ASTVisitor {
     public boolean preVisit2(ASTNode node) {
         if (node instanceof MethodDeclaration ||
             node instanceof CatchClause ||
-            (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
+            node instanceof Statement ||
             node instanceof Expression || // inside ExpressionStatements
             node instanceof VariableDeclaration ||
             node instanceof TypeDeclaration ||
@@ -81,7 +79,7 @@ public class AstToLineVisitor extends ASTVisitor {
     public void postVisit(ASTNode node) {
         if (node instanceof MethodDeclaration ||
             node instanceof CatchClause ||
-            (node instanceof Statement && (includeThrowNode || !(node instanceof ThrowStatement)) ) ||
+            node instanceof Statement ||
             node instanceof Expression || // inside ExpressionStatements
             node instanceof VariableDeclaration ||
             node instanceof TypeDeclaration ||

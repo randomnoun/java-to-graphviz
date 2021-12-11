@@ -7,9 +7,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.AST;
@@ -32,11 +30,12 @@ import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.common.StreamUtil;
 
-// so the next bit is going to be styling
-// and supporting more types of statements
-// and user-defined subgraphs
-// and then integrating with jacoco
-// and AOP 
+// so the next bit is going to be 
+// x styling
+// x and supporting more types of statements
+// x and user-defined subgraphs
+// . and then integrating with jacoco
+// . and AOP 
 
 /** Convert an AST tree of a java class ( CompilationUnit, created by the eclipse ASTParser )
  * into a graphviz diagram ( Dag )
@@ -58,8 +57,6 @@ public class JavaToGraphviz {
     // options
     boolean removeNode = false;
     int astParserLevel = JLS11;
-    boolean includeThrowEdges = true;
-    boolean includeThrowNodes = true;
     String format = "dot";
     String baseCssUrl = "JavaToGraphviz-base.css";
     List<String> userCssUrls = null;
@@ -117,32 +114,14 @@ public class JavaToGraphviz {
     public static final int JLS16 = AST.JLS16; // 16;
 
     
-// see https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
-    
-    // depending on how many of these I end up with, maybe bundle these into an options object
-    // should be gv styles as well, probably
-    public void setRemoveNode(boolean removeNode) {
-        this.removeNode = removeNode;
-    }
+    // see https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
     
     public void setAstParserLevel(int astParserLevel) {
         this.astParserLevel = astParserLevel;
     }
     
-    public void setIncludeThrowNodes(boolean includeThrowNodes) {
-        this.includeThrowNodes = includeThrowNodes;
-    }
-    
-    public void setIncludeThrowEdges(boolean includeThrowEdges) {
-        this.includeThrowEdges = includeThrowEdges;
-    }
-    
     public void setBaseCssUrl(String baseCssUrl) {
         this.baseCssUrl = baseCssUrl;
-    }
-
-    public void setEdgerNames(List<String> edgerNames) {
-        this.edgerNames = edgerNames;
     }
 
     public void setUserCssUrls(List<String> userCssUrls) {
@@ -179,7 +158,7 @@ public class JavaToGraphviz {
 		comments = ce.getComments(cu, src);
 		styleSheet = ce.getStyleSheet(comments, baseCssUrl, userCssUrls, userCssRules);
 		
-		AstToDagVisitor dv = new AstToDagVisitor(cu, src, comments, includeThrowNodes, !removeNode);
+		AstToDagVisitor dv = new AstToDagVisitor(cu, src, comments, !removeNode);
         cu.accept(dv);
         dag = dv.getDag();
         
@@ -231,7 +210,6 @@ public class JavaToGraphviz {
                 for (String edgerName : edgerNames) {
                     if (edgerName.equals("control-flow")) {
                         ControlFlowEdger edger = new ControlFlowEdger(dag);
-                        edger.setIncludeThrowEdges(includeThrowEdges);
                         edger.addEdges(dag, rootNode, lexicalScope);
                     
                     } else if (edgerName.equals("ast")) {
@@ -401,35 +379,6 @@ public class JavaToGraphviz {
                 throw new IllegalArgumentException("Unknown source version '" + sourceVersion + "'");
         }
     }
-
     
 
-	
-	// yeah ok
-	/*
-	private void C(boolean condition, int thing) {
-	    System.out.println("something");
-        
-        switch (thing) {
-            case 1: System.out.println("something"); //gv: case 1
-                if (condition) {
-                    System.out.println("conditional");
-                    break;
-                }
-                // conditional fallthrough
-                
-            case 2: // comment on case 2
-                System.out.println("something"); // comment on case 2 body, fallthrough
-                
-            case 3:
-                System.out.println("something");
-                break;
-                
-            default:
-                System.out.println("something"); // the default body
-                
-        }
-        System.out.println("somethingElse");
-	}
-	*/
 }
