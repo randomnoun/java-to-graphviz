@@ -78,13 +78,35 @@ public class ControlFlowEdger {
     Dag dag;
     boolean includeThrowEdges;
     
+    // set this to false to create the ast+cf diagram
+    // could make this a gv-option later I guess
+    private static boolean HOIST_ENABLED = true;
+    
     public ControlFlowEdger(Dag dag) {
         this.dag = dag;
     }
     public void setIncludeThrowEdges(boolean includeThrowEdges) {
         this.includeThrowEdges = includeThrowEdges;
     }
+
+    
+    // every edge added by this class should have a 'cf' class
+    public void addEdge(DagEdge e) {
+        e.classes.add("cf");
+        dag.addEdge(e);
+    }
+    
+    public DagEdge addEdge(DagNode n1, DagNode n2) {
+        DagEdge result = dag.addEdge(n1, n2);
+        result.classes.add("cf");
+        return result;
         
+        // DagEdge fakeEdge = new DagEdge();
+        // fakeEdge.n1 = n1;
+        // fakeEdge.n2 = n2;
+        // return fakeEdge;
+    }
+    
     
     /** Adds the edges for a DagNode into the Dag, and returns the edges leading out of that DagNode
      * (which may now be labelled)
@@ -232,7 +254,7 @@ public class ControlFlowEdger {
 	        if (!c.skipNode) {
                 for (ExitEdge e : prevNodes) {
                     e.n2 = c;
-                    dag.addEdge(e);
+                    addEdge(e);
                 }
                 prevNodes = addEdges(dag, c, scope);
 	        }
@@ -253,7 +275,7 @@ public class ControlFlowEdger {
         
         for (ExitEdge e : prevNodes) {
             e.n2 = synchronizedBlock;
-            dag.addEdge(e);
+            addEdge(e);
         }
         
         prevNodes = addBlockEdges(dag, synchronizedBlock, scope);  
@@ -302,7 +324,7 @@ public class ControlFlowEdger {
         
         // last child is the block
         DagNode methodBlock = method.children.get(method.children.size() - 1);
-        dag.addEdge(method, methodBlock);
+        addEdge(method, methodBlock);
         
         LexicalScope lexicalScope = new LexicalScope(); 
         List<ExitEdge> ee = addBlockEdges(dag, methodBlock, lexicalScope);
@@ -332,14 +354,14 @@ public class ControlFlowEdger {
         
         for (ExitEdge e : lexicalScope.returnEdges) {
             e.n2 = returnNode;
-            dag.addEdge(e);
+            addEdge(e);
         }
         
         // and everything that was thrown connects to this node as well
         if (includeThrowEdges) { 
             for (ExitEdge e : lexicalScope.throwEdges) {
                 e.n2 = returnNode;
-                dag.addEdge(e);
+                addEdge(e);
             }
         }
         
@@ -348,7 +370,7 @@ public class ControlFlowEdger {
         // and everything flowing out of the first block connects to this node as well
         for (ExitEdge e : ee) {
             e.n2 = returnNode;
-            dag.addEdge(e);
+            addEdge(e);
         }
         
         // there's no exit edges out of a method
@@ -434,7 +456,7 @@ public class ControlFlowEdger {
         DagNode c = getDagChild(labeledStatementNode.children, ls.getBody(), null);
         String label = ls.getLabel() == null ? null : ls.getLabel().toString();
         
-        dag.addEdge(labeledStatementNode, c);
+        addEdge(labeledStatementNode, c);
 
         c.javaLabel = label;
         
@@ -506,7 +528,7 @@ public class ControlFlowEdger {
         List<ExitEdge> prevNodes = new ArrayList<>();
 	    if (ifNode.children.size() == 2) {
 	        DagNode c = ifNode.children.get(1);
-            DagEdge trueEdge = dag.addEdge(ifNode, c, null);
+            DagEdge trueEdge = addEdge(ifNode, c);
             trueEdge.classes.add("if");
             trueEdge.classes.add("true");
             
@@ -523,8 +545,8 @@ public class ControlFlowEdger {
 	    } else if (ifNode.children.size() == 3) {
 	        DagNode c1 = ifNode.children.get(1);
 	        DagNode c2 = ifNode.children.get(2);
-            DagEdge trueEdge = dag.addEdge(ifNode, c1, null); trueEdge.classes.add("if"); trueEdge.classes.add("true");
-            DagEdge falseEdge = dag.addEdge(ifNode, c2, null); falseEdge.classes.add("if"); falseEdge.classes.add("false");
+            DagEdge trueEdge = addEdge(ifNode, c1); trueEdge.classes.add("if"); trueEdge.classes.add("true");
+            DagEdge falseEdge = addEdge(ifNode, c2); falseEdge.classes.add("if"); falseEdge.classes.add("false");
             List<ExitEdge> branch1PrevNodes = addEdges(dag, c1, scope);
             List<ExitEdge> branch2PrevNodes = addEdges(dag, c2, scope);
             prevNodes.addAll(branch1PrevNodes);
@@ -568,7 +590,7 @@ public class ControlFlowEdger {
             if (prevNodes != null) {
                 for (ExitEdge e : prevNodes) {
                     e.n2 = rd;
-                    dag.addEdge(e);
+                    addEdge(e);
                 }
             }
             // if exceptions occur here they pass to the exception handler defined here 
@@ -578,9 +600,9 @@ public class ControlFlowEdger {
 
         for (ExitEdge e : prevNodes) {
             e.n2 = bodyDag;
-            dag.addEdge(e);
+            addEdge(e);
         }
-        // dag.addEdge(tryNode,  bodyDag);
+        // addEdge(tryNode,  bodyDag);
         
         List<ExitEdge> tryPrevNodes = new ArrayList<>(addEdges(dag, bodyDag, throwScope));
 
@@ -594,7 +616,7 @@ public class ControlFlowEdger {
                 de.n1 = e.n1;
                 de.n2 = ccDag;
                 de.classes.add("throw");
-                dag.addEdge(de);
+                addEdge(de);
             }
             
             // original scope for exceptions thrown in exception handlers
@@ -611,12 +633,12 @@ public class ControlFlowEdger {
             boolean returnIntoFinally = false, otherIntoFinally = false;;
             for (ExitEdge e : throwScope.returnEdges) {
                 e.n2 = finallyDag;
-                dag.addEdge(e);
+                addEdge(e);
                 returnIntoFinally = true;
             }
             for (ExitEdge e : tryPrevNodes) {
                 e.n2 = finallyDag;
-                dag.addEdge(e);
+                addEdge(e);
                 otherIntoFinally = true;
             }
             tryPrevNodes = addEdges(dag, finallyDag, scope);
@@ -653,7 +675,7 @@ public class ControlFlowEdger {
         catchNode.gvAttributes.put("exceptionSpec", cc.getException().toString());
         
         DagNode bodyDag = getDagChild(catchNode.children, cc.getBody(), null);
-        dag.addEdge(catchNode, bodyDag);
+        addEdge(catchNode, bodyDag);
         
         List<ExitEdge> prevNodes = addEdges(dag, bodyDag, scope);
         return prevNodes;
@@ -680,7 +702,7 @@ public class ControlFlowEdger {
             if (prevNodes != null) {
                 for (ExitEdge e : prevNodes) {
                     e.n2 = i;
-                    dag.addEdge(e);
+                    addEdge(e);
                 }
             }
             prevNodes = addExpressionEdges(dag, i, scope );
@@ -690,7 +712,7 @@ public class ControlFlowEdger {
         if (prevNodes != null) {
             for (ExitEdge e : prevNodes) {
                 e.n2 = exprDag;
-                dag.addEdge(e);
+                addEdge(e);
                 firstExpressionEdge = e;
             }
         }
@@ -706,7 +728,7 @@ public class ControlFlowEdger {
         forTrue.classes.add("for");
         forTrue.classes.add("true");
         forTrue.n2 = repeatingBlock;
-        dag.addEdge(forTrue);
+        addEdge(forTrue);
         
         LexicalScope newScope = scope.newBreakContinueScope(forNode, firstExpressionNode);
         prevNodes = addEdges(dag, repeatingBlock, newScope);
@@ -714,7 +736,7 @@ public class ControlFlowEdger {
         for (DagNode u : updaterDags) {
             for (ExitEdge e : prevNodes) {
                 e.n2 = u;
-                dag.addEdge(e);
+                addEdge(e);
             }
             prevNodes = addExpressionEdges(dag, u, scope );
         }
@@ -756,7 +778,7 @@ public class ControlFlowEdger {
         if (prevNodes != null) {
             for (ExitEdge e : prevNodes) {
                 e.n2 = exprDag;
-                dag.addEdge(e);
+                addEdge(e);
                 firstExpressionEdge = e;
             }
         }
@@ -770,7 +792,7 @@ public class ControlFlowEdger {
         forTrue.classes.add("enhancedFor");
         forTrue.classes.add("true");
         forTrue.n2 = repeatingBlock;
-        dag.addEdge(forTrue);
+        addEdge(forTrue);
         
         LexicalScope newScope = scope.newBreakContinueScope(forNode, firstExpressionNode);
         prevNodes = addEdges(dag, repeatingBlock, newScope);
@@ -817,7 +839,7 @@ public class ControlFlowEdger {
         prevNodes = rejigger.unhoistNode(dag, prevNodes);
 
         // DagNode repeatingBlock = whileNode.children.get(0);
-        DagEdge whileTrue = dag.addEdge(whileNode, repeatingBlock);
+        DagEdge whileTrue = addEdge(whileNode, repeatingBlock);
         // whileTrue.label = "Y";
         whileTrue.classes.add("while");
         whileTrue.classes.add("true");
@@ -863,7 +885,7 @@ public class ControlFlowEdger {
         for (ExitEdge e : repeatingBlockPrevNodes) {
             // DagEdge backEdge = dag.addBackEdge(e.n1, doNode, null);
             // backEdge.classes.add("do");
-            dag.addEdge(e.n1, exprDag, null);
+            addEdge(e.n1, exprDag);
         }
 
         Rejigger markedExpression = markNode(dag, exprDag);
@@ -883,7 +905,7 @@ public class ControlFlowEdger {
         
         for (DagEdge ce : newScope.continueEdges) {
             ce.n2 = firstExpressionNode;
-            dag.addEdge(ce);
+            addEdge(ce);
         }
         
         // prevNodes.addAll(repeatingBlockPrevNodes);
@@ -943,7 +965,7 @@ public class ControlFlowEdger {
                     
                     if (exprDags.size() > 0) {
                         for (DagNode caseExprDag : exprDags) {
-                            DagEdge exprEdge = dag.addEdge(switchNode, caseExprDag);
+                            DagEdge exprEdge = addEdge(switchNode, caseExprDag);
                             exprEdge.classes.add("switchCase");
                             exprPrevNodes = new ArrayList<>(addExpressionEdges(dag, caseExprDag, newScope));
                             // @TODO link these up with || nodes
@@ -960,12 +982,12 @@ public class ControlFlowEdger {
                     
                     for (ExitEdge e : exprPrevNodes) {
                         e.n2 = c;
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                     
                     for (ExitEdge e : casePrevNodes) { // fall-through edges. maybe these should be red instead of the break edges
                         e.n2 = c;
-                        dag.addEdge(e);
+                        addEdge(e);
                         e.classes.add("switch");
                         e.classes.add("fallthrough");
                     }
@@ -982,7 +1004,7 @@ public class ControlFlowEdger {
                     }
                     for (ExitEdge e : casePrevNodes) {
                         e.n2 = c;
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                     casePrevNodes = addEdges(dag, c, newScope);
                 }
@@ -1018,7 +1040,7 @@ public class ControlFlowEdger {
                         for (DagNode caseExprDag : exprDags) {
                             for (ExitEdge e : noCasePrevNodes) {
                                 e.n2 = caseExprDag;
-                                dag.addEdge(e);
+                                addEdge(e);
                             }
                             noCasePrevNodes = new ArrayList<>(addExpressionEdges(dag, caseExprDag, newScope));
                             // @TODO link these up with || nodes
@@ -1026,7 +1048,7 @@ public class ControlFlowEdger {
                     }
                     for (DagEdge e : noCasePrevNodes) {
                         e.n2 = c;
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                     for (ExitEdge e : casePrevNodes) { // fall-through edges from previous case
                         e.classes.add("switch");
@@ -1053,7 +1075,7 @@ public class ControlFlowEdger {
                     }
                     for (ExitEdge e : casePrevNodes) {
                         e.n2 = c;
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                     casePrevNodes = new ArrayList<>(addEdges(dag, c, newScope));
                 }
@@ -1093,7 +1115,7 @@ public class ControlFlowEdger {
             throw new IllegalStateException("expected 1 child; found " + expressionStatementNode.children.size());
         }
         DagNode eNode = expressionStatementNode.children.get(0);
-        dag.addEdge(expressionStatementNode, eNode);
+        addEdge(expressionStatementNode, eNode);
         
         return addExpressionEdges(dag, eNode, scope);
     }
@@ -1261,7 +1283,7 @@ public class ControlFlowEdger {
         // so maybe I skip all of that somehow. OK so let's create an edge so it's grouped together but hide it in the diagram.
         
         DagNode blockNode = lambdaNode.children.get(lambdaNode.children.size() - 1);
-        DagEdge lambdaEntryEdge = dag.addEdge(lambdaNode, blockNode);
+        DagEdge lambdaEntryEdge = addEdge(lambdaNode, blockNode);
         lambdaEntryEdge.classes.add("lambdaEntry");
 
         // @TODO these probably need a new lexical scope
@@ -1299,18 +1321,18 @@ public class ControlFlowEdger {
         
         for (ExitEdge e : lexicalScope.returnEdges) {
             e.n2 = returnNode;
-            dag.addEdge(e);
+            addEdge(e);
         }
         for (ExitEdge e : ee) {
             e.n2 = returnNode;
-            dag.addEdge(e);
+            addEdge(e);
         }
         
         // and everything that was thrown connects to this node as well
         if (includeThrowEdges) { 
             for (ExitEdge e : lexicalScope.throwEdges) {
                 e.n2 = returnNode;
-                dag.addEdge(e);
+                addEdge(e);
             }
         }
         
@@ -1359,7 +1381,7 @@ public class ControlFlowEdger {
         
         if (node.children != null && node.children.size() > 0) {
             for (DagNode c : node.children) {
-                DagEdge ce = dag.addEdge(node, c);
+                DagEdge ce = addEdge(node, c);
                 ce.classes.add("ast");
                 addExpressionEdges(dag, c, scope);
             }
@@ -1372,38 +1394,56 @@ public class ControlFlowEdger {
      * whilst things are moving around, or even after they've moved around for that matter.
      * 
      */
-    public static class Rejigger {
+    public class Rejigger {
         DagNode hoistedNode;
         List<DagEdge> inEdges;  // old in edges
         EntryEdge inEdge;       // new in edge
         
         public List<ExitEdge> unhoistNode(Dag dag, List<ExitEdge> prevNodes) {
             // inEdge may have been rejiggered as well though, so the firstNode may no longer be the firstNode
-            for (DagEdge e : this.inEdges) {
-                e.n2 = this.inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
-            }
-            dag.edges.remove(this.inEdge);
-            if (prevNodes != null) {
-                for (DagEdge e : prevNodes) {
-                    e.n2 = hoistedNode;
-                    dag.edges.add(e);
+            if (HOIST_ENABLED) {
+                for (DagEdge e : this.inEdges) {
+                    e.n2 = this.inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
                 }
+                dag.edges.remove(this.inEdge);
+                if (prevNodes != null) {
+                    for (DagEdge e : prevNodes) {
+                        e.n2 = hoistedNode;
+                        dag.edges.add(e);
+                    }
+                }
+                
+                ExitEdge e = new ExitEdge();
+                e.n1 = hoistedNode;
+                prevNodes = new ArrayList<>();
+                prevNodes.add(e);
+            
+            } else { 
+                // non-hoisting:
+                if (prevNodes != null) {
+                    for (DagEdge e : prevNodes) {
+                        e.n2 = hoistedNode;
+                        addEdge(e);
+                    }
+                }
+                
+                ExitEdge e = new ExitEdge();
+                e.n1 = hoistedNode;
+                prevNodes = new ArrayList<>();
+                prevNodes.add(e);
             }
             
-            ExitEdge e = new ExitEdge();
-            e.n1 = hoistedNode;
-            prevNodes = new ArrayList<>();
-            prevNodes.add(e);
             return prevNodes;
         }
         
         
         public void unmarkNode(Dag dag) {
-            dag.edges.remove(this.inEdge);
+            // dag.edges.remove(this.inEdge);
         }
     }
     
     private Rejigger hoistNode(Dag dag, DagNode node, DagNode newNode) {
+        
         // move methodInvocation node after the expression & argument nodes
         List<DagEdge> inEdges = new ArrayList<>();
         for (DagEdge e : dag.edges) { if ( e.n2 == node ) { inEdges.add(e); } }
@@ -1414,7 +1454,7 @@ public class ControlFlowEdger {
 
         EntryEdge inEdge = new EntryEdge();
         inEdge.n2 = newNode;
-        dag.edges.add(inEdge);
+        if (HOIST_ENABLED) { dag.edges.add(inEdge); }
         
         Rejigger rejigger = new Rejigger();
         rejigger.hoistedNode = node;
@@ -1430,7 +1470,7 @@ public class ControlFlowEdger {
     private Rejigger markNode(Dag dag, DagNode node) {
         EntryEdge inEdge = new EntryEdge();
         inEdge.n2 = node;
-        dag.edges.add(inEdge);
+        // dag.edges.add(inEdge);
         
         Rejigger rejigger = new Rejigger();
         rejigger.hoistedNode = node;
@@ -1456,7 +1496,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = a;
                         e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, a, scope );
@@ -1489,7 +1529,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = a;
                         e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, a, scope );
@@ -1507,9 +1547,13 @@ public class ControlFlowEdger {
     private List<ExitEdge> addMethodInvocationEdges(Dag dag, DagNode methodInvocationNode, LexicalScope scope) {
         MethodInvocation mi = (MethodInvocation) methodInvocationNode.astNode;
         DagNode expressionDag = getDagChild(methodInvocationNode.children, mi.getExpression(), null);
-        methodInvocationNode.gvAttributes.put("methodName", mi.getName().toString());
+        DagNode nameDag = getDagChild(methodInvocationNode.children, mi.getName(), null);
         List<DagNode> argumentDags = getDagChildren(methodInvocationNode.children, mi.arguments(), null);
-
+        
+        methodInvocationNode.gvAttributes.put("methodName", mi.getName().toString());
+        
+        addEdges(dag, nameDag, scope); // for combined charts only
+        
         List<ExitEdge> prevNodes = null;
         if (expressionDag != null || argumentDags.size() > 0) {
             // move methodInvocation node after the expression & argument nodes
@@ -1523,7 +1567,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = a;
                         e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, a, scope );
@@ -1558,7 +1602,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = a;
                         e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, a, scope );
@@ -1615,7 +1659,7 @@ public class ControlFlowEdger {
             trueEdge.classes.add("infixConditional");
             trueEdge.classes.add(op == Operator.CONDITIONAL_OR ? "true" : "false");
             
-            DagEdge falseEdge = dag.addEdge(infixNode, rightDag);
+            DagEdge falseEdge = addEdge(infixNode, rightDag);
             falseEdge.classes.add("infixConditional"); // well this is the non-shortcut branch, but hey
             falseEdge.classes.add(op == Operator.CONDITIONAL_OR ? "false" : "true");
             List<ExitEdge> lastPrevNodes = addExpressionEdges(dag, rightDag, scope);
@@ -1648,7 +1692,7 @@ public class ControlFlowEdger {
                 trueEdge.classes.add(op == Operator.CONDITIONAL_OR ? "true" : "false");
                 prevNodes.add(0, trueEdge);
 
-                falseEdge = dag.addEdge(extInfixNode, n);
+                falseEdge = addEdge(extInfixNode, n);
                 falseEdge.classes.add("infixConditional"); // well this is the non-shortcut branch, but hey
                 falseEdge.classes.add(op == Operator.CONDITIONAL_OR ? "false" : "true");
                 lastPrevNodes = addExpressionEdges(dag, n, scope);
@@ -1663,7 +1707,7 @@ public class ControlFlowEdger {
                 if (prevNodes != null) {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = a;
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 } 
                 prevNodes = addExpressionEdges(dag, a, scope );
@@ -1688,7 +1732,7 @@ public class ControlFlowEdger {
         prevNodes = rejigger.unhoistNode(dag, prevNodes); // discard prevNodes I guess
         prevNodes = new ArrayList<>();
         
-        // dag.addEdge(ceNode, expressionDag);
+        // addEdge(ceNode, expressionDag);
         /*
         List<ExitEdge> ee = addExpressionEdges(dag, expressionDag, scope);
         for (DagEdge e : ee) {
@@ -1698,8 +1742,8 @@ public class ControlFlowEdger {
                 
         // 
         // DagEdge trueEdge = prevNodes.get(0); trueEdge.n2 = thenDag;
-        DagEdge trueEdge = dag.addEdge(ceNode, thenDag, null); trueEdge.classes.add("conditionalExpression"); trueEdge.classes.add("true");
-        DagEdge falseEdge = dag.addEdge(ceNode, elseDag, null); falseEdge.classes.add("conditionalExpression"); falseEdge.classes.add("false");
+        DagEdge trueEdge = addEdge(ceNode, thenDag); trueEdge.classes.add("conditionalExpression"); trueEdge.classes.add("true");
+        DagEdge falseEdge = addEdge(ceNode, elseDag); falseEdge.classes.add("conditionalExpression"); falseEdge.classes.add("false");
         List<ExitEdge> branch1PrevNodes = addExpressionEdges(dag, thenDag, scope);
         List<ExitEdge> branch2PrevNodes = addExpressionEdges(dag, elseDag, scope);
         
@@ -1889,7 +1933,7 @@ public class ControlFlowEdger {
         // node.gvAttributes.put("fieldName", fa.getIndex().toString()); 
         Rejigger rejigger = hoistNode(dag, node, arrayDag);
         List<ExitEdge> prevNodes = addExpressionEdges(dag, arrayDag, scope);
-        dag.addEdge(arrayDag, indexDag);
+        addEdge(arrayDag, indexDag);
         prevNodes = addExpressionEdges(dag, indexDag, scope);
         prevNodes = rejigger.unhoistNode(dag, prevNodes);
         return prevNodes;
@@ -1924,7 +1968,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = a;
                         e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, a, scope );
@@ -1940,7 +1984,7 @@ public class ControlFlowEdger {
         if (anonClassDag != null) {
             for (ExitEdge e : prevNodes) {
                 e.n2 = anonClassDag;
-                dag.addEdge(e);
+                addEdge(e);
             }
             
             AnonymousClassDeclaration acdNode = (AnonymousClassDeclaration) anonClassDag.astNode;
@@ -1956,7 +2000,7 @@ public class ControlFlowEdger {
             List<ExitEdge> ees = new ArrayList<>();
             for (DagNode n : bodyDeclarationDags) {
                 // add a transparent edge to each thing defined in this class so that the 'AnonymousClassDeclaration' node appears above them
-                DagEdge e = dag.addEdge(anonClassDag, n);
+                DagEdge e = addEdge(anonClassDag, n);
                 e.classes.add("anonymousClassDeclarationBegin");
                 ees.addAll(addEdges(dag, n, lexicalScope));
             }
@@ -1985,7 +2029,7 @@ public class ControlFlowEdger {
                 // so that it appears underneath them
                 ee.n2 = returnNode;
                 ee.classes.add("anonymousClassDeclarationEnd");
-                dag.addEdge(ee);
+                addEdge(ee);
             }
             
             // there's no exit edges out of an anonymous class
@@ -2015,7 +2059,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = expr;
                         e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, expr, scope );
@@ -2046,7 +2090,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = a;
                         // e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, a, scope );
@@ -2057,7 +2101,7 @@ public class ControlFlowEdger {
                     for (ExitEdge e : prevNodes) {
                         e.n2 = arrayInitDag;
                         // e.classes.add("invocationArgument");
-                        dag.addEdge(e);
+                        addEdge(e);
                     }
                 }
                 prevNodes = addExpressionEdges(dag, arrayInitDag, scope);
