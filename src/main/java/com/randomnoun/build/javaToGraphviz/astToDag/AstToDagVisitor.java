@@ -43,7 +43,7 @@ import com.randomnoun.common.Text;
  *
  * <p>If there are multiple statements on a line, it will be associated with the first one on the line.
  * 
- * <p>Actually this is a bit more complicated now, as comments can have directions ('^', '>', 'v', '<') to  
+ * <p>Actually this is a bit more complicated now, as comments can have directions ('^', '&gt;', 'v', '&lt;') to  
  * give the developer more control over which statement is being annotated.
  */
 public class AstToDagVisitor extends ASTVisitor {
@@ -57,7 +57,6 @@ public class AstToDagVisitor extends ASTVisitor {
     List<CommentText> comments;
     CompilationUnit cu;
     String src;
-    boolean defaultKeepNode;
     int nextLineFromLine = 0;
     List<GvComment> nextLineComments = new ArrayList<>(); 
     List<GvComment> nextDagComments = new ArrayList<>();
@@ -70,13 +69,11 @@ public class AstToDagVisitor extends ASTVisitor {
     Map<Integer, List<ASTNode>> endLineNumberAsts;
     
     
-    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, boolean defaultKeepNode) {
+    public AstToDagVisitor(CompilationUnit cu, String src, List<CommentText> comments, Map<String, String> options) {
         super(true);
         this.cu = cu;
         this.comments = comments;
         this.src = src;
-        this.defaultKeepNode = defaultKeepNode;
-        this.keepNodeMatcher = new KeepNodeMatcher(defaultKeepNode);
         dag = new Dag();
         root = new DagSubgraph(dag, null);
         dag.rootGraphs.add(root);
@@ -87,7 +84,12 @@ public class AstToDagVisitor extends ASTVisitor {
         endLineNumberAsts = lv.getEndLineNumberAstsMap();
         
         this.options = new HashMap<>();
-        options.put("defaultKeepNode", defaultKeepNode ? "true" : "false");
+        this.options.putAll(options);
+        if (!this.options.containsKey("defaultKeepNode")) { 
+            this.options.put("defaultKeepNode",  "true"); 
+        }
+        boolean defaultKeepNode = "true".equals(this.options.get("defaultKeepNode"));
+        this.keepNodeMatcher = new KeepNodeMatcher(defaultKeepNode);
     }
     
     public Dag getDag() { 

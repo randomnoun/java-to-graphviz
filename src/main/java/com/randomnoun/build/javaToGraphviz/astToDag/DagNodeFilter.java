@@ -1,7 +1,6 @@
 package com.randomnoun.build.javaToGraphviz.astToDag;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +24,6 @@ public class DagNodeFilter {
 	/** Traces through the DAG, storing in each node the most recently seen node that had 'keepNode' set to true
      * (the 'lastKeepNode').
      *  
-     * @param dag dag we're traversing
      * @param node the node in the dag we're up to
      * @param lastKeepNode most recently seen node with keepNode set to true
      */
@@ -61,16 +59,21 @@ public class DagNodeFilter {
      * @param e
      * @param fromNode
      * @param keepNode
+     * 
+     * @return true if any removed edge was a back edge
      */
-    private void pruneEdges(DagEdge e, DagNode fromNode, DagNode keepNode) {
+    private boolean pruneEdges(DagEdge e, DagNode fromNode, DagNode keepNode) {
+        boolean result = false;
         if (e.n1 == keepNode) {
+            result = e.back;
             dag.removeEdge(e);
-            return;
+            return result;
         } else if (e.n1 == null) {
             throw new IllegalStateException("e.n1 was null");
         } else {
             DagNode prevNode = e.n1;
             // logger.info("removing edge from " + prevNode.name + " to " + e.n2.name);
+            result = e.back;
             dag.removeEdge(e);
             
             // prevNode may have already been removed
@@ -80,10 +83,11 @@ public class DagNodeFilter {
                 dag.nodes.remove(prevNode);
                 for (DagEdge prevEdge : new ArrayList<DagEdge>(prevNode.inEdges)) { // may be modified whilst iterating ?
                     if (dag.edges.contains(prevEdge)) { // prevNode.inEdges
-                        pruneEdges(prevEdge, fromNode, keepNode);
+                        result = result || pruneEdges(prevEdge, fromNode, keepNode);
                     }
                 }
             }
+            return result;
         }
     }
 
@@ -161,8 +165,10 @@ public class DagNodeFilter {
                             // newEdge.label = "something";
                             // format the edge a bit ?
                             
-                            pruneEdges(inEdge1, node, inEdge1KeepNode);  
-                            pruneEdges(inEdge2, node, inEdge2KeepNode); 
+                            boolean prunedBackEdge = false;
+                            prunedBackEdge |= pruneEdges(inEdge1, node, inEdge1KeepNode);  
+                            prunedBackEdge |= pruneEdges(inEdge2, node, inEdge2KeepNode);
+                            newEdge.back = prunedBackEdge;
                             if ((newEdge.n1 != newEdge.n2) && !dag.hasEdge(newEdge.n1, newEdge.n2)) {
                                 dag.addEdge(newEdge);
                             }

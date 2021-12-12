@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.core.dom.AST;
@@ -29,6 +31,7 @@ import com.randomnoun.build.javaToGraphviz.dag.DagEdge;
 import com.randomnoun.build.javaToGraphviz.dag.DagNode;
 import com.randomnoun.build.javaToGraphviz.dag.DagSubgraph;
 import com.randomnoun.common.StreamUtil;
+import com.randomnoun.common.Text;
 
 // so the next bit is going to be 
 // x styling
@@ -40,9 +43,7 @@ import com.randomnoun.common.StreamUtil;
 /** Convert an AST tree of a java class ( CompilationUnit, created by the eclipse ASTParser )
  * into a graphviz diagram ( Dag )
  * 
- * A complete standalone example of ASTParser
- * @see https://www.programcreek.com/2011/01/a-complete-standalone-example-of-astparser/
- *
+ * @see <a href="https://www.programcreek.com/2011/01/a-complete-standalone-example-of-astparser/">standalone ASTParser example</a>
  */
 public class JavaToGraphviz {
 
@@ -55,22 +56,21 @@ public class JavaToGraphviz {
     int rootGraphIdx;
     
     // options
-    boolean removeNode = false;
+    Map<String, String> options; // @TODO enum -> string 
     int astParserLevel = JLS11;
     String format = "dot";
     String baseCssUrl = "JavaToGraphviz-base.css";
     List<String> userCssUrls = null;
     List<String> userCssRules = null;
-    List<String> edgerNames = Collections.singletonList("control-flow");
     
     // non-deprecated AST constants. 
     // there's an eclipse ticket to create an alternative non-deprecated interface for these which isn't complete yet.
     
-    /** Java Language Specification, Second Edition (JLS2); <= J2SE 1.4 */
+    /** Java Language Specification, Second Edition (JLS2); &lt;= J2SE 1.4 */
     @SuppressWarnings("deprecation")
     public static final int JLS2 = AST.JLS2; // 2
 
-    /** Java LanguageSpecification, Third Edition (JLS3); <= J2SE 5 (aka JDK 1.5) */
+    /** Java LanguageSpecification, Third Edition (JLS3); &lt;= J2SE 5 (aka JDK 1.5) */
     @SuppressWarnings("deprecation")
     public static final int JLS3 = AST.JLS3; // 3
     
@@ -116,6 +116,17 @@ public class JavaToGraphviz {
     
     // see https://stackoverflow.com/questions/47146706/how-do-i-associate-svg-elements-generated-by-graphviz-to-elements-in-the-dot-sou
     
+    public JavaToGraphviz() {
+        options = new HashMap<>();
+        options.put("edgerNamesCsv", "control-flow");
+        options.put("enableKeepNodeFilter", "false");
+        options.put("defaultKeepNode", "true");
+    }
+   
+    public void setOptions(Map<String, String> options) {
+        this.options.putAll(options);
+    }
+    
     public void setAstParserLevel(int astParserLevel) {
         this.astParserLevel = astParserLevel;
     }
@@ -132,8 +143,6 @@ public class JavaToGraphviz {
         this.userCssRules = userCssRules;
     }
     
-    
-    
     /** Parse the java source code in the supplied inputstream.
      * 
      * <p>This method creates the CompilationUnit AST, collects comments, creates the stylesheet, and constructs the Dag
@@ -144,7 +153,8 @@ public class JavaToGraphviz {
      * @throws IOException
      */
 	public void parse(InputStream is, String charset) throws IOException  {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		StreamUtil.copyStream(is, baos);
 		
 		String src = baos.toString(charset);
@@ -158,7 +168,7 @@ public class JavaToGraphviz {
 		comments = ce.getComments(cu, src);
 		styleSheet = ce.getStyleSheet(comments, baseCssUrl, userCssUrls, userCssRules);
 		
-		AstToDagVisitor dv = new AstToDagVisitor(cu, src, comments, !removeNode);
+		AstToDagVisitor dv = new AstToDagVisitor(cu, src, comments, options);
         cu.accept(dv);
         dag = dv.getDag();
         
@@ -173,37 +183,31 @@ public class JavaToGraphviz {
 	 */
 	public boolean writeGraphviz(Writer writer) throws IOException {
 	    
-	    // DagNode methodNode = dag.rootNodes.get(rootNodeIdx);
 	    DagSubgraph rootGraph = dag.rootGraphs.get(rootGraphIdx);
-	    
         PrintWriter pw = new PrintWriter(writer);
-
-        dag.edges.clear();
-
-        
-        /*
-        // clear edges and graphs from previous runs
-        dag.edges.clear();
-        dag.subgraphs.clear();
-        dag.dagNodeToSubgraph.clear();
-        
-        // clear styles from previous runs
-        // doesn't clear calculated labels though. maybe it should. maybe. it. should.
-        dag.gvStyles.clear();
-        dag.gvNodeStyles.clear();
-        dag.gvEdgeStyles.clear();
-        for (DagNode n : dag.nodes) {
-            n.gvStyles.clear();
-        }
-        */
+   
+        // remove edges from previous runs
+        dag.edges.clear(); 
         
         // a rootGraph can now contain multiple rootNodes
-
+        // but a rootNode can only be in a single rootGraph
         int c = 0;
         for (DagNode rootNode : dag.rootNodes) {
             c++;
-            if (rootGraph.nodes.contains(rootNode)) {  // nodes are in the wrong graph
+            if (rootGraph.nodes.contains(rootNode)) {
                 logger.info("including rootNode " + c);
+                
+                String edgerNamesCsv = rootNode.options.get("edgerNamesCsv");
+                if (Text.isBlank(edgerNamesCsv)) { edgerNamesCsv = "control-flow"; }
+                boolean enableKeepNodeFilter = "true".equals(rootNode.options.get("enableKeepNodeFilter"));
+                
+                List<String> edgerNames;
+                try {
+                    edgerNames = Text.parseCsv(edgerNamesCsv);
+                } catch (ParseException e1) {
+                    throw new IllegalArgumentException("edgerNamesCsv is not valid CSV", e1);
+                }
+                rootNode.options.get("removeNodes");
                 
                 LexicalScope lexicalScope = new LexicalScope();
 
@@ -236,7 +240,7 @@ public class JavaToGraphviz {
                     e.n2.inEdges.add(e);
                 }
                 
-                if (!"false".equals(rootNode.options.get("removeNodes"))) {
+                if (enableKeepNodeFilter) {
                     DagNodeFilter filter = new DagNodeFilter(dag);
                     if (rootNode.keepNodeMatcher.matches("startNode")) {
                         rootNode.keepNode = true;
@@ -260,28 +264,6 @@ public class JavaToGraphviz {
             dsa.inlineStyles(styleSheet);
         }
         
-        
-        
-
-        // actually think I'm going to evaluate some of this css as the dag is being constructed.
-        /*
-        // find any DagNodes that have gv-fluent: true on them
-        // and add some more edges into the graph
-        ArrayList<DagNode> fluentNodes = new ArrayList<>();
-        for (DagNode methodNode : dag.rootNodes) {
-            if (rootGraph.nodes.contains(methodNode)) {
-                findNodesWithGvStyle(fluentNodes, methodNode, "gv-fluent", "true");
-            }
-        }
-        for (DagNode expressionNode : fluentNodes) {
-            LexicalScope lexicalScope = new LexicalScope();
-            ExpressionEdger edger = new ExpressionEdger(dag);
-            edger.setIncludeThrowEdges(includeThrowEdges);
-            edger.addEdges(dag, expressionNode, lexicalScope);
-        }
-        // probably need to restyle things again
-         */
-        
         if (format.equals("dom1")) {
             // already generated output
         } else if (format.equals("dom2")) {
@@ -291,45 +273,9 @@ public class JavaToGraphviz {
             pw.println(rootGraph.toGraphviz(0));
         }
         
-        
-        /*
-        pw.println(dag.toGraphvizHeader());
-        for (DagNode node : dag.nodes) {
-            // only draw nodes if they have an edge
-            boolean hasEdge = false;
-            for (DagEdge e : dag.edges) {
-                if (e.n1 == node || e.n2 == node) { hasEdge = true; break; }
-            }
-            if (node != methodNode && hasEdge) {
-                pw.println(node.toGraphviz(isDebugLabel));
-            }
-        }
-        for (DagEdge edge : dag.edges) {
-            if (edge.n1 != methodNode) {
-                pw.println(edge.toGraphviz());
-            }
-        }
-
-        // subgraphs
-        for (DagSubgraph sg : dag.subgraphs) {
-            pw.println(sg.toGraphviz(2));
-        }
-        pw.println(dag.toGraphvizFooter());
-        pw.flush();
-        */
-        
         rootGraphIdx++; 
         return (rootGraphIdx < dag.rootGraphs.size());
 	}
-
-	private void findNodesWithGvStyle(ArrayList<DagNode> result, DagNode node, String gvStyleName, String value) {
-        if (value.equals(node.gvStyles.get(gvStyleName))) {
-            result.add(node);
-        }
-        for (DagNode n : node.children) {
-            findNodesWithGvStyle(result, n, gvStyleName, value);
-        }
-    }
 
     public void setFormat(String format) {
         this.format = format;

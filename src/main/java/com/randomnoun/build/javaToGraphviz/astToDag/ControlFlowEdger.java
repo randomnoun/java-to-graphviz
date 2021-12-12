@@ -79,7 +79,7 @@ public class ControlFlowEdger {
     
     // set this to false to create the ast+cf diagram
     // could make this a gv-option later I guess
-    private static boolean HOIST_ENABLED = true;
+    // private static boolean HOIST_ENABLED = true;
     
     public ControlFlowEdger(Dag dag) {
         this.dag = dag;
@@ -105,11 +105,11 @@ public class ControlFlowEdger {
     /** Adds the edges for a DagNode into the Dag, and returns the edges leading out of that DagNode
      * (which may now be labelled)
      * 
-     * @param dag
-     * @param node
-     * @param breakEdges if a 'break' is encountered, a collection to add the outgoing edge to
-     * @param continueNode if a 'continue' is encountered, the node to continue to
-     * @return
+     * @param dag the dag being modified
+     * @param node the node we're up to
+     * @param scope the scope containing break, continue, throws labels and contexts for this node
+     * 
+     * @return the edges leading out of the supplied node
      */
 	public List<ExitEdge> addEdges(Dag dag, DagNode node, LexicalScope scope) {
 	    
@@ -1380,18 +1380,21 @@ public class ControlFlowEdger {
     
     
     /** A rejigger is a hoisted node, which has been removed from the dag with the intention of adding it back in again
-     * a bit further down ( unhoisting ). This class is mostly necessary since I don't trust the edge collections in the DagNodes
-     * whilst things are moving around, or even after they've moved around for that matter.
-     * 
+     * a bit further down ( unhoisting ). This happens because I prefer to style the decision parts of loop constructs as 
+     * taking place on the 'do' / 'for' / 'while' node, with the conditional expressions occuring before that node.  
      */
     public class Rejigger {
+        boolean hoistEnabled;  // can disable this when overlaying control flow edges over an AST diagram
         DagNode hoistedNode;
+
+        /** The edge collections in this class are mostly necessary since I don't trust the edge collections in the DagNodes
+         * whilst things are moving around, or even after they've moved around for that matter. */
         List<DagEdge> inEdges;  // old in edges
         EntryEdge inEdge;       // new in edge
         
         public List<ExitEdge> unhoistNode(Dag dag, List<ExitEdge> prevNodes) {
             // inEdge may have been rejiggered as well though, so the firstNode may no longer be the firstNode
-            if (HOIST_ENABLED) {
+            if (hoistEnabled) {
                 for (DagEdge e : this.inEdges) {
                     e.n2 = this.inEdge.n2;  // this is so going to work.  t// firstNode; // @TODO probably some other structures to change here
                 }
@@ -1442,11 +1445,15 @@ public class ControlFlowEdger {
             
         }
 
+        // enable hoist by default
+        boolean hoistEnabled = !"false".equals(node.options.get("enableHoist"));
+        
         EntryEdge inEdge = new EntryEdge();
         inEdge.n2 = newNode;
-        if (HOIST_ENABLED) { dag.edges.add(inEdge); }
+        if (hoistEnabled) { dag.edges.add(inEdge); }
         
         Rejigger rejigger = new Rejigger();
+        rejigger.hoistEnabled = hoistEnabled;
         rejigger.hoistedNode = node;
         rejigger.inEdges = inEdges;
         rejigger.inEdge = inEdge;
