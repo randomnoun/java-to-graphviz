@@ -170,7 +170,7 @@ public class StylesheetApplier {
 	}
 
 	/**
-	 * Given a File which is a path to an HTML file that has <link /> tags in it pointing to
+	 * Given a File which is a path to an HTML file that has &lt;link /&gt; tags in it pointing to
 	 * CSS files in the local filesystem, inline the styles in that stylesheet, returning
 	 * the HTML result.
 	 *
