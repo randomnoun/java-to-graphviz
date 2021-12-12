@@ -27,7 +27,6 @@ public class AstEdger {
      * @param dag
      * @param node
      * @param scope a lexical scope, which define the boundary for 'break', 'continue', 'return' and 'throws' statements
-     * @return
      */
     public void addEdges(Dag dag, DagNode node, LexicalScope scope) {
         

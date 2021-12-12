@@ -100,8 +100,8 @@ public class DagStyleApplier {
     /** Apply the rules in the stylesheet to the Dag, and populates the gvStyles 
      * fields on the Dag, DagEdge and DagNode objects.
      * 
-     * @param dag
      * @param stylesheet
+     * 
      * @throws IOException
      */
     public void inlineStyles(CSSStyleSheet stylesheet) throws IOException {

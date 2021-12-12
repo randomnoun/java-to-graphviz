@@ -16,8 +16,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * have a bit more control over, and it also acts as the source for the graphviz diagram.
  * 
  * <ol><li>The AST structure is defined using the node.children / node.parentDagNode fields in the DagNodes
- *     <ul><li>dag.astToDagNode - a Map from AST nodes -> DAG nodes
- *     <ul><li>node.astNode - the AST Node for this DagNode
+ *     <ul><li>dag.astToDagNode - a Map from AST nodes -&gt; DAG nodes
+ *         <li>node.astNode - the AST Node for this DagNode
  *     </ul>
  *     <li>The diagram is defined using the edges between the visible nodes, which are defined in 
  *     <ul><li>dag.edges - list of all edges
@@ -196,7 +196,7 @@ public class Dag {
     }
     
     /** Create a unique node name (appending _2, _3 etc suffixes until it's unique).
-     * Our node names are basically the line number (badoom boom tish), so this is required when there's >1 statement on a line.
+     * Our node names are basically the line number (badoom boom tish), so this is required when there's &gt;1 statement on a line.
      * 
      * @param n
      * @return
