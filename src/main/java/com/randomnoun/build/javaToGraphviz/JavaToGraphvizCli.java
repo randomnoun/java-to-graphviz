@@ -7,8 +7,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -27,39 +31,49 @@ public class JavaToGraphvizCli {
         return 
           "Usage: \n" +
           "  java " + JavaToGraphvizCli.class.getName() + " [options] filename filename ... \n" +
+          "\n" + 
           "where [options] are:\n" +
-          " -h -?                    displays this help text\n" +
-          " --verbose  -v            increase verbosity ( info level )\n" +
-          " --verbose2 -vv           increase verbosity a bit more ( debug level )\n" +
-          " --format   -f dot|dom1|dom2 output format: DOT diagram, pre-styling DOM, post-styling DOM\n" +
-          " --output   -o filename   send output to filename; use {f} for base filename, {i} for diagram index\n" +
-          "                          e.g. \"{f}-{i}.dot\" for dot output, \"{f}.html\" for dom output\n" +
-          "                          default is stdout\n" +
-          " --source   -s version    set Java source language version ( 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,\n" +
-          "                          8, 9, 10, 11, 12, 13, 14, 15, 16)\n" +
+          " -h -?                       display this help text\n" +
+          " --verbose  -v               increase verbosity ( info level )\n" +
+          " --verbose2 -vv              increase verbosity a bit more ( debug level )\n" +
+          " --format   -f dot|dom1|dom2 output format: DOT diagram (default), pre-styled DOM, post-styled DOM\n" +
+          " --output   -o filename      send output to filename\n" +
+          "                             For multiple output files, use {f} for base filename, {i} for diagram index\n" +
+          "                             e.g. \"{f}-{i}.dot\" for dot output, \"{f}.html\" for dom output\n" +
+          "                             default is stdout\n" +
+          " --source   -s version       set Java source language version ( 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,\n" +
+          "                               8, 9, 10, 11, 12, 13, 14, 15, 16 )\n" +
           "\n" +
-          " --edger    -e name       add edger to list of edgers\n" +
-          "                          available edgers: control-flow, ast\n" +
-          " --remove   -r            perform node / edge removal\n" +
+          " --base-css -b url           replace base css with url ( relative to classpath, then file://./ )\n" +
+          "                               default = JavaToGraphviz.css\n" +
+          " --user-css -u url           add url to list of user css imports\n" +
+          " --css      -c {rules}       add css rules\n" +
           "\n" +
-          " --base-css -b url        replace base css with url ( relative to file://./ )\n" +
-          " --user-css -u url        add url to list of user css list\n" +
-          " --css      -c {rules}    add css rules\n";
+          " --option   -p key=value     set initial option; can be modified in source by 'gv-option' and 'gv-keepNode' directives\n" +
+          "\n" +
+          "Options keys and defaults:\n" +
+          " edgerNamesCsv=control-flow  csv list of edger names\n" +
+          "                             possible edger names: control-flow, ast\n" +
+          " enableKeepNodeFilter=false  if true, will perform node filtering\n" +
+          " defaultKeepNode=true        if true, filter will keep nodes by default\n" +
+          " keepNode=                   space-separated nodeTypes for fine-grained keepNode control\n" +
+          "                             prefix nodeType with '-' to exclude, '+' or no prefix to include\n" +
+          "                               e.g. \"-expressionStatement -block -switchCase\"\n" +
+          "                               to exclude those nodeTypes when defaultKeepNode=true\n" +
+          "                             NB: any node with a 'gv' comment will always be kept\n";
     }
     
     public static void main(String args[]) throws IOException {
-        List<String> filenames = new ArrayList<>();
         int verbose = 0;
         String format = "dot";
         String outputTemplate = null;
         
         String sourceVersion = "11";
-        List<String> edgers = new ArrayList<>();
-        boolean remove = false;
-        String baseCssUrl = "something";
+        String baseCssUrl = "JavaToGraphviz.css";
         List<String> userCssUrls = new ArrayList<>();
         List<String> userCssRules = new ArrayList<>();
         List<File> inputFiles = new ArrayList<>();
+        Map<String, String> options = new HashMap<>();
         
         if (args.length < 1) { 
             System.out.println(usage());
@@ -83,12 +97,24 @@ public class JavaToGraphvizCli {
             } else if (a.equals("--source") || a.equals("-s")) {
                 sourceVersion = args[argIndex + 1];
                 argIndex += 2;
-            } else if (a.equals("--edger") || a.equals("-e")) {
-                edgers.add(args[argIndex + 1]);
+            } else if (a.equals("--options") || a.equals("-p")) {
+                String t = args[argIndex + 1];
                 argIndex += 2;
-            } else if (a.equals("--remove") || a.equals("-r")) {
-                remove = true;
-                argIndex ++; 
+                
+                // same as AstToDagVisitor.newOptions()
+                Pattern optionPattern = Pattern.compile("([a-zA-Z0-9-_]+)\\s*=\\s*([a-zA-Z0-9-_]+)\\s*");
+                Matcher m = optionPattern.matcher(t);
+                while (m.find()) {
+                    String k = m.group(1);
+                    String v = m.group(2);
+                    if (v.equals("unset")) {
+                        options.remove(k);
+                    } else {
+                        options.put(k, v);
+                    }
+                }
+                
+
             } else if (a.equals("--base-css") || a.equals("-b")) {
                 baseCssUrl = args[argIndex + 1];
                 argIndex += 2;
@@ -134,12 +160,6 @@ public class JavaToGraphvizCli {
             }
         }
         */
-        if (edgers.isEmpty()) { 
-            edgers.add("control-flow");
-        } 
-        for (String e : edgers) {
-            // something
-        }
         
 
         Log4jCliConfiguration lcc = new Log4jCliConfiguration();
@@ -158,8 +178,6 @@ public class JavaToGraphvizCli {
             JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
             javaToGraphviz.setFormat(format);
             javaToGraphviz.setSourceVersion(sourceVersion);
-            javaToGraphviz.setEdgerNames(edgers);
-            javaToGraphviz.setRemoveNode(remove);
             
             if (baseCssUrl != null) {
                 javaToGraphviz.setBaseCssUrl(baseCssUrl);
@@ -167,9 +185,6 @@ public class JavaToGraphvizCli {
             javaToGraphviz.setUserCssUrls(userCssUrls);
             javaToGraphviz.setUserCssRules(userCssRules);
             
-            // javaToGraphviz.setIncludeThrowEdges(false); // collapse throw edges
-            // javaToGraphviz.setIncludeThrowNodes(false); // collapse throw nodes
-    
             // String className = "com.example.input.SwitchStatement2";
             // File f = new File("src/test/java/" + Text.replaceString(className,  ".",  "/") + ".java");
             logger.debug("Reading " + f.getCanonicalPath());            
