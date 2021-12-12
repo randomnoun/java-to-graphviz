@@ -164,11 +164,11 @@ public class JavaToGraphvizCli {
 
         Log4jCliConfiguration lcc = new Log4jCliConfiguration();
         Properties props = new Properties();
-        props.put("log4j.logger", "FATAL");
+        props.put("log4j.rootCategory", "FATAL, CONSOLE");
         if (verbose == 1) {
-            props.put("log4j.logger", "INFO");
+            props.put("log4j.rootCategory", "INFO, CONSOLE");
         } else if (verbose == 2) {
-            props.put("log4j.logger", "DEBUG");
+            props.put("log4j.rootCategory", "DEBUG, CONSOLE");
         }
         lcc.init("[JavaToGraphviz]", props);
         Logger logger = Logger.getLogger(JavaToGraphvizCli.class);
