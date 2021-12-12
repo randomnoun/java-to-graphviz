@@ -196,7 +196,7 @@ There are a few **standard attributes** on every node / edge:
 
 These attributes can also be referenced within `gv-idFormat` and `gv-labelFormat` style rules using `${xxx}` syntax.
 
-| className | Attribute | Attribute value |
+| nodeType className | Attribute | Attribute value |
 |--|--|--|
 | typeDeclaration | className | The name of the Java class |
 | typeDeclaration | interfaceName | The name of the Java interface |
@@ -234,14 +234,14 @@ These attributes can also be referenced within `gv-idFormat` and `gv-labelFormat
 
 These attributes can also be referenced within `gv-labelFormat` and `gv-xlabelFormat` style rules using `${xxx}` syntax.
 
-| Attribute | Applies to | Description |
+| nodeType className | Attribute | Attribute value |
 |--|--|--|
-| breakLabel | Break | if a target label was included in the `break` statement, that target label, otherwise an empty string  |
-| continueLabel |  if a target label was included in the `continue` statement, that target label, otherwise an empty string  |
+| break | breakLabel | if a target label was included in the `break` statement, that target label, otherwise an empty string  |
+| continue | continueLabel | if a target label was included in the `continue` statement, that target label, otherwise an empty string  |
 
 **Classes** added to various **nodes** and **edges** by the ControlFlowEdger:
 
-| className | Applies to | class | Description |
+| nodeType className | Element | className | Description |
 |--|--|--|--|
 | typeDeclaration | node | interface | The type declaration is for an interface |
 | typeDeclaration | node | class | The type declaration is for a class |
