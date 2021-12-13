@@ -469,7 +469,7 @@ there are multiple passes of the CSS.
 * [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz-debug.css) - debugging CSS ; all node labels include lineNumber, nodeType and lastKeepNodeId
 * [JavaToGraphviz.css](src/main/resources/JavaToGraphviz.css) - default CSS ; uses most of the classes and attributes listed above
 
-## CLI
+# CLI
 
 The java-to-graphviz-cli.jar can be used to generate diagrams from a command line. There's a few options you can supply:
 
