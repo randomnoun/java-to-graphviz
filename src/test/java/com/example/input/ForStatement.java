@@ -10,6 +10,12 @@ public class ForStatement {
 
     // gv-style: { @import "JavaToGraphviz.css"; }
     
+    // uncomment to test
+    // gv-stylex: { @import url("https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/main/resources/JavaToGraphviz.css"); }
+    // gv-stylex: { @import url("something.txt"); }
+    // gv-stylex: { @import "something.txt"; }
+    // gv-stylex: { @import "https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/main/resources/JavaToGraphviz.css"; }
+    
     public void testFor() {
         // gv: start of method 
         for (int i=0; i<12; i++) {
@@ -30,11 +36,12 @@ public class ForStatement {
             // @TODO add NLP processing
             thingCount ++; // gv: in loop  
         }
+        // gv: after loop
         System.out.println("these are " + 
             (thingCount == 1 ? "one of" :
             (thingCount == 2 ? "a couple of " :
             (thingCount == 3 ? "a few of" :
-            "DOES NOT COMPUTE" ))) + " my favourite things"); // gv: after loop
+            "DOES NOT COMPUTE" ))) + " my favourite things"); 
     }
 
     
