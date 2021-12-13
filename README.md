@@ -123,7 +123,7 @@ e.g.
    } 
 */
 
-before(); // gv: the beginning { fillcolor: grey;; } 
+before(); // gv: the beginning { fillcolor: grey; } 
 someCode(); // gv.something: well hello there
 someOtherCode(true); // gv.something.special: well hello there again
 someOtherCode(false); // gv#unique.something: righteo then
