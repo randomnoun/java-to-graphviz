@@ -23,8 +23,8 @@ import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 public class JavaToGraphvizTest {
 
-    private static boolean WRITE_EXPECTED_OUTPUT = true;
-    private static boolean WRITE_EXPECTED_OUTPUT_PNG = true;
+    private static boolean WRITE_EXPECTED_OUTPUT = false;
+    private static boolean WRITE_EXPECTED_OUTPUT_PNG = false;
     
     @BeforeClass 
     public static void beforeAllTestMethods() {
