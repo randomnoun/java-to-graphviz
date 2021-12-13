@@ -30,7 +30,7 @@ public class JavaToGraphvizCli {
     public static String usage() {
         return 
           "Usage: \n" +
-          "  java -jar JavaToGraphvizCli.jar [options] filename filename ... \n" +
+          "  java -jar java-to-graphviz-cli.jar [options] filename filename ... \n" +
           // "  java " + JavaToGraphvizCli.class.getName() + " [options] filename filename ... \n" +
           "\n" + 
           "where [options] are:\n" +
