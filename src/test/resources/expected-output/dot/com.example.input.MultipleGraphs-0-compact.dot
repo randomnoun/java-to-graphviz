@@ -1,0 +1,28 @@
+digraph first {
+  node [
+    a = b;
+    c = d;
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    a = b;
+    c = d;
+    fontname = "Handlee";
+  ]
+  a = b;
+  bgcolor = transparent;
+  c = d;
+  e = f;
+  fontname = "Handlee";
+  compound = true;
+
+  subgraph cluster_m_30 {
+    label="method testTheOnlyWayIsUp";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+}
+

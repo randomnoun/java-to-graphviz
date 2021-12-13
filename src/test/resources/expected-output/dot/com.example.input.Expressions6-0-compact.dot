@@ -1,0 +1,112 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+
+  subgraph cluster_m_14 {
+    label="method testFunction";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_anon_15 {
+      label="anonymous class";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+      subgraph cluster_m_16 {
+        label="method apply";
+        labeljust = "l";
+        ranksep = 0.5;
+        pencolor = transparent;
+       
+      }
+    }
+    subgraph cluster_anon_21 {
+      label="anonymous class";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+      subgraph cluster_m_22 {
+        label="method apply";
+        labeljust = "l";
+        ranksep = 0.5;
+        pencolor = transparent;
+       
+      }
+    }
+  }
+  subgraph cluster_m_32 {
+    label="method testBiConsumer";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_anon_33 {
+      label="anonymous class";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+      subgraph cluster_m_34 {
+        label="method accept";
+        labeljust = "l";
+        ranksep = 0.5;
+        pencolor = transparent;
+       
+      }
+    }
+  }
+  subgraph cluster_m_44 {
+    label="method testProducer";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_anon_45 {
+      label="anonymous class";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+      subgraph cluster_m_46 {
+        label="method get";
+        labeljust = "l";
+        ranksep = 0.5;
+        pencolor = transparent;
+       
+      }
+    }
+  }
+  subgraph cluster_m_54 {
+    label="method testPredicate";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_anon_55 {
+      label="anonymous class";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+      subgraph cluster_m_56 {
+        label="method test";
+        labeljust = "l";
+        ranksep = 0.5;
+        pencolor = transparent;
+       
+      }
+    }
+  }
+}
+

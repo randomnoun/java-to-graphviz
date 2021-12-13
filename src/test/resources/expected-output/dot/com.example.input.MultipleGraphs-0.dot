@@ -1,0 +1,76 @@
+digraph first {
+  node [
+    a = b;
+    c = d;
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    a = b;
+    c = d;
+    fontname = "Handlee";
+  ]
+  a = b;
+  bgcolor = transparent;
+  c = d;
+  e = f;
+  fontname = "Handlee";
+  compound = true;
+  s_30 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31_7 [
+    class = "stringLiteral literal";
+    label = "\"baby\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_32 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30 -> s_30_3;
+  s_30_3 -> s_31;
+  s_31 -> s_31_3;
+  s_31_3 -> s_31_7;
+  s_31_7 -> s_31_2;
+  s_31_2 -> m_32;
+
+  subgraph cluster_m_30 {
+    label="method testTheOnlyWayIsUp";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_30; s_30_3; s_31; s_31_2; s_31_3; s_31_7; m_32;
+  }
+}
+

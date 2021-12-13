@@ -1,0 +1,291 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_21 [
+    class = "methodDeclaration";
+    label = "comment just before the method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_22 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_23 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_23_3 [
+    class = "variableDeclarationFragment";
+    label = "Object user";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_23_5 [
+    class = "nullLiteral literal";
+    label = "null";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_25 [
+    class = "comment";
+    label = "user login tests";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_27 [
+    class = "if";
+    label = " null user ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_27 [
+    class = "infixExpression";
+    label = "==";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_2 [
+    class = "simpleName";
+    label = "user";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 [
+    class = "nullLiteral literal";
+    label = "null";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28_7 [
+    class = "stringLiteral literal";
+    label = "\"user not logged in\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_7 [
+    class = "stringLiteral literal";
+    label = "\"user logged in\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_33 [
+    class = "comment";
+    label = "the exact same test but labelled differently";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_35 [
+    class = "flipYn if";
+    label = " logged in ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_35 [
+    class = "infixExpression";
+    label = "==";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35_2 [
+    class = "simpleName";
+    label = "user";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35_3 [
+    class = "nullLiteral literal";
+    label = "null";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_7 [
+    class = "stringLiteral literal";
+    label = "\"user not logged in\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_7 [
+    class = "stringLiteral literal";
+    label = "\"user logged in\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_40 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21 -> s_21_3;
+  s_21_3 -> c_22;
+  c_22 -> s_23;
+  s_23 -> s_23_5;
+  s_23_5 -> s_23_3;
+  s_23_3 -> c_25;
+  c_25 -> s_27_2;
+  s_27_2 -> s_27_3;
+  s_27_3 -> s_27;
+  s_27 -> if_27;
+  if_27 -> s_27_4 [
+    label="Yes";
+  ];
+  if_27 -> s_29 [
+    label="No";
+  ];
+  s_27_4 -> s_28;
+  s_28 -> s_28_3;
+  s_28_3 -> s_28_7;
+  s_28_7 -> s_28_2;
+  s_29 -> s_30;
+  s_30 -> s_30_3;
+  s_30_3 -> s_30_7;
+  s_30_7 -> s_30_2;
+  s_28_2 -> c_33;
+  s_30_2 -> c_33;
+  c_33 -> s_35_2;
+  s_35_2 -> s_35_3;
+  s_35_3 -> s_35;
+  s_35 -> if_35;
+  if_35 -> s_35_4 [
+    label="Yes";
+  ];
+  if_35 -> s_37 [
+    label="No";
+  ];
+  s_35_4 -> s_36;
+  s_36 -> s_36_3;
+  s_36_3 -> s_36_7;
+  s_36_7 -> s_36_2;
+  s_37 -> s_38;
+  s_38 -> s_38_3;
+  s_38_3 -> s_38_7;
+  s_38_7 -> s_38_2;
+  s_36_2 -> m_40;
+  s_38_2 -> m_40;
+
+  subgraph cluster_m_21 {
+    label="method testIf";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_21; s_21_3; c_22; s_23; s_23_3; s_23_5; c_25; if_27; s_27; s_27_2; s_27_3; s_27_4; s_28; s_28_2; s_28_3; s_28_7; s_29; s_30; s_30_2; s_30_3; s_30_7; c_33; if_35; s_35; s_35_2; s_35_3; s_35_4; s_36; s_36_2; s_36_3; s_36_7; s_37; s_38; s_38_2; s_38_3; s_38_7; m_40;
+  }
+}
+

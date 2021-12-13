@@ -1,0 +1,25 @@
+digraph G_6 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  do_88 [
+    class = "do";
+    label = " Do";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  do_88 -> do_88 [
+    label="do";
+    style = dashed;
+  ];
+
+}
+

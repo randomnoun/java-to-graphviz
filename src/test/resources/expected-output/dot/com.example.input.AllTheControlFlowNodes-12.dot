@@ -1,0 +1,90 @@
+digraph G_13 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_152 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_152_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_153 [
+    class = "expressionStatement";
+    label = "";
+    fillcolor = white;
+    color = transparent;
+    fontcolor = transparent;
+    style = unset;
+  ];
+  s_153_2 [
+    class = "methodInvocation";
+    label = "before()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_154 [
+    class = "expressionStatement";
+    label = "order some donuts";
+    fillcolor = white;
+    shape = oval;
+    color = blue;
+    fontcolor = blue;
+    style = filled;
+  ];
+  s_154_2 [
+    class = "methodInvocation";
+    label = "orderDonuts()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_155 [
+    class = "expressionStatement";
+    label = "";
+    fillcolor = white;
+    color = transparent;
+    fontcolor = transparent;
+    style = unset;
+  ];
+  s_155_2 [
+    class = "methodInvocation";
+    label = "after()";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_156 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_152 -> s_152_3;
+  s_152_3 -> s_153;
+  s_153 -> s_153_2;
+  s_153_2 -> s_154;
+  s_154 -> s_154_2;
+  s_154_2 -> s_155;
+  s_155 -> s_155_2;
+  s_155_2 -> m_156;
+
+  subgraph cluster_m_152 {
+    label="method example2";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_152; s_152_3; s_153; s_153_2; s_154; s_154_2; s_155; s_155_2; m_156;
+  }
+}
+

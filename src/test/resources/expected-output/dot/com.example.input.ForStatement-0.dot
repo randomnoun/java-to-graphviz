@@ -1,0 +1,580 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_19 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_20 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  for_21 [
+    class = "for";
+    label = "for";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_21 [
+    class = "initialiser variableDeclarationExpression";
+    label = "VariableDeclarationExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_2 [
+    class = "variableDeclarationFragment";
+    label = "int i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_4 [
+    class = "numberLiteral literal";
+    label = "0";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_5 [
+    class = "expression infixExpression";
+    label = "<";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_6 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_7 [
+    class = "numberLiteral literal";
+    label = "12";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_8 [
+    class = "postfixExpression updater";
+    label = "postfixOp ++";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_9 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_10 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22 [
+    class = "expressionStatement";
+    label = "in loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_7 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24 [
+    class = "expressionStatement";
+    label = "after loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_7 [
+    class = "stringLiteral literal";
+    label = "\"twelve little ladybugs. at the ladybug picnic.\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_28 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29_4 [
+    class = "variableDeclarationFragment";
+    label = "List<String> things";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29_6 [
+    class = "classInstanceCreation";
+    label = "new ArrayList<>()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_2 [
+    class = "methodInvocation";
+    label = "add()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_3 [
+    class = "simpleName";
+    label = "things";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_5 [
+    class = "stringLiteral literal";
+    label = "\"raindrops on roses and whiskers on kittens\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31_2 [
+    class = "methodInvocation";
+    label = "add()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31_3 [
+    class = "simpleName";
+    label = "things";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_31_5 [
+    class = "stringLiteral literal";
+    label = "\"bright copper kettles and warm woolen mittens\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32_2 [
+    class = "methodInvocation";
+    label = "add()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32_3 [
+    class = "simpleName";
+    label = "things";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32_5 [
+    class = "stringLiteral literal";
+    label = "\"brown paper packages tied up with string\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33_2 [
+    class = "variableDeclarationFragment";
+    label = "int thingCount";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33_4 [
+    class = "numberLiteral literal";
+    label = "0";
+    fillcolor = white;
+    style = filled;
+  ];
+  for_34 [
+    class = "enhancedFor";
+    label = " iterable\nfor";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_34 [
+    class = "initialiser singleVariableDeclaration";
+    label = "String t";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_4 [
+    class = "expression simpleName";
+    label = "things";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_5 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37 [
+    class = "expressionStatement";
+    label = "in loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37_2 [
+    class = "postfixExpression";
+    label = "postfixOp ++";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37_3 [
+    class = "simpleName";
+    label = "thingCount";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_39 [
+    class = "comment";
+    label = "after loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_7 [
+    class = "infixExpression";
+    label = "+";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_8 [
+    class = "stringLiteral literal";
+    label = "\"these are \"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_2 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_41_3 [
+    class = "infixExpression";
+    label = "==";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_4 [
+    class = "simpleName";
+    label = "thingCount";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_5 [
+    class = "numberLiteral literal";
+    label = "1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_6 [
+    class = "stringLiteral literal";
+    label = "\"one of\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_2 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_42_3 [
+    class = "infixExpression";
+    label = "==";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_4 [
+    class = "simpleName";
+    label = "thingCount";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_5 [
+    class = "numberLiteral literal";
+    label = "2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_6 [
+    class = "stringLiteral literal";
+    label = "\"a couple of \"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_2 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_43_3 [
+    class = "infixExpression";
+    label = "==";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_4 [
+    class = "simpleName";
+    label = "thingCount";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_5 [
+    class = "numberLiteral literal";
+    label = "3";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_6 [
+    class = "stringLiteral literal";
+    label = "\"a few of\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_44 [
+    class = "stringLiteral literal";
+    label = "\"DOES NOT COMPUTE\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_44_2 [
+    class = "stringLiteral literal";
+    label = "\" my favourite things\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_25 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_45 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19 -> s_19_3;
+  s_19_3 -> c_20;
+  c_20 -> s_21;
+  s_21 -> s_21_4;
+  s_21_4 -> s_21_2;
+  s_21_2 -> s_21_6;
+  s_21_6 -> s_21_7;
+  s_21_7 -> s_21_5;
+  s_21_5 -> for_21;
+  for_21 -> s_21_10 [
+    label="Y";
+  ];
+  s_21_10 -> s_22;
+  s_22 -> s_22_3;
+  s_22_3 -> s_22_7;
+  s_22_7 -> s_22_2;
+  s_22_2 -> s_21_9;
+  s_21_9 -> s_21_8;
+  s_21_8 -> s_21_6 [
+    label="for";
+    style = dashed;
+  ];
+  for_21 -> s_24 [
+    label="N";
+  ];
+  s_24 -> s_24_3;
+  s_24_3 -> s_24_7;
+  s_24_7 -> s_24_2;
+  s_24_2 -> m_25;
+  s_27 -> s_27_3;
+  s_27_3 -> c_28;
+  c_28 -> s_29;
+  s_29 -> s_29_6;
+  s_29_6 -> s_29_4;
+  s_29_4 -> s_30;
+  s_30 -> s_30_3;
+  s_30_3 -> s_30_5;
+  s_30_5 -> s_30_2;
+  s_30_2 -> s_31;
+  s_31 -> s_31_3;
+  s_31_3 -> s_31_5;
+  s_31_5 -> s_31_2;
+  s_31_2 -> s_32;
+  s_32 -> s_32_3;
+  s_32_3 -> s_32_5;
+  s_32_5 -> s_32_2;
+  s_32_2 -> s_33;
+  s_33 -> s_33_4;
+  s_33_4 -> s_33_2;
+  s_33_2 -> s_34;
+  s_34 -> s_34_4;
+  s_34_4 -> for_34;
+  for_34 -> s_34_5 [
+    label="next";
+  ];
+  s_34_5 -> s_37;
+  s_37 -> s_37_3;
+  s_37_3 -> s_37_2;
+  s_37_2 -> s_34_4 [
+    label="for";
+    style = dashed;
+  ];
+  for_34 -> c_39 [
+    label="end";
+  ];
+  c_39 -> s_40;
+  s_40 -> s_40_3;
+  s_40_3 -> s_40_8;
+  s_40_8 -> s_41_4;
+  s_41_4 -> s_41_5;
+  s_41_5 -> s_41_3;
+  s_41_3 -> s_41_2;
+  s_41_2 -> s_41_6 [
+    label="Y";
+  ];
+  s_41_2 -> s_42_4 [
+    label="N";
+  ];
+  s_42_4 -> s_42_5;
+  s_42_5 -> s_42_3;
+  s_42_3 -> s_42_2;
+  s_42_2 -> s_42_6 [
+    label="Y";
+  ];
+  s_42_2 -> s_43_4 [
+    label="N";
+  ];
+  s_43_4 -> s_43_5;
+  s_43_5 -> s_43_3;
+  s_43_3 -> s_43_2;
+  s_43_2 -> s_43_6 [
+    label="Y";
+  ];
+  s_43_2 -> s_44 [
+    label="N";
+  ];
+  s_41_6 -> s_44_2;
+  s_42_6 -> s_44_2;
+  s_43_6 -> s_44_2;
+  s_44 -> s_44_2;
+  s_44_2 -> s_40_7;
+  s_40_7 -> s_40_2;
+  s_40_2 -> m_45;
+
+  subgraph cluster_m_19 {
+    label="method testFor";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_19; s_19_3; c_20; for_21; s_21; s_21_2; s_21_4; s_21_5; s_21_6; s_21_7; s_21_8; s_21_9; s_21_10; s_22; s_22_2; s_22_3; s_22_7; s_24; s_24_2; s_24_3; s_24_7; m_25;
+  }
+  subgraph cluster_m_27 {
+    label="method testEnhancedFor";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_27; s_27_3; c_28; s_29; s_29_4; s_29_6; s_30; s_30_2; s_30_3; s_30_5; s_31; s_31_2; s_31_3; s_31_5; s_32; s_32_2; s_32_3; s_32_5; s_33; s_33_2; s_33_4; for_34; s_34; s_34_4; s_34_5; s_37; s_37_2; s_37_3; c_39; s_40; s_40_2; s_40_3; s_40_7; s_40_8; s_41_2; s_41_3; s_41_4; s_41_5; s_41_6; s_42_2; s_42_3; s_42_4; s_42_5; s_42_6; s_43_2; s_43_3; s_43_4; s_43_5; s_43_6; s_44; s_44_2; m_45;
+  }
+}
+

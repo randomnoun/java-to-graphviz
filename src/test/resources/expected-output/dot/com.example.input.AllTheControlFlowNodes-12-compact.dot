@@ -1,0 +1,48 @@
+digraph G_13 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_153 [
+    class = "expressionStatement";
+    label = "";
+    fillcolor = white;
+    color = transparent;
+    fontcolor = transparent;
+    style = unset;
+  ];
+  s_154 [
+    class = "expressionStatement";
+    label = "order some donuts";
+    fillcolor = white;
+    shape = oval;
+    color = blue;
+    fontcolor = blue;
+    style = filled;
+  ];
+  s_155 [
+    class = "expressionStatement";
+    label = "";
+    fillcolor = white;
+    color = transparent;
+    fontcolor = transparent;
+    style = unset;
+  ];
+  s_153 -> s_154;
+  s_154 -> s_155;
+
+  subgraph cluster_m_152 {
+    label="method example2";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_153; s_154; s_155;
+  }
+}
+

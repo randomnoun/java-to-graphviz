@@ -1,0 +1,258 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_8 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_7 [
+    class = "stringLiteral literal";
+    label = "\"I like traffic lights\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_7 [
+    class = "stringLiteral literal";
+    label = "\"I like traffic lights\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_7 [
+    class = "stringLiteral literal";
+    label = "\"I like traffic lights\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_14 [
+    class = "beginSubgraph comment";
+    label = "full orchestral backing";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16_7 [
+    class = "stringLiteral literal";
+    label = "\"I like traffic lights\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_7 [
+    class = "stringLiteral literal";
+    label = "\"I like traffic lights\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_7 [
+    class = "stringLiteral literal";
+    label = "\"I like\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_20 [
+    class = "endSubgraph comment";
+    label = "comment";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_7 [
+    class = "stringLiteral literal";
+    label = "\"traffic lights\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_24 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8 -> s_8_3;
+  s_8_3 -> s_10;
+  s_10 -> s_10_3;
+  s_10_3 -> s_10_7;
+  s_10_7 -> s_10_2;
+  s_10_2 -> s_11;
+  s_11 -> s_11_3;
+  s_11_3 -> s_11_7;
+  s_11_7 -> s_11_2;
+  s_11_2 -> s_12;
+  s_12 -> s_12_3;
+  s_12_3 -> s_12_7;
+  s_12_7 -> s_12_2;
+  s_12_2 -> c_14;
+  c_14 -> s_16;
+  s_16 -> s_16_3;
+  s_16_3 -> s_16_7;
+  s_16_7 -> s_16_2;
+  s_16_2 -> s_17;
+  s_17 -> s_17_3;
+  s_17_3 -> s_17_7;
+  s_17_7 -> s_17_2;
+  s_17_2 -> s_18;
+  s_18 -> s_18_3;
+  s_18_3 -> s_18_7;
+  s_18_7 -> s_18_2;
+  s_18_2 -> c_20;
+  c_20 -> s_22;
+  s_22 -> s_22_3;
+  s_22_3 -> s_22_7;
+  s_22_7 -> s_22_2;
+  s_22_2 -> m_24;
+
+  subgraph cluster_m_8 {
+    label="method testAmber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_8; s_8_3; s_10; s_10_2; s_10_3; s_10_7; s_11; s_11_2; s_11_3; s_11_7; s_12; s_12_2; s_12_3; s_12_7; s_22; s_22_2; s_22_3; s_22_7; m_24;
+    subgraph cluster_uds_14 {
+      label="";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      c_14; s_16; s_16_2; s_16_3; s_16_7; s_17; s_17_2; s_17_3; s_17_7; s_18; s_18_2; s_18_3; s_18_7; c_20;
+    }
+  }
+}
+

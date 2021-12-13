@@ -1,0 +1,53 @@
+digraph G_7 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_97 [
+    class = "switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_98 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_99 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_102_2 [
+    class = "methodInvocation";
+    label = "after()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_97 -> case_98;
+  s_97 -> s_102_2;
+  case_98 -> case_99 [
+    label="N";
+  ];
+  case_99 -> s_102_2 [
+    label="Y";
+    color = red;
+  ];
+  case_98 -> s_102_2 [
+    label="fallthrough";
+    color = red;
+  ];
+
+}
+

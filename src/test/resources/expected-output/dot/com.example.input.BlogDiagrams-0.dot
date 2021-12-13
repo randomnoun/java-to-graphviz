@@ -1,0 +1,62 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_42 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43 [
+    class = "expressionStatement";
+    label = "step 1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_2 [
+    class = "methodInvocation";
+    label = "a()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_44 [
+    class = "expressionStatement";
+    label = "step 2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_44_2 [
+    class = "methodInvocation";
+    label = "b()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45 [
+    class = "expressionStatement";
+    label = "step 3";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45_2 [
+    class = "methodInvocation";
+    label = "c()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42 -> s_43;
+  s_43 -> s_43_2;
+  s_43_2 -> s_44;
+  s_44 -> s_44_2;
+  s_44_2 -> s_45;
+  s_45 -> s_45_2;
+
+}
+

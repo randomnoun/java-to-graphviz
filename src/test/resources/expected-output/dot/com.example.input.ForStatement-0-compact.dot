@@ -1,0 +1,143 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  c_20 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  for_21 [
+    class = "for";
+    label = "for";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_22 [
+    class = "expressionStatement";
+    label = "in loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24 [
+    class = "expressionStatement";
+    label = "after loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_28 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  for_34 [
+    class = "enhancedFor";
+    label = " iterable\nfor";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_37 [
+    class = "expressionStatement";
+    label = "in loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_39 [
+    class = "comment";
+    label = "after loop";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_2 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_42_2 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_43_2 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  m_45 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  for_21 -> s_24 [
+    label="N";
+  ];
+  for_34 -> c_39 [
+    label="end";
+  ];
+  c_20 -> for_21;
+  for_21 -> s_22 [
+    label="Y";
+  ];
+  s_22 -> for_21 [
+    label="for";
+    style = dashed;
+  ];
+  c_28 -> for_34;
+  for_34 -> s_37 [
+    label="next";
+  ];
+  s_37 -> for_34 [
+    label="for";
+    style = dashed;
+  ];
+  c_39 -> s_41_2;
+  s_41_2 -> s_42_2 [
+    label="N";
+  ];
+  s_41_2 -> m_45 [
+    label="Y";
+  ];
+  s_42_2 -> m_45 [
+    label="Y";
+  ];
+  s_42_2 -> s_43_2 [
+    label="N";
+  ];
+  s_43_2 -> m_45 [
+    label="Y";
+  ];
+
+  subgraph cluster_m_19 {
+    label="method testFor";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_20; for_21; s_22; s_24;
+  }
+  subgraph cluster_m_27 {
+    label="method testEnhancedFor";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_28; for_34; s_37; c_39; s_41_2; s_42_2; s_43_2; m_45;
+  }
+}
+

@@ -1,0 +1,54 @@
+digraph G_2 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_50 [
+    class = "expressionStatement";
+    label = "step 1";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_51 [
+    class = "if";
+    label = " make a\ndecision";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_52 [
+    class = "expressionStatement";
+    label = "option 1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_54 [
+    class = "expressionStatement";
+    label = "option 2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_56 [
+    class = "expressionStatement";
+    label = "step 3";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_50 -> if_51;
+  if_51 -> s_52 [
+    label="Y";
+  ];
+  if_51 -> s_54 [
+    label="N";
+  ];
+  s_52 -> s_56;
+  s_54 -> s_56;
+
+}
+

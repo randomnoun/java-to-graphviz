@@ -1,0 +1,179 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  c_15 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  while_17 [
+    class = "while";
+    label = " While";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_18_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_23 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  while_27 [
+    class = "while";
+    label = " While";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_29 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_32 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_36 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_40 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_47 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_51_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_20 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_53 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_2 -> m_20;
+  while_17 -> m_20 [
+    label="N";
+  ];
+  s_51_2 -> m_53;
+  while_27 -> m_53 [
+    label="N";
+  ];
+  s_18_2 -> while_17 [
+    label="while";
+    style = dashed;
+  ];
+  c_15 -> while_17;
+  while_17 -> s_18_2 [
+    label="Y";
+  ];
+  s_51_2 -> while_27 [
+    label="while";
+    style = dashed;
+  ];
+  c_23 -> while_27;
+  while_27 -> if_29 [
+    label="Y";
+  ];
+  if_29 -> if_32 [
+    label="N";
+  ];
+  if_32 -> if_36 [
+    label="N";
+  ];
+  if_40 -> if_47 [
+    label="N";
+  ];
+  if_29 -> if_47 [
+    label="Y";
+  ];
+  if_32 -> m_53 [
+    label="Y";
+    color = blue;
+  ];
+  if_36 -> if_40 [
+    label="N";
+  ];
+  if_47 -> m_53 [
+    label="Y";
+    color = blue;
+  ];
+  if_47 -> s_51_2 [
+    label="N";
+  ];
+  if_36 -> while_27 [
+    label="Y";
+    color = red;
+    style = dashed;
+  ];
+  if_40 -> m_53 [
+    label="Y";
+    color = red;
+  ];
+
+  subgraph cluster_m_9 {
+    label="method getNextAction";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_14 {
+    label="method testWhile";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_15; while_17; s_18_2; m_20;
+  }
+  subgraph cluster_m_22 {
+    label="method testWhileBreakContinue";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_23; while_27; if_29; if_32; if_36; if_40; if_47; s_51_2; m_53;
+  }
+}
+

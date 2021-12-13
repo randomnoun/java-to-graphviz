@@ -1,0 +1,165 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  g = h;
+  fontname = "Handlee";
+  compound = true;
+  s_36 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37_7 [
+    class = "stringLiteral literal";
+    label = "\"prices are down\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_7 [
+    class = "stringLiteral literal";
+    label = "\"jitterbug\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_44 [
+    class = "comment";
+    label = "a comment";
+    fillcolor = white;
+    style = filled;
+  ];
+  thisOne [
+    class = "comment";
+    label = "comment with id";
+    fillcolor = white;
+    i = j;
+    style = filled;
+  ];
+  c_48 [
+    class = "green comment";
+    label = "comment with class";
+    fillcolor = white;
+    color = green;
+    style = filled;
+  ];
+  noThisOne [
+    class = "green comment";
+    label = "comment id and a class";
+    fillcolor = white;
+    color = green;
+    style = filled;
+    k = l;
+  ];
+  howAboutThisOne [
+    class = "green comment";
+    label = "comment id and a class and a style";
+    fillcolor = white;
+    color = blue;
+    style = filled;
+  ];
+  m_38 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_56 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36 -> s_36_3;
+  s_36_3 -> s_37;
+  s_37 -> s_37_3;
+  s_37_3 -> s_37_7;
+  s_37_7 -> s_37_2;
+  s_37_2 -> m_38;
+  s_40 -> s_40_3;
+  s_40_3 -> s_42;
+  s_42 -> s_42_3;
+  s_42_3 -> s_42_7;
+  s_42_7 -> s_42_2;
+  s_42_2 -> c_44;
+  c_44 -> thisOne;
+  thisOne -> c_48;
+  c_48 -> noThisOne;
+  noThisOne -> howAboutThisOne;
+  howAboutThisOne -> m_56;
+
+  subgraph cluster_m_36 {
+    label="method testDownDown";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_36; s_36_3; s_37; s_37_2; s_37_3; s_37_7; m_38;
+  }
+  subgraph cluster_m_40 {
+    label="method testJitterbug";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_40; s_40_3; s_42; s_42_2; s_42_3; s_42_7; c_44; thisOne; c_48; noThisOne; howAboutThisOne; m_56;
+  }
+}
+

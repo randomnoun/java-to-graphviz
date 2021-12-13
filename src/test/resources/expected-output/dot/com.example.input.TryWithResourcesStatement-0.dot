@@ -1,0 +1,429 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_13 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_2 [
+    class = "variableDeclarationFragment";
+    label = "int whatTheCompanyTakes";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_4 [
+    class = "prefixExpression";
+    label = "prefixOp -";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_5 [
+    class = "numberLiteral literal";
+    label = "1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_6 [
+    class = "variableDeclarationFragment";
+    label = "int whatTheCompanyWants";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_8 [
+    class = "prefixExpression";
+    label = "prefixOp -";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_9 [
+    class = "numberLiteral literal";
+    label = "1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_7 [
+    class = "stringLiteral literal";
+    label = "\"But if I work all day at the blue sky mine\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16 [
+    class = "try";
+    label = "Try";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17 [
+    class = "tryResource variableDeclarationExpression";
+    label = "VariableDeclarationExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_3 [
+    class = "variableDeclarationFragment";
+    label = "InputStream is";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_5 [
+    class = "classInstanceCreation";
+    label = "new FileInputStream()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_7 [
+    class = "stringLiteral literal";
+    label = "\"blue-sky-mine.txt\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18 [
+    class = "tryResource variableDeclarationExpression";
+    label = "VariableDeclarationExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_3 [
+    class = "variableDeclarationFragment";
+    label = "OutputStream os";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_5 [
+    class = "classInstanceCreation";
+    label = "new FileOutputStream()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_7 [
+    class = "stringLiteral literal";
+    label = "\"whos-gonna-save-me.txt\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19 [
+    class = "tryBody block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_3 [
+    class = "simpleName";
+    label = "whatTheCompanyWants";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_4 [
+    class = "methodInvocation";
+    label = "read()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_5 [
+    class = "simpleName";
+    label = "is";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_3 [
+    class = "simpleName";
+    label = "whatTheCompanyTakes";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_4 [
+    class = "simpleName";
+    label = "whatTheCompanyWants";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_2 [
+    class = "methodInvocation";
+    label = "write()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_3 [
+    class = "simpleName";
+    label = "os";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_5 [
+    class = "nullLiteral literal";
+    label = "null";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_2 [
+    class = "simpleName";
+    label = "whatTheCompanyTakes";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26 [
+    class = "catchClause catch";
+    label = "CatchClause";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_5 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_7 [
+    class = "stringLiteral literal";
+    label = "\"Some have sailed from a distant shore\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29 [
+    class = "finally block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_7 [
+    class = "stringLiteral literal";
+    label = "\"There'll be food on the table tonight\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32_2 [
+    class = "simpleName";
+    label = "whatTheCompanyWants";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_33 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13 -> s_13_3;
+  s_13_3 -> s_14;
+  s_14 -> s_14_5;
+  s_14_5 -> s_14_4;
+  s_14_4 -> s_14_2;
+  s_14_2 -> s_14_9;
+  s_14_9 -> s_14_8;
+  s_14_8 -> s_14_6;
+  s_14_6 -> s_15;
+  s_15 -> s_15_3;
+  s_15_3 -> s_15_7;
+  s_15_7 -> s_15_2;
+  s_15_2 -> s_16;
+  s_16 -> s_17;
+  s_17 -> s_17_7;
+  s_17_7 -> s_17_5;
+  s_17_5 -> s_17_3;
+  s_17_3 -> s_18;
+  s_18 -> s_18_7;
+  s_18_7 -> s_18_5;
+  s_18_5 -> s_18_3;
+  s_18_3 -> s_19;
+  s_19 -> s_20;
+  s_20 -> s_20_5;
+  s_20_5 -> s_20_4;
+  s_20_4 -> s_20_3;
+  s_20_3 -> s_20_2;
+  s_20_2 -> s_21;
+  s_21 -> s_21_4;
+  s_21_4 -> s_21_3;
+  s_21_3 -> s_21_2;
+  s_21_2 -> s_22;
+  s_22 -> s_22_3;
+  s_22_3 -> s_22_5;
+  s_22_5 -> s_22_2;
+  s_22_2 -> s_25_2;
+  s_25_2 -> s_25;
+  s_26 -> s_26_5;
+  s_26_5 -> s_27;
+  s_27 -> s_27_3;
+  s_27_3 -> s_27_7;
+  s_27_7 -> s_27_2;
+  s_25 -> s_29 [
+    label="return";
+    color = blue;
+  ];
+  s_27_2 -> s_29;
+  s_29 -> s_30;
+  s_30 -> s_30_3;
+  s_30_3 -> s_30_7;
+  s_30_7 -> s_30_2;
+  s_30_2 -> s_32_2;
+  s_32_2 -> s_32;
+  s_30_2 -> m_33 [
+    label="return";
+    color = blue;
+  ];
+  s_32 -> m_33 [
+    label="return";
+    color = blue;
+  ];
+
+  subgraph cluster_m_13 {
+    label="method testAHoleInTheGround";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_13; s_13_3; s_14; s_14_2; s_14_4; s_14_5; s_14_6; s_14_8; s_14_9; s_15; s_15_2; s_15_3; s_15_7; s_16; s_32; s_32_2; m_33;
+    subgraph cluster_t_resource_17 {
+      label="resource";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_17; s_17_3; s_17_5; s_17_7;
+    }
+    subgraph cluster_t_resource_18 {
+      label="resource";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_18; s_18_3; s_18_5; s_18_7;
+    }
+    subgraph cluster_t_body_19 {
+      label="body";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_19; s_20; s_20_2; s_20_3; s_20_4; s_20_5; s_21; s_21_2; s_21_3; s_21_4; s_22; s_22_2; s_22_3; s_22_5; s_25; s_25_2;
+    }
+    subgraph cluster_t_catch_26 {
+      label="catch Exception e";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_26; s_26_5; s_27; s_27_2; s_27_3; s_27_7;
+    }
+    subgraph cluster_t_finally_29 {
+      label="finally";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_29; s_30; s_30_2; s_30_3; s_30_7;
+    }
+  }
+}
+

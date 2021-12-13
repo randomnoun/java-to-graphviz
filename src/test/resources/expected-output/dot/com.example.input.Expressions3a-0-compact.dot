@@ -1,0 +1,77 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+
+  subgraph cluster_m_14 {
+    label="method MyNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_17 {
+    label="method getNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_21 {
+    label="method MyOtherNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_24 {
+    label="method getNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_25 {
+    label="method getOrigNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_30 {
+    label="method qualifiedThis";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_33 {
+    label="method callSuperMethod";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_36 {
+    label="method getSuperField";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_42 {
+    label="method testExpressions";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+}
+

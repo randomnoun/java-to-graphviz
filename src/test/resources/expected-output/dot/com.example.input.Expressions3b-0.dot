@@ -1,0 +1,733 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_33 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_3 [
+    class = "fieldAccess";
+    label = "field i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_4 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_6 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_6 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41 [
+    class = "superConstructorInvocation";
+    label = "super()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_2 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_6 [
+    class = "infixExpression";
+    label = "*";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_7 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_8 [
+    class = "numberLiteral literal";
+    label = "2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_44 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_44_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45_4 [
+    class = "variableDeclarationFragment";
+    label = "Supplier<Long> thisGetter";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45_6 [
+    class = "expressionMethodReference";
+    label = "this::getNumber";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_46 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_46_4 [
+    class = "variableDeclarationFragment";
+    label = "Supplier<Long> superGetter";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_46_6 [
+    class = "superMethodReference";
+    label = "super::getNumber";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47_2 [
+    class = "methodInvocation";
+    label = "get()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47_4 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_47_6 [
+    class = "infixExpression";
+    label = ">";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47_7 [
+    class = "methodInvocation";
+    label = "random()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47_8 [
+    class = "simpleName";
+    label = "Math";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47_10 [
+    class = "numberLiteral literal";
+    label = "0.5";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47_11 [
+    class = "simpleName";
+    label = "thisGetter";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_47_12 [
+    class = "simpleName";
+    label = "superGetter";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_49 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_49_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_50 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_50_2 [
+    class = "methodInvocation";
+    label = "testExpressions()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_50_3 [
+    class = "thisExpression";
+    label = "Expressions3b.this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_52 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_52_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_53 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_53_2 [
+    class = "superMethodInvocation";
+    label = ".super.getNumber()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_55 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_55_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_56 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_56_2 [
+    class = "superFieldAccess";
+    label = "field i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_61 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_61_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_4 [
+    class = "variableDeclarationFragment";
+    label = "List<Long> numbers";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_6 [
+    class = "methodInvocation";
+    label = "asList()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_7 [
+    class = "simpleName";
+    label = "Arrays";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_9 [
+    class = "numberLiteral literal";
+    label = "3L";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_10 [
+    class = "numberLiteral literal";
+    label = "2L";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_11 [
+    class = "numberLiteral literal";
+    label = "1L";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_65 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_65_2 [
+    class = "methodInvocation";
+    label = "sorted()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_65_3 [
+    class = "methodInvocation";
+    label = "stream()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_65_4 [
+    class = "simpleName";
+    label = "numbers";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_65_7 [
+    class = "expressionMethodReference";
+    label = "Long::compareTo";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_67 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_67_3 [
+    class = "variableDeclarationFragment";
+    label = "MyNumber[] myNumbers";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_67_5 [
+    class = "methodInvocation";
+    label = "toArray()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_67_6 [
+    class = "methodInvocation";
+    label = "map()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_67_7 [
+    class = "methodInvocation";
+    label = "stream()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_67_8 [
+    class = "simpleName";
+    label = "numbers";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_68_2 [
+    class = "creationReference";
+    label = "MyOtherNumber::new";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_69_2 [
+    class = "creationReference";
+    label = "MyOtherNumber[]::new";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_71 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_71_4 [
+    class = "variableDeclarationFragment";
+    label = "Supplier<Long> aGetter";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_71_6 [
+    class = "expressionMethodReference";
+    label = "myNumbers[0]::getNumber";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_74 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_74_3 [
+    class = "variableDeclarationFragment";
+    label = "MyNumber arrayAccess";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_74_5 [
+    class = "arrayAccess";
+    label = "ArrayAccess";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_74_6 [
+    class = "simpleName";
+    label = "myNumbers";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_74_7 [
+    class = "numberLiteral literal";
+    label = "2";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_35 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_36 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_42 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_43 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_48 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_51 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_54 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_57 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_76 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33 -> s_33_6;
+  s_33_6 -> s_34;
+  s_34 -> s_34_6;
+  s_34_6 -> s_34_4;
+  s_34_4 -> s_34_3;
+  s_34_3 -> s_34_2;
+  s_34_2 -> m_35;
+  s_36 -> s_36_4;
+  s_36_4 -> s_36_6;
+  s_36_6 -> s_36_5;
+  s_36_5 -> m_36 [
+    label="return";
+    color = blue;
+  ];
+  s_40 -> s_40_6;
+  s_40_6 -> s_41_2;
+  s_41_2 -> s_41;
+  s_41 -> m_42;
+  s_43 -> s_43_4;
+  s_43_4 -> s_43_7;
+  s_43_7 -> s_43_8;
+  s_43_8 -> s_43_6;
+  s_43_6 -> s_43_5;
+  s_43_5 -> m_43 [
+    label="return";
+    color = blue;
+  ];
+  s_44 -> s_44_4;
+  s_44_4 -> s_45;
+  s_45 -> s_45_6;
+  s_45_6 -> s_45_4;
+  s_45_4 -> s_46;
+  s_46 -> s_46_6;
+  s_46_6 -> s_46_4;
+  s_46_4 -> s_47_8;
+  s_47_8 -> s_47_7;
+  s_47_7 -> s_47_10;
+  s_47_10 -> s_47_6;
+  s_47_6 -> s_47_4;
+  s_47_4 -> s_47_11 [
+    label="Y";
+  ];
+  s_47_4 -> s_47_12 [
+    label="N";
+  ];
+  s_47_11 -> s_47_2;
+  s_47_12 -> s_47_2;
+  s_47_2 -> s_47;
+  s_47 -> m_48 [
+    label="return";
+    color = blue;
+  ];
+  s_49 -> s_49_3;
+  s_49_3 -> s_50;
+  s_50 -> s_50_3;
+  s_50_3 -> s_50_2;
+  s_50_2 -> m_51;
+  s_52 -> s_52_4;
+  s_52_4 -> s_53_2;
+  s_53_2 -> s_53;
+  s_53 -> m_54 [
+    label="return";
+    color = blue;
+  ];
+  s_55 -> s_55_4;
+  s_55_4 -> s_56_2;
+  s_56_2 -> s_56;
+  s_56 -> m_57 [
+    label="return";
+    color = blue;
+  ];
+  s_61 -> s_61_3;
+  s_61_3 -> s_64;
+  s_64 -> s_64_7;
+  s_64_7 -> s_64_9;
+  s_64_9 -> s_64_10;
+  s_64_10 -> s_64_11;
+  s_64_11 -> s_64_6;
+  s_64_6 -> s_64_4;
+  s_64_4 -> s_65;
+  s_65 -> s_65_4;
+  s_65_4 -> s_65_3;
+  s_65_3 -> s_65_7;
+  s_65_7 -> s_65_2;
+  s_65_2 -> s_67;
+  s_67 -> s_67_8;
+  s_67_8 -> s_67_7;
+  s_67_7 -> s_68_2;
+  s_68_2 -> s_67_6;
+  s_67_6 -> s_69_2;
+  s_69_2 -> s_67_5;
+  s_67_5 -> s_67_3;
+  s_67_3 -> s_71;
+  s_71 -> s_71_6;
+  s_71_6 -> s_71_4;
+  s_71_4 -> s_74;
+  s_74 -> s_74_6;
+  s_74_6 -> s_74_7;
+  s_74_7 -> s_74_5;
+  s_74_5 -> s_74_3;
+  s_74_3 -> m_76;
+
+  subgraph cluster_c_31 {
+    label="class MyNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = gray;
+   
+    subgraph cluster_m_33 {
+      label="method MyNumber";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_33; s_33_6; s_34; s_34_2; s_34_3; s_34_4; s_34_6; m_35;
+    }
+    subgraph cluster_m_36 {
+      label="method getNumber";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_36; s_36_4; s_36_5; s_36_6; m_36;
+    }
+  }
+  subgraph cluster_c_39 {
+    label="class MyOtherNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = gray;
+   
+    subgraph cluster_m_40 {
+      label="method MyOtherNumber";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_40; s_40_6; s_41; s_41_2; m_42;
+    }
+    subgraph cluster_m_43 {
+      label="method getNumber";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_43; s_43_4; s_43_5; s_43_6; s_43_7; s_43_8; m_43;
+    }
+    subgraph cluster_m_44 {
+      label="method getOrigNumber";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_44; s_44_4; s_45; s_45_4; s_45_6; s_46; s_46_4; s_46_6; s_47; s_47_2; s_47_4; s_47_6; s_47_7; s_47_8; s_47_10; s_47_11; s_47_12; m_48;
+    }
+    subgraph cluster_m_49 {
+      label="method qualifiedThis";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_49; s_49_3; s_50; s_50_2; s_50_3; m_51;
+    }
+    subgraph cluster_m_52 {
+      label="method callSuperMethod";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_52; s_52_4; s_53; s_53_2; m_54;
+    }
+    subgraph cluster_m_55 {
+      label="method getSuperField";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+      s_55; s_55_4; s_56; s_56_2; m_57;
+    }
+  }
+  subgraph cluster_m_61 {
+    label="method testExpressions";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_61; s_61_3; s_64; s_64_4; s_64_6; s_64_7; s_64_9; s_64_10; s_64_11; s_65; s_65_2; s_65_3; s_65_4; s_65_7; s_67; s_67_3; s_67_5; s_67_6; s_67_7; s_67_8; s_68_2; s_69_2; s_71; s_71_4; s_71_6; s_74; s_74_3; s_74_5; s_74_6; s_74_7; m_76;
+  }
+}
+

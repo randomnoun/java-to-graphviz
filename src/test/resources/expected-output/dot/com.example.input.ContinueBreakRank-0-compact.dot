@@ -1,0 +1,351 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  for_25 [
+    class = "for";
+    label = "for";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  c_28 [
+    class = "beginSubgraph comment";
+    label = "around the switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30 [
+    class = "switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  case0 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case1 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case2 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case3 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case4 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case5 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case6 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case7 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_38 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case8 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case9 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case10 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case11 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case12 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case13 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case14 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case15 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  caseDefault [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  c_53 [
+    class = "endSubgraph comment";
+    label = "comment";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_56 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_60 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  m_70 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  case15 -> caseDefault [
+    label="N";
+  ];
+  for_25 -> c_28 [
+    label="Y";
+  ];
+  c_28 -> s_30;
+  s_30 -> case0;
+  s_30 -> c_53;
+  case0 -> case1 [
+    label="N";
+  ];
+  case1 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case1 -> case2 [
+    label="N";
+  ];
+  case0 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case2 -> case3 [
+    label="N";
+  ];
+  c_53 -> if_56 [
+    label="false";
+  ];
+  case3 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case3 -> case4 [
+    label="N";
+  ];
+  if_56 -> if_60 [
+    label="N";
+  ];
+  case2 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case4 -> case5 [
+    label="N";
+  ];
+  if_56 -> for_25 [
+    label="Y";
+    color = red;
+    style = dashed;
+  ];
+  case5 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case5 -> case6 [
+    label="N";
+  ];
+  for_25 -> m_70 [
+    label="N";
+  ];
+  if_60 -> m_70 [
+    label="N";
+    color = red;
+  ];
+  if_60 -> for_25 [
+    label="N";
+    style = dashed;
+  ];
+  case4 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case6 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case6 -> case7 [
+    label="N";
+  ];
+  case7 -> case8 [
+    label="N";
+  ];
+  if_38 -> c_53 [
+    label="fallthrough";
+    color = red;
+  ];
+  case8 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case8 -> case9 [
+    label="N";
+  ];
+  case7 -> if_38 [
+    label="Y";
+  ];
+  case9 -> case10 [
+    label="N";
+  ];
+  case10 -> case11 [
+    label="N";
+  ];
+  if_38 -> m_70 [
+    label="N";
+    color = red;
+  ];
+  case9 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case11 -> case12 [
+    label="N";
+  ];
+  case10 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case12 -> case13 [
+    label="N";
+  ];
+  case11 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case13 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case13 -> case14 [
+    label="N";
+  ];
+  case12 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case14 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+  case14 -> case15 [
+    label="N";
+  ];
+  caseDefault -> m_70 [
+    label="Y";
+    color = maroon;
+  ];
+  case15 -> c_53 [
+    label="Y";
+    color = red;
+  ];
+
+  subgraph cluster_m_15 {
+    label="method testAmenBreak";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    for_25; if_56; if_60; m_70;
+    subgraph cluster_uds_28 {
+      label="";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      c_28; s_30; case0; case1; case2; case3; case4; case5; case6; case7; if_38; case8; case9; case10; case11; case12; case13; case14; case15; caseDefault; c_53;
+      { rank = same; case0; case1; case2; case3; case4; case5; case6; case7; case8; case9; case10; case11; case12; case13; case14; case15; caseDefault }
+    }
+  }
+}
+

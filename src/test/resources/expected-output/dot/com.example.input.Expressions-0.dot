@@ -1,0 +1,415 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_8 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8_7 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8_8 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9_7 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9_8 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_7 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_8 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_3 [
+    class = "variableDeclarationFragment";
+    label = "Expressions e";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_5 [
+    class = "classInstanceCreation";
+    label = "new Expressions()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_2 [
+    class = "methodInvocation";
+    label = "c()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_3 [
+    class = "methodInvocation";
+    label = "b()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_4 [
+    class = "methodInvocation";
+    label = "a()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_5 [
+    class = "simpleName";
+    label = "e";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_7 [
+    class = "booleanLiteral literal";
+    label = "true";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_9 [
+    class = "booleanLiteral literal";
+    label = "false";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_11 [
+    class = "booleanLiteral literal";
+    label = "true";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean x";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_4 [
+    class = "booleanLiteral literal";
+    label = "true";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean y";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_18_4 [
+    class = "booleanLiteral literal";
+    label = "true";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_2 [
+    class = "methodInvocation";
+    label = "c()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_3 [
+    class = "methodInvocation";
+    label = "b()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_4 [
+    class = "methodInvocation";
+    label = "a()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_5 [
+    class = "simpleName";
+    label = "e";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_7 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_19_8 [
+    class = "simpleName";
+    label = "x";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_9 [
+    class = "simpleName";
+    label = "x";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_10 [
+    class = "simpleName";
+    label = "y";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_12 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_19_13 [
+    class = "simpleName";
+    label = "x";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_14 [
+    class = "simpleName";
+    label = "y";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_16 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_19_17 [
+    class = "simpleName";
+    label = "x";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_18 [
+    class = "simpleName";
+    label = "y";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_8 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_9 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_10 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_21 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8 -> s_8_6;
+  s_8_6 -> s_8_8;
+  s_8_8 -> s_8_7;
+  s_8_7 -> m_8 [
+    label="return";
+    color = blue;
+  ];
+  s_9 -> s_9_6;
+  s_9_6 -> s_9_8;
+  s_9_8 -> s_9_7;
+  s_9_7 -> m_9 [
+    label="return";
+    color = blue;
+  ];
+  s_10 -> s_10_6;
+  s_10_6 -> s_10_8;
+  s_10_8 -> s_10_7;
+  s_10_7 -> m_10 [
+    label="return";
+    color = blue;
+  ];
+  s_12 -> s_12_3;
+  s_12_3 -> s_14;
+  s_14 -> s_14_5;
+  s_14_5 -> s_14_3;
+  s_14_3 -> s_15;
+  s_15 -> s_15_5;
+  s_15_5 -> s_15_7;
+  s_15_7 -> s_15_4;
+  s_15_4 -> s_15_9;
+  s_15_9 -> s_15_3;
+  s_15_3 -> s_15_11;
+  s_15_11 -> s_15_2;
+  s_15_2 -> s_17;
+  s_17 -> s_17_4;
+  s_17_4 -> s_17_2;
+  s_17_2 -> s_18;
+  s_18 -> s_18_4;
+  s_18_4 -> s_18_2;
+  s_18_2 -> s_19;
+  s_19 -> s_19_5;
+  s_19_5 -> s_19_8;
+  s_19_8 -> s_19_7;
+  s_19_7 -> s_19_9 [
+    label="Y";
+  ];
+  s_19_7 -> s_19_10 [
+    label="N";
+  ];
+  s_19_9 -> s_19_4;
+  s_19_10 -> s_19_4;
+  s_19_4 -> s_19_13;
+  s_19_13 -> s_19_12;
+  s_19_12 -> s_19_14 [
+    label="true";
+  ];
+  s_19_12 -> s_19_3 [
+    label="false";
+  ];
+  s_19_14 -> s_19_3;
+  s_19_3 -> s_19_17;
+  s_19_17 -> s_19_16;
+  s_19_16 -> s_19_18 [
+    label="false";
+  ];
+  s_19_16 -> s_19_2 [
+    label="true";
+  ];
+  s_19_18 -> s_19_2;
+  s_19_2 -> m_21;
+
+  subgraph cluster_m_8 {
+    label="method a";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_8; s_8_6; s_8_7; s_8_8; m_8;
+  }
+  subgraph cluster_m_9 {
+    label="method b";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_9; s_9_6; s_9_7; s_9_8; m_9;
+  }
+  subgraph cluster_m_10 {
+    label="method c";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_10; s_10_6; s_10_7; s_10_8; m_10;
+  }
+  subgraph cluster_m_12 {
+    label="method testExpressions";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_12; s_12_3; s_14; s_14_3; s_14_5; s_15; s_15_2; s_15_3; s_15_4; s_15_5; s_15_7; s_15_9; s_15_11; s_17; s_17_2; s_17_4; s_18; s_18_2; s_18_4; s_19; s_19_2; s_19_3; s_19_4; s_19_5; s_19_7; s_19_8; s_19_9; s_19_10; s_19_12; s_19_13; s_19_14; s_19_16; s_19_17; s_19_18; m_21;
+  }
+}
+

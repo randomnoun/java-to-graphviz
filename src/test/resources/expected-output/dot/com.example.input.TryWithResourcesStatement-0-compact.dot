@@ -1,0 +1,104 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_26 [
+    class = "catchClause catch";
+    label = "CatchClause";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_5 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_7 [
+    class = "stringLiteral literal";
+    label = "\"Some have sailed from a distant shore\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26 -> s_26_5;
+  s_26_5 -> s_27;
+  s_27 -> s_27_3;
+  s_27_3 -> s_27_7;
+  s_27_7 -> s_27_2;
+  s_27_2 -> s_30_2;
+
+  subgraph cluster_m_13 {
+    label="method testAHoleInTheGround";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_t_resource_17 {
+      label="resource";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+    subgraph cluster_t_resource_18 {
+      label="resource";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+    subgraph cluster_t_body_19 {
+      label="body";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+    subgraph cluster_t_catch_26 {
+      label="catch Exception e";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_26; s_26_5; s_27; s_27_2; s_27_3; s_27_7;
+    }
+    subgraph cluster_t_finally_29 {
+      label="finally";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_30_2;
+    }
+  }
+}
+

@@ -1,0 +1,35 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+
+  subgraph cluster_m_9 {
+    label="method testTenthBirthday";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_t_body_12 {
+      label="body";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+    subgraph cluster_t_catch_18 {
+      label="catch Exception e";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+  }
+}
+

@@ -1,0 +1,648 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_9 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_6 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_4 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_5 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_6 [
+    class = "classInstanceCreation";
+    label = "new Fool()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_2 [
+    class = "methodInvocation";
+    label = "chain()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 [
+    class = "methodInvocation";
+    label = "chain()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_4 [
+    class = "methodInvocation";
+    label = "chain()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_5 [
+    class = "methodInvocation";
+    label = "generate()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_6 [
+    class = "classInstanceCreation";
+    label = "new FoolGenerator()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37_3 [
+    class = "variableDeclarationFragment";
+    label = "Heart h";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_37_5 [
+    class = "classInstanceCreation";
+    label = "new Heart()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_2 [
+    class = "methodInvocation";
+    label = "more()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_3 [
+    class = "methodInvocation";
+    label = "no()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_4 [
+    class = "methodInvocation";
+    label = "me()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_5 [
+    class = "methodInvocation";
+    label = "love()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_6 [
+    class = "methodInvocation";
+    label = "dont()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_7 [
+    class = "methodInvocation";
+    label = "you()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_8 [
+    class = "methodInvocation";
+    label = "cos()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_9 [
+    class = "methodInvocation";
+    label = "unchain()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_38_10 [
+    class = "simpleName";
+    label = "h";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_9 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_10 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_11 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_12 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_13 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_14 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_15 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_16 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_19 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_22 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_31 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_46 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_9 -> s_9_4;
+  s_9_4 -> s_9_6;
+  s_9_6 -> s_9_5;
+  s_9_5 -> m_9 [
+    label="return";
+    color = blue;
+  ];
+  s_10 -> s_10_4;
+  s_10_4 -> s_10_6;
+  s_10_6 -> s_10_5;
+  s_10_5 -> m_10 [
+    label="return";
+    color = blue;
+  ];
+  s_11 -> s_11_4;
+  s_11_4 -> s_11_6;
+  s_11_6 -> s_11_5;
+  s_11_5 -> m_11 [
+    label="return";
+    color = blue;
+  ];
+  s_12 -> s_12_4;
+  s_12_4 -> s_12_6;
+  s_12_6 -> s_12_5;
+  s_12_5 -> m_12 [
+    label="return";
+    color = blue;
+  ];
+  s_13 -> s_13_4;
+  s_13_4 -> s_13_6;
+  s_13_6 -> s_13_5;
+  s_13_5 -> m_13 [
+    label="return";
+    color = blue;
+  ];
+  s_14 -> s_14_4;
+  s_14_4 -> s_14_6;
+  s_14_6 -> s_14_5;
+  s_14_5 -> m_14 [
+    label="return";
+    color = blue;
+  ];
+  s_15 -> s_15_4;
+  s_15_4 -> s_15_6;
+  s_15_6 -> s_15_5;
+  s_15_5 -> m_15 [
+    label="return";
+    color = blue;
+  ];
+  s_16 -> s_16_4;
+  s_16_4 -> s_16_6;
+  s_16_6 -> s_16_5;
+  s_16_5 -> m_16 [
+    label="return";
+    color = blue;
+  ];
+  s_19 -> s_19_4;
+  s_19_4 -> s_19_6;
+  s_19_6 -> s_19_5;
+  s_19_5 -> m_19 [
+    label="return";
+    color = blue;
+  ];
+  s_22 -> s_22_4;
+  s_22_4 -> s_22_6;
+  s_22_6 -> s_22_5;
+  s_22_5 -> m_22 [
+    label="return";
+    color = blue;
+  ];
+  s_25 -> s_25_3;
+  s_25_3 -> s_27;
+  s_27 -> s_27_6;
+  s_27_6 -> s_27_5;
+  s_27_5 -> s_27_4;
+  s_27_4 -> s_27_3;
+  s_27_3 -> s_27_2;
+  s_27_2 -> m_31;
+  s_35 -> s_35_3;
+  s_35_3 -> s_37;
+  s_37 -> s_37_5;
+  s_37_5 -> s_37_3;
+  s_37_3 -> s_38;
+  s_38 -> s_38_10;
+  s_38_10 -> s_38_9;
+  s_38_9 -> s_38_8;
+  s_38_8 -> s_38_7;
+  s_38_7 -> s_38_6;
+  s_38_6 -> s_38_5;
+  s_38_5 -> s_38_4;
+  s_38_4 -> s_38_3;
+  s_38_3 -> s_38_2;
+  s_38_2 -> m_46;
+
+  subgraph cluster_m_9 {
+    label="method unchain";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_9; s_9_4; s_9_5; s_9_6; m_9;
+  }
+  subgraph cluster_m_10 {
+    label="method cos";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_10; s_10_4; s_10_5; s_10_6; m_10;
+  }
+  subgraph cluster_m_11 {
+    label="method you";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_11; s_11_4; s_11_5; s_11_6; m_11;
+  }
+  subgraph cluster_m_12 {
+    label="method dont";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_12; s_12_4; s_12_5; s_12_6; m_12;
+  }
+  subgraph cluster_m_13 {
+    label="method love";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_13; s_13_4; s_13_5; s_13_6; m_13;
+  }
+  subgraph cluster_m_14 {
+    label="method me";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_14; s_14_4; s_14_5; s_14_6; m_14;
+  }
+  subgraph cluster_m_15 {
+    label="method no";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_15; s_15_4; s_15_5; s_15_6; m_15;
+  }
+  subgraph cluster_m_16 {
+    label="method more";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_16; s_16_4; s_16_5; s_16_6; m_16;
+  }
+  subgraph cluster_m_19 {
+    label="method chain";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_19; s_19_4; s_19_5; s_19_6; m_19;
+  }
+  subgraph cluster_m_22 {
+    label="method generate";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_22; s_22_4; s_22_5; s_22_6; m_22;
+  }
+  subgraph cluster_m_25 {
+    label="method testMethodChain";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_25; s_25_3; s_27; s_27_2; s_27_3; s_27_4; s_27_5; s_27_6; m_31;
+  }
+  subgraph cluster_m_35 {
+    label="method testMethodUnchain";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_uds_34 {
+    label="";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = black;
+    s_35; s_35_3; s_37; s_37_3; s_37_5; s_38; s_38_2; s_38_3; s_38_4; s_38_5; s_38_6; s_38_7; s_38_8; s_38_9; s_38_10; m_46;
+  }
+}
+

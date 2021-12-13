@@ -1,0 +1,1238 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_52 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_52_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_56 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_56_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_57 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_58 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_58_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean worldIsTurning";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_58_4 [
+    class = "booleanLiteral literal";
+    label = "true";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_59 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_59_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean alwaysBurning";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_59_4 [
+    class = "booleanLiteral literal";
+    label = "false";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_60 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_60 [
+    class = "prefixExpression";
+    label = "prefixOp !";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_60_3 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_60_4 [
+    class = "simpleName";
+    label = "worldIsTurning";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_60_5 [
+    class = "simpleName";
+    label = "alwaysBurning";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_60_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_61 [
+    class = "throw";
+    label = "Throw";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_3 [
+    class = "variableDeclarationFragment";
+    label = "BillyJoelBeefs ignitionSource";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_5 [
+    class = "nullLiteral literal";
+    label = "null";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_65 [
+    class = "switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_65_2 [
+    class = "simpleName";
+    label = "ignitionSource";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_66 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_66 [
+    class = "simpleName";
+    label = "HARRY_TRUMAN";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_67 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_67 [
+    class = "simpleName";
+    label = "DORIS_DAY";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_68 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_68 [
+    class = "simpleName";
+    label = "RED_CHINA";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_69 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_69 [
+    class = "simpleName";
+    label = "JOHNNIE_RAY";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_70 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_70 [
+    class = "simpleName";
+    label = "SOUTH_PACIFIC";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_71 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_71 [
+    class = "simpleName";
+    label = "WALTER_WINCHELL";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_72 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_72 [
+    class = "simpleName";
+    label = "JOE_DIMAGGO";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_73 [
+    class = "expressionStatement";
+    label = "fallthrough";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_73_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_73_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_73_7 [
+    class = "stringLiteral literal";
+    label = "\"pause for breath\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_74 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_74 [
+    class = "simpleName";
+    label = "JOE_MCCARTHY";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_75 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_75 [
+    class = "simpleName";
+    label = "RICHARD_NIXON";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_76 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_76 [
+    class = "simpleName";
+    label = "STUDEBAKER";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_77 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_77 [
+    class = "simpleName";
+    label = "TELEVISION";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_78 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_78 [
+    class = "simpleName";
+    label = "NORTH_KOREA";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_79 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_79 [
+    class = "simpleName";
+    label = "SOUTH_KOREA";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_80 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_80 [
+    class = "simpleName";
+    label = "MARILYN_MONROE";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_81 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_82 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_82_2 [
+    class = "methodInvocation";
+    label = "chorus()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_86 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_86_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_87 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_88 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_88_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_88_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_88_7 [
+    class = "stringLiteral literal";
+    label = "\"earthquake\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_90 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_90_3 [
+    class = "variableDeclarationFragment";
+    label = "MichaelStipeStreamOfConsciousnessNugget mssocn";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_90_5 [
+    class = "nullLiteral literal";
+    label = "null";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_91 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_91_3 [
+    class = "variableDeclarationFragment";
+    label = "String result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_92 [
+    class = "switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_92_2 [
+    class = "simpleName";
+    label = "mssocn";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_93 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_93 [
+    class = "simpleName";
+    label = "CONTINENTAL_DRIFT_DIVIDE";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_94 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_94 [
+    class = "simpleName";
+    label = "MOUNTAINS_SIT_IN_A_LINE";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_95 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_95_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_95_3 [
+    class = "simpleName";
+    label = "result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_95_4 [
+    class = "stringLiteral literal";
+    label = "\"geographic feature\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_96 [
+    class = "break";
+    label = "Break";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_98 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_98 [
+    class = "simpleName";
+    label = "LEONARD_BERNSTEIN";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_99 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_99 [
+    class = "simpleName";
+    label = "LEONID_BREZHNEV";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_100 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_100 [
+    class = "simpleName";
+    label = "LENNY_BRUCE";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_101 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_101 [
+    class = "simpleName";
+    label = "LESTER_BANGS";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_102 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_102_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_102_3 [
+    class = "simpleName";
+    label = "result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_102_4 [
+    class = "stringLiteral literal";
+    label = "\"someone from the 60s\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_103 [
+    class = "break";
+    label = "Break";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_105 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_105 [
+    class = "simpleName";
+    label = "BIRTHDAY_PARTY";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_106 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_106 [
+    class = "simpleName";
+    label = "CHEESECAKE";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_107 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_107 [
+    class = "simpleName";
+    label = "JELLYBEAN";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_108 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_108_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_108_3 [
+    class = "simpleName";
+    label = "result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_108_4 [
+    class = "stringLiteral literal";
+    label = "\"nostalgic childhood memory\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_110 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_110 [
+    class = "simpleName";
+    label = "BOOM";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_111 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_111_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_111_3 [
+    class = "simpleName";
+    label = "result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_111_4 [
+    class = "stringLiteral literal";
+    label = "\"the end of nostalgic childhood memories\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_113 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_113 [
+    class = "simpleName";
+    label = "YOU_SYMBIOTIC";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_114 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_114 [
+    class = "simpleName";
+    label = "PATRIOTIC";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_115 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_115 [
+    class = "simpleName";
+    label = "SLAM_BUT_NECK";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_116 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_116_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_116_3 [
+    class = "simpleName";
+    label = "result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_116_4 [
+    class = "stringLiteral literal";
+    label = "\"your guess is as good as mine\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_118 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_118 [
+    class = "simpleName";
+    label = "RIGHT";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_119 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_119 [
+    class = "simpleName";
+    label = "RIGHT_2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_120 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_120_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_120_3 [
+    class = "simpleName";
+    label = "result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_120_4 [
+    class = "stringLiteral literal";
+    label = "\"ok then\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_122 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_123 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_123_2 [
+    class = "methodInvocation";
+    label = "chorus()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_125 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_125_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_125_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_125_7 [
+    class = "stringLiteral literal";
+    label = "\"time I spent some time alone\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_54 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_84 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_126 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_52 -> s_52_3;
+  s_52_3 -> m_54;
+  s_56 -> s_56_3;
+  s_56_3 -> c_57;
+  c_57 -> s_58;
+  s_58 -> s_58_4;
+  s_58_4 -> s_58_2;
+  s_58_2 -> s_59;
+  s_59 -> s_59_4;
+  s_59_4 -> s_59_2;
+  s_59_2 -> s_60_4;
+  s_60_4 -> s_60_3;
+  s_60_3 -> s_60_5 [
+    label="true";
+  ];
+  s_60_3 -> s_60 [
+    label="false";
+  ];
+  s_60_5 -> s_60;
+  s_60 -> if_60;
+  if_60 -> s_60_6 [
+    label="Y";
+  ];
+  s_60_6 -> s_61;
+  if_60 -> s_64 [
+    label="N";
+  ];
+  s_64 -> s_64_5;
+  s_64_5 -> s_64_3;
+  s_64_3 -> s_65_2;
+  s_65_2 -> s_65;
+  s_65 -> s_66;
+  s_66 -> case_66;
+  case_66 -> s_67 [
+    label="N";
+  ];
+  s_67 -> case_67;
+  case_67 -> s_68 [
+    label="N";
+  ];
+  s_68 -> case_68;
+  case_68 -> s_69 [
+    label="N";
+  ];
+  s_69 -> case_69;
+  case_69 -> s_70 [
+    label="N";
+  ];
+  s_70 -> case_70;
+  case_70 -> s_71 [
+    label="N";
+  ];
+  s_71 -> case_71;
+  case_71 -> s_72 [
+    label="N";
+  ];
+  s_72 -> case_72;
+  case_66 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_67 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_68 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_69 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_70 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_71 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_72 -> s_73 [
+    label="Y";
+  ];
+  s_73 -> s_73_3;
+  s_73_3 -> s_73_7;
+  s_73_7 -> s_73_2;
+  case_72 -> s_74 [
+    label="N";
+  ];
+  s_74 -> case_74;
+  case_74 -> s_75 [
+    label="N";
+  ];
+  s_75 -> case_75;
+  case_75 -> s_76 [
+    label="N";
+  ];
+  s_76 -> case_76;
+  case_76 -> s_77 [
+    label="N";
+  ];
+  s_77 -> case_77;
+  case_77 -> s_78 [
+    label="N";
+  ];
+  s_78 -> case_78;
+  case_78 -> s_79 [
+    label="N";
+  ];
+  s_79 -> case_79;
+  case_79 -> s_80 [
+    label="N";
+  ];
+  s_80 -> case_80;
+  case_80 -> case_81 [
+    label="N";
+  ];
+  s_73_2 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_74 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_75 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_76 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_77 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_78 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_79 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_80 -> s_82 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_81 -> s_82 [
+    label="Y";
+  ];
+  s_82 -> s_82_2;
+  s_61 -> m_84 [
+    color = maroon;
+    xlabel = "throw";
+  ];
+  s_82_2 -> m_84;
+  s_65 -> m_84;
+  s_86 -> s_86_3;
+  s_86_3 -> c_87;
+  c_87 -> s_88;
+  s_88 -> s_88_3;
+  s_88_3 -> s_88_7;
+  s_88_7 -> s_88_2;
+  s_88_2 -> s_90;
+  s_90 -> s_90_5;
+  s_90_5 -> s_90_3;
+  s_90_3 -> s_91;
+  s_91 -> s_91_3;
+  s_91_3 -> s_92_2;
+  s_92_2 -> s_92;
+  s_92 -> s_93;
+  s_93 -> case_93;
+  case_93 -> s_94 [
+    label="N";
+  ];
+  s_94 -> case_94;
+  case_93 -> s_95 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_94 -> s_95 [
+    label="Y";
+  ];
+  s_95 -> s_95_4;
+  s_95_4 -> s_95_3;
+  s_95_3 -> s_95_2;
+  s_95_2 -> s_96;
+  case_94 -> s_98 [
+    label="N";
+  ];
+  s_98 -> case_98;
+  case_98 -> s_99 [
+    label="N";
+  ];
+  s_99 -> case_99;
+  case_99 -> s_100 [
+    label="N";
+  ];
+  s_100 -> case_100;
+  case_100 -> s_101 [
+    label="N";
+  ];
+  s_101 -> case_101;
+  case_98 -> s_102 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_99 -> s_102 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_100 -> s_102 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_101 -> s_102 [
+    label="Y";
+  ];
+  s_102 -> s_102_4;
+  s_102_4 -> s_102_3;
+  s_102_3 -> s_102_2;
+  s_102_2 -> s_103;
+  case_101 -> s_105 [
+    label="N";
+  ];
+  s_105 -> case_105;
+  case_105 -> s_106 [
+    label="N";
+  ];
+  s_106 -> case_106;
+  case_106 -> s_107 [
+    label="N";
+  ];
+  s_107 -> case_107;
+  case_105 -> s_108 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_106 -> s_108 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_107 -> s_108 [
+    label="Y";
+  ];
+  s_108 -> s_108_4;
+  s_108_4 -> s_108_3;
+  s_108_3 -> s_108_2;
+  case_107 -> s_110 [
+    label="N";
+  ];
+  s_110 -> case_110;
+  s_108_2 -> s_111 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_110 -> s_111 [
+    label="Y";
+  ];
+  s_111 -> s_111_4;
+  s_111_4 -> s_111_3;
+  s_111_3 -> s_111_2;
+  case_110 -> s_113 [
+    label="N";
+  ];
+  s_113 -> case_113;
+  case_113 -> s_114 [
+    label="N";
+  ];
+  s_114 -> case_114;
+  case_114 -> s_115 [
+    label="N";
+  ];
+  s_115 -> case_115;
+  s_111_2 -> s_116 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_113 -> s_116 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_114 -> s_116 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_115 -> s_116 [
+    label="Y";
+  ];
+  s_116 -> s_116_4;
+  s_116_4 -> s_116_3;
+  s_116_3 -> s_116_2;
+  case_115 -> s_118 [
+    label="N";
+  ];
+  s_118 -> case_118;
+  case_118 -> s_119 [
+    label="N";
+  ];
+  s_119 -> case_119;
+  s_116_2 -> s_120 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_118 -> s_120 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_119 -> s_120 [
+    label="Y";
+  ];
+  s_120 -> s_120_4;
+  s_120_4 -> s_120_3;
+  s_120_3 -> s_120_2;
+  case_119 -> case_122 [
+    label="N";
+  ];
+  s_120_2 -> s_123 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_122 -> s_123 [
+    label="Y";
+  ];
+  s_123 -> s_123_2;
+  s_96 -> s_125 [
+    label="break";
+    color = red;
+  ];
+  s_103 -> s_125 [
+    label="break";
+    color = red;
+  ];
+  s_123_2 -> s_125;
+  s_92 -> s_125;
+  s_125 -> s_125_3;
+  s_125_3 -> s_125_7;
+  s_125_7 -> s_125_2;
+  s_125_2 -> m_126;
+
+  subgraph cluster_m_52 {
+    label="method chorus";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_52; s_52_3; m_54;
+  }
+  subgraph cluster_m_56 {
+    label="method testSwitch";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_56; s_56_3; c_57; s_58; s_58_2; s_58_4; s_59; s_59_2; s_59_4; if_60; s_60; s_60_3; s_60_4; s_60_5; s_60_6; s_61; s_64; s_64_3; s_64_5; s_65; s_65_2; case_66; s_66; case_67; s_67; case_68; s_68; case_69; s_69; case_70; s_70; case_71; s_71; case_72; s_72; s_73; s_73_2; s_73_3; s_73_7; case_74; s_74; case_75; s_75; case_76; s_76; case_77; s_77; case_78; s_78; case_79; s_79; case_80; s_80; case_81; s_82; s_82_2; m_84;
+  }
+  subgraph cluster_m_86 {
+    label="method testSwitch2";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_86; s_86_3; c_87; s_88; s_88_2; s_88_3; s_88_7; s_90; s_90_3; s_90_5; s_91; s_91_3; s_92; s_92_2; case_93; s_93; case_94; s_94; s_95; s_95_2; s_95_3; s_95_4; s_96; case_98; s_98; case_99; s_99; case_100; s_100; case_101; s_101; s_102; s_102_2; s_102_3; s_102_4; s_103; case_105; s_105; case_106; s_106; case_107; s_107; s_108; s_108_2; s_108_3; s_108_4; case_110; s_110; s_111; s_111_2; s_111_3; s_111_4; case_113; s_113; case_114; s_114; case_115; s_115; s_116; s_116_2; s_116_3; s_116_4; case_118; s_118; case_119; s_119; s_120; s_120_2; s_120_3; s_120_4; case_122; s_123; s_123_2; s_125; s_125_2; s_125_3; s_125_7; m_126;
+  }
+}
+

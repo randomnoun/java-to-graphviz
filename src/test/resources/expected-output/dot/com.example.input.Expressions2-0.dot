@@ -1,0 +1,180 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_8 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean x";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_4 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_11_5 [
+    class = "booleanLiteral literal";
+    label = "true";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_6 [
+    class = "booleanLiteral literal";
+    label = "false";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_2 [
+    class = "variableDeclarationFragment";
+    label = "char ch";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_4 [
+    class = "infixExpression";
+    label = "+";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_5 [
+    class = "characterLiteral literal";
+    label = "'a'";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_12_6 [
+    class = "characterLiteral literal";
+    label = "'b'";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_2 [
+    class = "variableDeclarationFragment";
+    label = "int i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_4 [
+    class = "numberLiteral literal";
+    label = "123";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_3 [
+    class = "variableDeclarationFragment";
+    label = "String s";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_5 [
+    class = "stringLiteral literal";
+    label = "\"123\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_3 [
+    class = "variableDeclarationFragment";
+    label = "Class c";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_5 [
+    class = "typeLiteral literal";
+    label = "String.class";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_17 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_8 -> s_8_3;
+  s_8_3 -> s_11;
+  s_11 -> s_11_5;
+  s_11_5 -> s_11_4;
+  s_11_4 -> s_11_6 [
+    label="false";
+  ];
+  s_11_4 -> s_11_2 [
+    label="true";
+  ];
+  s_11_6 -> s_11_2;
+  s_11_2 -> s_12;
+  s_12 -> s_12_5;
+  s_12_5 -> s_12_6;
+  s_12_6 -> s_12_4;
+  s_12_4 -> s_12_2;
+  s_12_2 -> s_13;
+  s_13 -> s_13_4;
+  s_13_4 -> s_13_2;
+  s_13_2 -> s_14;
+  s_14 -> s_14_5;
+  s_14_5 -> s_14_3;
+  s_14_3 -> s_15;
+  s_15 -> s_15_5;
+  s_15_5 -> s_15_3;
+  s_15_3 -> m_17;
+
+  subgraph cluster_m_8 {
+    label="method testExpressions";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_8; s_8_3; s_11; s_11_2; s_11_4; s_11_5; s_11_6; s_12; s_12_2; s_12_4; s_12_5; s_12_6; s_13; s_13_2; s_13_4; s_14; s_14_3; s_14_5; s_15; s_15_3; s_15_5; m_17;
+  }
+}
+

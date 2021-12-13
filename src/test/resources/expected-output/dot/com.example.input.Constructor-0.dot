@@ -1,0 +1,297 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_10 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_3 [
+    class = "fieldAccess";
+    label = "field i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_4 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_11_6 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_8 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14 [
+    class = "constructorInvocation";
+    label = "this()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_2 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_3 [
+    class = "fieldAccess";
+    label = "field i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_4 [
+    class = "thisExpression";
+    label = "this";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_6 [
+    class = "infixExpression";
+    label = "*";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_7 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_8 [
+    class = "simpleName";
+    label = "factor";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_6 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21 [
+    class = "superConstructorInvocation";
+    label = "super()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_2 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_21_3 [
+    class = "numberLiteral literal";
+    label = "3";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 [
+    class = "variableDeclarationFragment";
+    label = "MyNumber a";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_5 [
+    class = "classInstanceCreation";
+    label = "new MyNumber()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_7 [
+    class = "numberLiteral literal";
+    label = "3L";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28_3 [
+    class = "variableDeclarationFragment";
+    label = "TripleNumber b";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28_5 [
+    class = "classInstanceCreation";
+    label = "new TripleNumber()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28_7 [
+    class = "numberLiteral literal";
+    label = "1L";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_12 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_16 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_22 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_29 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10 -> s_10_6;
+  s_10_6 -> s_11;
+  s_11 -> s_11_6;
+  s_11_6 -> s_11_4;
+  s_11_4 -> s_11_3;
+  s_11_3 -> s_11_2;
+  s_11_2 -> m_12;
+  s_13 -> s_13_8;
+  s_13_8 -> s_14_2;
+  s_14_2 -> s_14;
+  s_14 -> s_15;
+  s_15 -> s_15_7;
+  s_15_7 -> s_15_8;
+  s_15_8 -> s_15_6;
+  s_15_6 -> s_15_4;
+  s_15_4 -> s_15_3;
+  s_15_3 -> s_15_2;
+  s_15_2 -> m_16;
+  s_20 -> s_20_6;
+  s_20_6 -> s_21_2;
+  s_21_2 -> s_21_3;
+  s_21_3 -> s_21;
+  s_21 -> m_22;
+  s_25 -> s_25_3;
+  s_25_3 -> s_27;
+  s_27 -> s_27_7;
+  s_27_7 -> s_27_5;
+  s_27_5 -> s_27_3;
+  s_27_3 -> s_28;
+  s_28 -> s_28_7;
+  s_28_7 -> s_28_5;
+  s_28_5 -> s_28_3;
+  s_28_3 -> m_29;
+
+  subgraph cluster_m_10 {
+    label="method MyNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_10; s_10_6; s_11; s_11_2; s_11_3; s_11_4; s_11_6; m_12;
+  }
+  subgraph cluster_m_13 {
+    label="method MyNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_13; s_13_8; s_14; s_14_2; s_15; s_15_2; s_15_3; s_15_4; s_15_6; s_15_7; s_15_8; m_16;
+  }
+  subgraph cluster_m_20 {
+    label="method TripleNumber";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_20; s_20_6; s_21; s_21_2; s_21_3; m_22;
+  }
+  subgraph cluster_m_25 {
+    label="method testConstructors";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_25; s_25_3; s_27; s_27_3; s_27_5; s_27_7; s_28; s_28_3; s_28_5; s_28_7; m_29;
+  }
+}
+

@@ -1,0 +1,260 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  for_19 [
+    class = "for";
+    label = "for";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_21 [
+    class = "centralSwitch switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_29 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_41 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_45 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  do_66 [
+    class = "do";
+    label = " Do";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  for_67 [
+    class = "for";
+    label = "for";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  while_70 [
+    class = "while";
+    label = " While";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_71 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_75 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_77 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_79 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_83 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_85 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_87_2 [
+    class = "assignment";
+    label = "=";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_95 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  m_55 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  for_19 -> s_21 [
+    label="Y";
+  ];
+  do_66 -> for_67 [
+    label="do";
+    style = dashed;
+  ];
+  s_21 -> m_55 [
+    label="default";
+    color = maroon;
+  ];
+  for_67 -> do_66;
+  s_21 -> if_29 [
+    label="case";
+  ];
+  s_21 -> if_41 [
+    label="N";
+    color = red;
+  ];
+  if_29 -> if_41 [
+    label="fallthrough";
+    color = red;
+  ];
+  for_19 -> m_55 [
+    label="N";
+  ];
+  if_29 -> m_55 [
+    label="N";
+    color = red;
+  ];
+  if_41 -> if_45 [
+    label="N";
+  ];
+  if_41 -> for_19 [
+    label="Y";
+    color = red;
+    style = dashed;
+  ];
+  s_87_2 -> while_70 [
+    label="while";
+    style = dashed;
+  ];
+  if_85 -> while_70 [
+    label="while";
+    style = dashed;
+  ];
+  for_67 -> while_70 [
+    label="Y";
+  ];
+  if_45 -> m_55 [
+    label="N";
+    color = red;
+  ];
+  if_45 -> for_19 [
+    label="N";
+    style = dashed;
+  ];
+  while_70 -> if_71 [
+    label="Y";
+  ];
+  s_87_2 -> for_67 [
+    label="for";
+    style = dashed;
+  ];
+  if_85 -> for_67 [
+    label="N";
+    style = dashed;
+  ];
+  while_70 -> for_67 [
+    label="N";
+    style = dashed;
+  ];
+  if_71 -> if_75 [
+    label="N";
+  ];
+  if_75 -> if_77 [
+    label="N";
+  ];
+  do_66 -> if_95 [
+    label="N";
+  ];
+  if_75 -> for_67 [
+    label="Y";
+    color = red;
+    style = dashed;
+  ];
+  if_77 -> if_79 [
+    label="N";
+  ];
+  if_77 -> do_66 [
+    label="Y";
+    color = red;
+  ];
+  if_79 -> if_83 [
+    label="N";
+  ];
+  if_83 -> if_85 [
+    label="N";
+  ];
+  if_71 -> while_70 [
+    label="Y";
+    color = red;
+    style = dashed;
+  ];
+  if_83 -> if_95 [
+    label="N";
+    color = red;
+  ];
+  if_79 -> for_67 [
+    label="Y";
+    color = red;
+    style = dashed;
+  ];
+  if_85 -> s_87_2 [
+    label="Y";
+  ];
+
+  subgraph cluster_m_11 {
+    label="method testAmenBreak";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    for_19; s_21; if_29; if_41; if_45; m_55;
+  }
+  subgraph cluster_m_57 {
+    label="method testWhile";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    do_66; for_67; while_70; if_71; if_75; if_77; if_79; if_83; if_85; s_87_2; if_95;
+  }
+}
+

@@ -1,0 +1,106 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_10_4 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_13_7 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_14_7 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_15_7 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_15_9 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_13_11 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_14_11 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  m_25 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_10_4 -> s_13_7 [
+    label="true";
+  ];
+  s_13_7 -> s_13_11 [
+    label="false";
+  ];
+  s_13_11 -> s_14_7 [
+    label="true";
+  ];
+  s_13_7 -> s_14_7 [
+    label="true";
+  ];
+  s_14_7 -> s_14_11 [
+    label="true";
+  ];
+  s_14_11 -> s_15_7 [
+    label="false";
+  ];
+  s_14_7 -> s_15_7 [
+    label="false";
+  ];
+  s_15_7 -> s_15_9 [
+    label="false";
+  ];
+  s_15_7 -> m_25 [
+    label="true";
+  ];
+  s_15_9 -> m_25 [
+    label="false";
+  ];
+
+  subgraph cluster_m_8 {
+    label="method testExpressions";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_10_4; s_13_7; s_13_11; s_14_7; s_14_11; s_15_7; s_15_9; m_25;
+  }
+}
+

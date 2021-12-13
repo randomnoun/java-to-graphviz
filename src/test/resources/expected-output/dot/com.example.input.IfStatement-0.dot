@@ -1,0 +1,459 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_22 [
+    class = "methodDeclaration";
+    label = "comment just before the method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_23 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean iThink";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_4 [
+    class = "booleanLiteral literal";
+    label = "false";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_25 [
+    class = "if";
+    label = " This is a reasonably\nlong comment to see how\nwordwrap works";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_25 [
+    class = "simpleName";
+    label = "iThink";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_2 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+   EXISTENCE_CONFIRMED  [
+    class = "expressionStatement state";
+    label = "EXISTENCE_CONFIRMED";
+    fillcolor = white;
+    color = red;
+    style = filled;
+    fontname = "Courier New";
+  ];
+  s_26 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_2 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_6 [
+    class = "stringLiteral literal";
+    label = "\"I am\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30 [
+    class = "methodDeclaration";
+    label = "comment on the method line";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_30_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_31 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean toBe";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32_4 [
+    class = "booleanLiteral literal";
+    label = "false";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_33 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_33 [
+    class = "simpleName";
+    label = "toBe";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33_2 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_7 [
+    class = "stringLiteral literal";
+    label = "\"that is the question\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_35 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_35 [
+    class = "prefixExpression";
+    label = "prefixOp !";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35_2 [
+    class = "simpleName";
+    label = "toBe";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_7 [
+    class = "stringLiteral literal";
+    label = "\"that is another question\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean youWantMyBody";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_4 [
+    class = "booleanLiteral literal";
+    label = "false";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_2 [
+    class = "variableDeclarationFragment";
+    label = "boolean youThinkImSexy";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_4 [
+    class = "booleanLiteral literal";
+    label = "false";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_44 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_44 [
+    class = "simpleName";
+    label = "youWantMyBody";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_44_2 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_45 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_45 [
+    class = "simpleName";
+    label = "youThinkImSexy";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45_2 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_46 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_46_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_46_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_46_7 [
+    class = "stringLiteral literal";
+    label = "\"come on baby let me know\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_28 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_38 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_49 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_22 -> s_22_3;
+  s_22_3 -> c_23;
+  c_23 -> s_24;
+  s_24 -> s_24_4;
+  s_24_4 -> s_24_2;
+  s_24_2 -> s_25;
+  s_25 -> if_25;
+  if_25 -> s_25_2 [
+    label="Y";
+    shape = diamond;
+  ];
+  s_25_2 ->  EXISTENCE_CONFIRMED ;
+   EXISTENCE_CONFIRMED  -> s_26_2;
+  s_26_2 -> s_26_6;
+  s_26_6 -> s_26;
+  s_26 -> m_28;
+  if_25 -> m_28 [
+    label="N";
+    shape = diamond;
+  ];
+  s_30 -> s_30_3;
+  s_30_3 -> c_31;
+  c_31 -> s_32;
+  s_32 -> s_32_4;
+  s_32_4 -> s_32_2;
+  s_32_2 -> s_33;
+  s_33 -> if_33;
+  if_33 -> s_33_2 [
+    label="Y";
+    shape = diamond;
+  ];
+  if_33 -> s_35_2 [
+    label="N";
+    shape = diamond;
+  ];
+  s_33_2 -> s_34;
+  s_34 -> s_34_3;
+  s_34_3 -> s_34_7;
+  s_34_7 -> s_34_2;
+  s_35_2 -> s_35;
+  s_35 -> if_35;
+  if_35 -> s_35_3 [
+    label="Y";
+    shape = diamond;
+  ];
+  s_35_3 -> s_36;
+  s_36 -> s_36_3;
+  s_36_3 -> s_36_7;
+  s_36_7 -> s_36_2;
+  s_34_2 -> m_38;
+  s_36_2 -> m_38;
+  if_35 -> m_38 [
+    label="N";
+    shape = diamond;
+  ];
+  s_40 -> s_40_3;
+  s_40_3 -> s_42;
+  s_42 -> s_42_4;
+  s_42_4 -> s_42_2;
+  s_42_2 -> s_43;
+  s_43 -> s_43_4;
+  s_43_4 -> s_43_2;
+  s_43_2 -> s_44;
+  s_44 -> if_44;
+  if_44 -> s_44_2 [
+    label="Y";
+    shape = diamond;
+  ];
+  s_44_2 -> s_45;
+  s_45 -> if_45;
+  if_45 -> s_45_2 [
+    label="Y";
+    shape = diamond;
+  ];
+  s_45_2 -> s_46;
+  s_46 -> s_46_3;
+  s_46_3 -> s_46_7;
+  s_46_7 -> s_46_2;
+  s_46_2 -> m_49;
+  if_45 -> m_49 [
+    label="N";
+    shape = diamond;
+  ];
+  if_44 -> m_49 [
+    label="N";
+    shape = diamond;
+  ];
+
+  subgraph cluster_m_22 {
+    label="method testIf";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_22; s_22_3; c_23; s_24; s_24_2; s_24_4; if_25; s_25; s_25_2;  EXISTENCE_CONFIRMED ; s_26; s_26_2; s_26_6; m_28;
+  }
+  subgraph cluster_m_30 {
+    label="method testIfElse";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_30; s_30_3; c_31; s_32; s_32_2; s_32_4; if_33; s_33; s_33_2; s_34; s_34_2; s_34_3; s_34_7; if_35; s_35; s_35_2; s_35_3; s_36; s_36_2; s_36_3; s_36_7; m_38;
+  }
+  subgraph cluster_m_40 {
+    label="method testNestedIf";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_40; s_40_3; s_42; s_42_2; s_42_4; s_43; s_43_2; s_43_4; if_44; s_44; s_44_2; if_45; s_45; s_45_2; s_46; s_46_2; s_46_3; s_46_7; m_49;
+  }
+}
+

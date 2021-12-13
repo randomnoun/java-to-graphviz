@@ -1,0 +1,743 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_13 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_5 [
+    class = "variableDeclarationFragment";
+    label = "Function<String,Integer> toInteger";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_7 [
+    class = "lambdaExpression";
+    label = "LambdaExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_14_11 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_2 [
+    class = "methodInvocation";
+    label = "parseInt()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_3 [
+    class = "simpleName";
+    label = "Integer";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_15_5 [
+    class = "simpleName";
+    label = "a";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_5 [
+    class = "variableDeclarationFragment";
+    label = "Function<Integer,Integer> addOne";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_7 [
+    class = "lambdaExpression";
+    label = "LambdaExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_10 [
+    class = "infixExpression";
+    label = "+";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_11 [
+    class = "simpleName";
+    label = "i";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_12 [
+    class = "numberLiteral literal";
+    label = "1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_2 [
+    class = "variableDeclarationFragment";
+    label = "int result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_4 [
+    class = "methodInvocation";
+    label = "apply()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_5 [
+    class = "methodInvocation";
+    label = "andThen()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_6 [
+    class = "simpleName";
+    label = "toInteger";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_8 [
+    class = "simpleName";
+    label = "addOne";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_10 [
+    class = "stringLiteral literal";
+    label = "\"eleven\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_20_7 [
+    class = "simpleName";
+    label = "result";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_23 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_23_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_5 [
+    class = "variableDeclarationFragment";
+    label = "BiConsumer<String,Integer> bc";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_7 [
+    class = "lambdaExpression";
+    label = "LambdaExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_24_14 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_7 [
+    class = "infixExpression";
+    label = "+";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_8 [
+    class = "stringLiteral literal";
+    label = "\"consumed \"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_25_9 [
+    class = "simpleName";
+    label = "a";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_7 [
+    class = "infixExpression";
+    label = "+";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_8 [
+    class = "stringLiteral literal";
+    label = "\"consumed \"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_26_9 [
+    class = "simpleName";
+    label = "b";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_7 [
+    class = "stringLiteral literal";
+    label = "\"*burp*\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29_2 [
+    class = "methodInvocation";
+    label = "accept()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29_3 [
+    class = "simpleName";
+    label = "bc";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29_5 [
+    class = "stringLiteral literal";
+    label = "\"one\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_29_6 [
+    class = "numberLiteral literal";
+    label = "23";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33_4 [
+    class = "variableDeclarationFragment";
+    label = "Supplier<String> stringSupplier";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33_6 [
+    class = "lambdaExpression";
+    label = "LambdaExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_33_7 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34 [
+    class = "return";
+    label = "Return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_34_2 [
+    class = "stringLiteral literal";
+    label = "\"everybody loves string\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_3 [
+    class = "variableDeclarationFragment";
+    label = "String s";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_5 [
+    class = "methodInvocation";
+    label = "get()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36_6 [
+    class = "simpleName";
+    label = "stringSupplier";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_39 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_39_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40 [
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_4 [
+    class = "variableDeclarationFragment";
+    label = "Predicate<String> isEven";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_6 [
+    class = "lambdaExpression";
+    label = "LambdaExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_10 [
+    class = "infixExpression";
+    label = "==";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_11 [
+    class = "infixExpression";
+    label = "%";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_12 [
+    class = "methodInvocation";
+    label = "length()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_13 [
+    class = "simpleName";
+    label = "s";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_15 [
+    class = "numberLiteral literal";
+    label = "2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_16 [
+    class = "numberLiteral literal";
+    label = "0";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_3 [
+    class = "qualifiedName";
+    label = "System.out";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_7 [
+    class = "methodInvocation";
+    label = "test()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_8 [
+    class = "simpleName";
+    label = "isEven";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_10 [
+    class = "stringLiteral literal";
+    label = "\"eleven\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_16 [
+    class = "lambdaExpression end";
+    label = "lambdaExpressionEnd";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_17_13 [
+    class = "lambdaExpression end";
+    label = "lambdaExpressionEnd";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_21 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_28 [
+    class = "lambdaExpression end";
+    label = "lambdaExpressionEnd";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_30 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35 [
+    class = "lambdaExpression end";
+    label = "lambdaExpressionEnd";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_37 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_17 [
+    class = "lambdaExpression end";
+    label = "lambdaExpressionEnd";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_42 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13 -> s_13_3;
+  s_13_3 -> s_14;
+  s_14 -> s_14_7 [
+    lhead = cluster_lambda_14;
+  ];
+  s_14_7 -> s_14_11;
+  s_14_11 -> s_15_3;
+  s_15_3 -> s_15_5;
+  s_15_5 -> s_15_2;
+  s_15_2 -> s_15;
+  s_15 -> s_16 [
+    label="return";
+    color = blue;
+  ];
+  s_16 -> s_14_5 [
+    ltail = cluster_lambda_14;
+  ];
+  s_14_5 -> s_17;
+  s_17 -> s_17_7 [
+    lhead = cluster_lambda_17;
+  ];
+  s_17_7 -> s_17_11;
+  s_17_11 -> s_17_12;
+  s_17_12 -> s_17_10;
+  s_17_10 -> s_17_13;
+  s_17_13 -> s_17_5 [
+    ltail = cluster_lambda_17;
+  ];
+  s_17_5 -> s_19;
+  s_19 -> s_19_6;
+  s_19_6 -> s_19_8;
+  s_19_8 -> s_19_5;
+  s_19_5 -> s_19_10;
+  s_19_10 -> s_19_4;
+  s_19_4 -> s_19_2;
+  s_19_2 -> s_20;
+  s_20 -> s_20_3;
+  s_20_3 -> s_20_7;
+  s_20_7 -> s_20_2;
+  s_20_2 -> m_21;
+  s_23 -> s_23_3;
+  s_23_3 -> s_24;
+  s_24 -> s_24_7 [
+    lhead = cluster_lambda_24;
+  ];
+  s_24_7 -> s_24_14;
+  s_24_14 -> s_25;
+  s_25 -> s_25_3;
+  s_25_3 -> s_25_8;
+  s_25_8 -> s_25_9;
+  s_25_9 -> s_25_7;
+  s_25_7 -> s_25_2;
+  s_25_2 -> s_26;
+  s_26 -> s_26_3;
+  s_26_3 -> s_26_8;
+  s_26_8 -> s_26_9;
+  s_26_9 -> s_26_7;
+  s_26_7 -> s_26_2;
+  s_26_2 -> s_27;
+  s_27 -> s_27_3;
+  s_27_3 -> s_27_7;
+  s_27_7 -> s_27_2;
+  s_27_2 -> s_28;
+  s_28 -> s_24_5 [
+    ltail = cluster_lambda_24;
+  ];
+  s_24_5 -> s_29;
+  s_29 -> s_29_3;
+  s_29_3 -> s_29_5;
+  s_29_5 -> s_29_6;
+  s_29_6 -> s_29_2;
+  s_29_2 -> m_30;
+  s_32 -> s_32_3;
+  s_32_3 -> s_33;
+  s_33 -> s_33_6 [
+    lhead = cluster_lambda_33;
+  ];
+  s_33_6 -> s_33_7;
+  s_33_7 -> s_34_2;
+  s_34_2 -> s_34;
+  s_34 -> s_35 [
+    label="return";
+    color = blue;
+  ];
+  s_35 -> s_33_4 [
+    ltail = cluster_lambda_33;
+  ];
+  s_33_4 -> s_36;
+  s_36 -> s_36_6;
+  s_36_6 -> s_36_5;
+  s_36_5 -> s_36_3;
+  s_36_3 -> m_37;
+  s_39 -> s_39_3;
+  s_39_3 -> s_40;
+  s_40 -> s_40_6 [
+    lhead = cluster_lambda_40;
+  ];
+  s_40_6 -> s_40_13;
+  s_40_13 -> s_40_12;
+  s_40_12 -> s_40_15;
+  s_40_15 -> s_40_11;
+  s_40_11 -> s_40_16;
+  s_40_16 -> s_40_10;
+  s_40_10 -> s_40_17;
+  s_40_17 -> s_40_4 [
+    ltail = cluster_lambda_40;
+  ];
+  s_40_4 -> s_41;
+  s_41 -> s_41_3;
+  s_41_3 -> s_41_8;
+  s_41_8 -> s_41_10;
+  s_41_10 -> s_41_7;
+  s_41_7 -> s_41_2;
+  s_41_2 -> m_42;
+
+  subgraph cluster_m_13 {
+    label="method testFunction";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_13; s_13_3; s_14; s_14_5; s_17; s_17_5; s_19; s_19_2; s_19_4; s_19_5; s_19_6; s_19_8; s_19_10; s_20; s_20_2; s_20_3; s_20_7; m_21;
+    subgraph cluster_lambda_14 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_14_7; s_14_11; s_15; s_15_2; s_15_3; s_15_5; s_16;
+    }
+    subgraph cluster_lambda_17 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_17_7; s_17_10; s_17_11; s_17_12; s_17_13;
+    }
+  }
+  subgraph cluster_m_23 {
+    label="method testBiConsumer";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_23; s_23_3; s_24; s_24_5; s_29; s_29_2; s_29_3; s_29_5; s_29_6; m_30;
+    subgraph cluster_lambda_24 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_24_7; s_24_14; s_25; s_25_2; s_25_3; s_25_7; s_25_8; s_25_9; s_26; s_26_2; s_26_3; s_26_7; s_26_8; s_26_9; s_27; s_27_2; s_27_3; s_27_7; s_28;
+    }
+  }
+  subgraph cluster_m_32 {
+    label="method testProducer";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_32; s_32_3; s_33; s_33_4; s_36; s_36_3; s_36_5; s_36_6; m_37;
+    subgraph cluster_lambda_33 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_33_6; s_33_7; s_34; s_34_2; s_35;
+    }
+  }
+  subgraph cluster_m_39 {
+    label="method testPredicate";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_39; s_39_3; s_40; s_40_4; s_41; s_41_2; s_41_3; s_41_7; s_41_8; s_41_10; m_42;
+    subgraph cluster_lambda_40 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+      s_40_6; s_40_10; s_40_11; s_40_12; s_40_13; s_40_15; s_40_16; s_40_17;
+    }
+  }
+}
+

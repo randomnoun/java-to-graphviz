@@ -1,0 +1,52 @@
+digraph G_14 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_162 [
+    class = "expressionStatement";
+    label = "the beginning";
+    fillcolor = grey;
+    style = filled;
+  ];
+  s_163 [
+    class = "expressionStatement something";
+    label = "well hello there";
+    fillcolor = white;
+    color = red;
+    style = filled;
+  ];
+  s_164 [
+    class = "special expressionStatement something";
+    label = "well hello there again";
+    fillcolor = white;
+    color = green;
+    style = filled;
+  ];
+  unique [
+    class = "expressionStatement something";
+    label = "righteo then";
+    fillcolor = white;
+    color = red;
+    shape = hexagon;
+    style = filled;
+  ];
+  s_162 -> s_163;
+  s_163 -> s_164;
+  s_164 -> unique;
+
+  subgraph cluster_m_161 {
+    label="method example3";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_162; s_163; s_164; unique;
+  }
+}
+

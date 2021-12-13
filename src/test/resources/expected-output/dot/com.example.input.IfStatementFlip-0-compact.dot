@@ -1,0 +1,59 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  c_22 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_25 [
+    class = "comment";
+    label = "user login tests";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_27 [
+    class = "if";
+    label = " null user ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  c_33 [
+    class = "comment";
+    label = "the exact same test but labelled differently";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_35 [
+    class = "flipYn if";
+    label = " logged in ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  c_22 -> c_25;
+  c_25 -> if_27;
+  if_27 -> c_33 [
+    label="Yes";
+  ];
+  c_33 -> if_35;
+
+  subgraph cluster_m_21 {
+    label="method testIf";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_22; c_25; if_27; c_33; if_35;
+  }
+}
+

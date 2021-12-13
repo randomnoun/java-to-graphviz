@@ -1,0 +1,510 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  c_57 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_60 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_60_3 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_65 [
+    class = "switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_66 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_67 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_68 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_69 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_70 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_71 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_72 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_73 [
+    class = "expressionStatement";
+    label = "fallthrough";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_74 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_75 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_76 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_77 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_78 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_79 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_80 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  c_87 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_92 [
+    class = "switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_93 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_94 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_98 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_99 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_100 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_101 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_105 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_106 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_107 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_110 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_113 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_114 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_115 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_118 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_119 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  m_84 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_126 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_66 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_67 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_68 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_69 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_70 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_71 -> s_73 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_72 -> s_73 [
+    label="Y";
+  ];
+  s_65 -> m_84;
+  c_57 -> s_60_3;
+  s_60_3 -> if_60 [
+    label="false";
+  ];
+  c_87 -> s_92;
+  if_60 -> m_84 [
+    label="Y";
+    color = maroon;
+  ];
+  s_92 -> case_93;
+  if_60 -> s_65 [
+    label="N";
+  ];
+  case_93 -> case_94 [
+    label="N";
+  ];
+  s_92 -> m_126;
+  s_65 -> case_66;
+  case_94 -> case_98 [
+    label="N";
+  ];
+  case_66 -> case_67 [
+    label="N";
+  ];
+  case_98 -> case_99 [
+    label="N";
+  ];
+  case_93 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_94 -> m_126 [
+    label="Y";
+    color = red;
+  ];
+  case_67 -> case_68 [
+    label="N";
+  ];
+  case_99 -> case_100 [
+    label="N";
+  ];
+  case_68 -> case_69 [
+    label="N";
+  ];
+  case_100 -> case_101 [
+    label="N";
+  ];
+  case_98 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_99 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_100 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_101 -> m_126 [
+    label="Y";
+    color = red;
+  ];
+  case_74 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_75 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_76 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_77 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_78 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_79 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_80 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  s_73 -> m_84 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_69 -> case_70 [
+    label="N";
+  ];
+  case_101 -> case_105 [
+    label="N";
+  ];
+  case_70 -> case_71 [
+    label="N";
+  ];
+  case_105 -> case_106 [
+    label="N";
+  ];
+  case_71 -> case_72 [
+    label="N";
+  ];
+  case_106 -> case_107 [
+    label="N";
+  ];
+  case_72 -> case_74 [
+    label="N";
+  ];
+  case_107 -> case_110 [
+    label="N";
+  ];
+  case_74 -> case_75 [
+    label="N";
+  ];
+  case_110 -> case_113 [
+    label="N";
+  ];
+  case_75 -> case_76 [
+    label="N";
+  ];
+  case_113 -> case_114 [
+    label="N";
+  ];
+  case_76 -> case_77 [
+    label="N";
+  ];
+  case_114 -> case_115 [
+    label="N";
+  ];
+  case_77 -> case_78 [
+    label="N";
+  ];
+  case_115 -> case_118 [
+    label="N";
+  ];
+  case_78 -> case_79 [
+    label="N";
+  ];
+  case_118 -> case_119 [
+    label="N";
+  ];
+  case_79 -> case_80 [
+    label="N";
+  ];
+  case_118 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_119 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_113 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_114 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_115 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_110 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_105 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_106 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+  case_107 -> m_126 [
+    label="fallthrough";
+    color = red;
+  ];
+
+  subgraph cluster_m_52 {
+    label="method chorus";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_56 {
+    label="method testSwitch";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_57; if_60; s_60_3; s_65; case_66; case_67; case_68; case_69; case_70; case_71; case_72; s_73; case_74; case_75; case_76; case_77; case_78; case_79; case_80; m_84;
+  }
+  subgraph cluster_m_86 {
+    label="method testSwitch2";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_87; s_92; case_93; case_94; case_98; case_99; case_100; case_101; case_105; case_106; case_107; case_110; case_113; case_114; case_115; case_118; case_119; m_126;
+  }
+}
+

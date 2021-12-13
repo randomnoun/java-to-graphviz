@@ -1,0 +1,69 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_19_7 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_19_12 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_19_16 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_19_7 -> s_19_12 [
+    label="Y";
+  ];
+  s_19_12 -> s_19_16 [
+    label="false";
+  ];
+
+  subgraph cluster_m_8 {
+    label="method a";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_9 {
+    label="method b";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_10 {
+    label="method c";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_12 {
+    label="method testExpressions";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_19_7; s_19_12; s_19_16;
+  }
+}
+

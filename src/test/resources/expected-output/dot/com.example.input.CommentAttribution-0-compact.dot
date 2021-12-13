@@ -1,0 +1,153 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_27_3 [
+    class = "block";
+    label = "27 (Block)";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_28 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_30 [
+    class = "comment";
+    label = "this comment has it's own node";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_32 [
+    class = "expressionStatement";
+    label = "this comment is for s1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_35 [
+    class = "expressionStatement";
+    label = "this comment is for s2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_36 [
+    class = "expressionStatement";
+    label = "this comment is for s3";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_39 [
+    class = "expressionStatement";
+    label = "this comment is for s4 OR IS IT";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_39_8 [
+    class = "expressionStatement";
+    label = "39 (ExpressionStatement)";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40 [
+    class = "expressionStatement";
+    label = "40 (ExpressionStatement)";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_40_8 [
+    class = "expressionStatement";
+    label = "this comment is for s7";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41 [
+    class = "expressionStatement";
+    label = "this comment is for s8";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_41_8 [
+    class = "expressionStatement";
+    label = "41 (ExpressionStatement)";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42 [
+    class = "expressionStatement";
+    label = "this comment is for s9";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_42_8 [
+    class = "expressionStatement";
+    label = "42 (ExpressionStatement)";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43 [
+    class = "expressionStatement";
+    label = "43 (ExpressionStatement)";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_43_8 [
+    class = "expressionStatement";
+    label = "this comment is for s12";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45 [
+    class = "expressionStatement";
+    label = "this comment is for s13";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45_2 [
+    class = "methodInvocation";
+    label = "this comment is for s14 OR IS IT";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_45_8 [
+    class = "expressionStatement";
+    label = "45 (ExpressionStatement)";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_27_3 -> c_28;
+  c_28 -> c_30;
+  c_30 -> s_32;
+  s_45_2 -> s_45_8;
+  s_32 -> s_35;
+  s_35 -> s_36;
+  s_36 -> s_39;
+  s_39 -> s_39_8;
+  s_39_8 -> s_40;
+  s_40 -> s_40_8;
+  s_40_8 -> s_41;
+  s_41 -> s_41_8;
+  s_41_8 -> s_42;
+  s_42 -> s_42_8;
+  s_42_8 -> s_43;
+  s_43 -> s_43_8;
+  s_43_8 -> s_45;
+  s_45 -> s_45_2;
+
+  subgraph cluster_m_27 {
+    label="method testAttribution";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_27_3; c_28; c_30; s_32; s_35; s_36; s_39; s_39_8; s_40; s_40_8; s_41; s_41_8; s_42; s_42_8; s_43; s_43_8; s_45; s_45_2; s_45_8;
+  }
+}
+

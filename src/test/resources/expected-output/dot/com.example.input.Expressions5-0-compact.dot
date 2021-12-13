@@ -1,0 +1,77 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+
+  subgraph cluster_m_13 {
+    label="method testFunction";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_lambda_14 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+    subgraph cluster_lambda_17 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+  }
+  subgraph cluster_m_23 {
+    label="method testBiConsumer";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_lambda_24 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+  }
+  subgraph cluster_m_32 {
+    label="method testProducer";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_lambda_33 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+  }
+  subgraph cluster_m_39 {
+    label="method testPredicate";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_lambda_40 {
+      label="lambda";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+  }
+}
+

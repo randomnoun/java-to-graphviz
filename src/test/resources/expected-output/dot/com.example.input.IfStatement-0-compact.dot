@@ -1,0 +1,150 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  c_23 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_25 [
+    class = "if";
+    label = " This is a reasonably\nlong comment to see how\nwordwrap works";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+   EXISTENCE_CONFIRMED  [
+    class = "expressionStatement state";
+    label = "EXISTENCE_CONFIRMED";
+    fillcolor = white;
+    color = red;
+    style = filled;
+    fontname = "Courier New";
+  ];
+  s_30 [
+    class = "methodDeclaration";
+    label = "comment on the method line";
+    fillcolor = white;
+    style = filled;
+  ];
+  c_31 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_33 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_35 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_44 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  if_45 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  m_28 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_38 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  m_49 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_25 -> m_28 [
+    label="N";
+    shape = diamond;
+  ];
+  if_35 -> m_38 [
+    label="N";
+    shape = diamond;
+  ];
+  if_45 -> m_49 [
+    label="N";
+    shape = diamond;
+  ];
+  if_44 -> m_49 [
+    label="N";
+    shape = diamond;
+  ];
+  s_30 -> c_31;
+  c_23 -> if_25;
+  c_31 -> if_33;
+  if_25 ->  EXISTENCE_CONFIRMED  [
+    label="Y";
+    shape = diamond;
+  ];
+  if_33 -> if_35 [
+    label="N";
+    shape = diamond;
+  ];
+  if_44 -> if_45 [
+    label="Y";
+    shape = diamond;
+  ];
+   EXISTENCE_CONFIRMED  -> m_28;
+  if_33 -> m_38 [
+    label="Y";
+    shape = diamond;
+  ];
+
+  subgraph cluster_m_22 {
+    label="method testIf";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_23; if_25;  EXISTENCE_CONFIRMED ; m_28;
+  }
+  subgraph cluster_m_30 {
+    label="method testIfElse";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    s_30; c_31; if_33; if_35; m_38;
+  }
+  subgraph cluster_m_40 {
+    label="method testNestedIf";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    if_44; if_45; m_49;
+  }
+}
+

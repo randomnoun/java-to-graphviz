@@ -1,0 +1,35 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+
+  subgraph cluster_m_10 {
+    label="method testSuperStylin";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+    subgraph cluster_sync_15 {
+      label="synchronized";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = black;
+     
+    }
+  }
+  subgraph cluster_m_24 {
+    label="method testFreeStyler";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+}
+

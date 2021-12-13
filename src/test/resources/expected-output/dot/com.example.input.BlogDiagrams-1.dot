@@ -1,0 +1,110 @@
+digraph G_2 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_49 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_50 [
+    class = "expressionStatement";
+    label = "step 1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_50_2 [
+    class = "methodInvocation";
+    label = "before()";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_51 [
+    class = "if";
+    label = " make a\ndecision";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_51 [
+    class = "simpleName";
+    label = "condition";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_51_2 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_52 [
+    class = "expressionStatement";
+    label = "option 1";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_52_2 [
+    class = "methodInvocation";
+    label = "truePath()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_53 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_54 [
+    class = "expressionStatement";
+    label = "option 2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_54_2 [
+    class = "methodInvocation";
+    label = "falsePath()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_56 [
+    class = "expressionStatement";
+    label = "step 3";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_56_2 [
+    class = "methodInvocation";
+    label = "after()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_49 -> s_50;
+  s_50 -> s_50_2;
+  s_50_2 -> s_51;
+  s_51 -> if_51;
+  if_51 -> s_51_2 [
+    label="Y";
+  ];
+  if_51 -> s_53 [
+    label="N";
+  ];
+  s_51_2 -> s_52;
+  s_52 -> s_52_2;
+  s_53 -> s_54;
+  s_54 -> s_54_2;
+  s_52_2 -> s_56;
+  s_54_2 -> s_56;
+  s_56 -> s_56_2;
+
+}
+
