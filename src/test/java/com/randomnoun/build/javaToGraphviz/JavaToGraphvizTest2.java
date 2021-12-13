@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -16,12 +17,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.randomnoun.common.ProcessUtil;
-import com.randomnoun.common.ProcessUtil.ProcessException;
 import com.randomnoun.common.StreamUtil;
+import com.randomnoun.common.ProcessUtil.ProcessException;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
-public class JavaToGraphvizTest {
+public class JavaToGraphvizTest2 {
 
     private static boolean WRITE_EXPECTED_OUTPUT = true;
     private static boolean WRITE_EXPECTED_OUTPUT_PNG = true;
@@ -30,55 +31,22 @@ public class JavaToGraphvizTest {
     public static void beforeAllTestMethods() {
         Log4jCliConfiguration lcc = new Log4jCliConfiguration();
         Properties props = new Properties();
-        props.put("log4j.rootCategory", "INFO, CONSOLE");
-        lcc.init("[JavaToGraphvizTest]", props);
+        props.put("log4j.rootCategory", "DEBUG, CONSOLE");
+        lcc.init("[JavaToGraphvizTest2]", props);
     }
     
     @Test
     public void testControlFlowStatements() throws IOException {
 
-        testStatement("com.example.input.AllTheControlFlowNodes");
-        testStatement("com.example.input.BlogDiagrams");
-        testStatement("com.example.input.MultipleGraphs");
-        testStatement("com.example.input.UserDefinedSubgraphs");
-        
-        testStatement("com.example.input.MethodChain");
-        testStatement("com.example.input.Constructor");
-        
-        testStatement("com.example.input.IfStatementFlip");
-        testStatement("com.example.input.ContinueBreakRank");
-        testStatement("com.example.input.ContinueBreakLabelA"); // comparisons
-        testStatement("com.example.input.ContinueBreakLabelB"); // centralSwitch
-        
-        testStatement("com.example.input.DoStatement");
-        testStatement("com.example.input.ForStatement");
-        testStatement("com.example.input.IfStatement");
-        testStatement("com.example.input.IfStatementExternalCss");
-        testStatement("com.example.input.SwitchStatement");
-        testStatement("com.example.input.WhileStatement");
-        testStatement("com.example.input.SynchronizeStatement");
-        testStatement("com.example.input.TryCatchStatement");
-        testStatement("com.example.input.TryCatchFinallyStatement");
-        testStatement("com.example.input.TryWithResourcesStatement");
-        
-        testStatement("com.example.input.CommentAttribution");
-        
-        testStatement("com.example.input.Expressions");
-        testStatement("com.example.input.Expressions1");
-        testStatement("com.example.input.Expressions2");
-        testStatement("com.example.input.Expressions3a");
-        testStatement("com.example.input.Expressions3b");
-        testStatement("com.example.input.Expressions4");
-        testStatement("com.example.input.Expressions5");
-        testStatement("com.example.input.Expressions6");
+        testStatement("com.example.input.BlogDiagrams2");
     }
     
     public void testStatement(String className) throws IOException {
-        Logger logger = Logger.getLogger(JavaToGraphvizTest.class);
+        Logger logger = Logger.getLogger(JavaToGraphvizTest2.class);
         logger.info(className);
         
-        // create 2 diagrams, one with removeNode = true
-        int configCombinations = 2;
+        // create 4 diagrams
+        int configCombinations = 4;
         String dotExe = "C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot.exe";
         
         for (int i = 0; i < configCombinations; i++) {
@@ -89,13 +57,30 @@ public class JavaToGraphvizTest {
             
             JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
             javaToGraphviz.setBaseCssUrl("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
+            
+            Map<String, String> options = new HashMap<>();
+            options.put("enableKeepNodeFilter", "false");
+            
+            
             if (i == 1) {
-                Map<String, String> options = new HashMap<>();
+                options.put("edgerNamesCsv", "ast");
+                javaToGraphviz.setBaseCssUrl("JavaToGraphviz-ast.css"); 
+                suffix = "-ast";
+            }
+            if (i == 2) {
+                // when capturing this image, you want to set ControlFlowEdger.HOIST_ENABLED to false
+                options.put("edgerNamesCsv", "ast,control-flow");
+                options.put("enableHoist", "false");
+                javaToGraphviz.setBaseCssUrl("JavaToGraphviz-noroute.css"); 
+                suffix = "-both";
+            }
+            if (i == 3) {
                 options.put("enableKeepNodeFilter", "true");
                 options.put("defaultKeepNode", "false");
-                javaToGraphviz.setOptions(options);
                 suffix = "-compact";
             }
+            
+            javaToGraphviz.setOptions(options);            
             javaToGraphviz.parse(fis, "UTF-8");
             fis.close();
             
@@ -150,13 +135,13 @@ public class JavaToGraphvizTest {
     }
         
         
-    @Test
-    public void testDom() throws IOException {
+    //@Test
+    public void notestDom() throws IOException {
         testDom("com.example.input.ForStatement");
     }
     
     public void testDom(String className) throws IOException {
-        Logger logger = Logger.getLogger(JavaToGraphvizTest.class);
+        Logger logger = Logger.getLogger(JavaToGraphvizTest2.class);
         logger.info(className);
         
         // create 2 files, with and without css applied
@@ -189,17 +174,11 @@ public class JavaToGraphvizTest {
                 hasNext = javaToGraphviz.writeGraphviz(sw);
                 logger.debug(sw.toString());
                 
-                File tf = new File("src/test/resources/expected-output/dom/" + className + "-" + idx + suffix + ".dom");
+                File tf = new File("src/test/resources/expected-output/" + className + "-" + idx + suffix + ".dom");
                 if (WRITE_EXPECTED_OUTPUT) {
                     FileOutputStream fos = new FileOutputStream(tf);
                     fos.write(sw.toString().getBytes());
                     fos.close();
-                    idx++;
-                } else {
-                    fis = new FileInputStream(tf);
-                    String expected = new String(StreamUtil.getByteArray(fis));
-                    fis.close();
-                    assertEquals("difference in " + className + "-" + idx + suffix + ".dom", expected, sw.toString());
                     idx++;
                 }
                 if (hasNext) { logger.info("==========================="); }
