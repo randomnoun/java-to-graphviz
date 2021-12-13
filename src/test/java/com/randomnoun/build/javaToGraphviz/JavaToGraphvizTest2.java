@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -17,8 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.randomnoun.common.ProcessUtil;
-import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.ProcessUtil.ProcessException;
+import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
