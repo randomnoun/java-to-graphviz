@@ -1,0 +1,258 @@
+<html>
+    <head></head>
+    <body>
+        <graph style="fontname: &quot;Handlee&quot;; bgcolor: transparent; gv-idFormat: &quot;G&quot;; gv-labelFormat: unset; compound: true">
+            <graphNode style="fontname: &quot;Handlee&quot;; shape: rect"></graphNode>
+            <graphEdge style="fontname: &quot;Handlee&quot;"></graphEdge>
+            <node id label class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                <node id label class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                    <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                    <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                </node>
+                <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+            </node>
+            <node id label class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                <node id label class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                    <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                    <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                </node>
+                <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+            </node>
+            <node id label class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                <node id label class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                    <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                    <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                </node>
+                <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+            </node>
+            <node id label classname="ForStatement" class="typeDeclaration class" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                <node id label methodname="testFor" class="methodDeclaration" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled; gv-newSubgraph: true">
+                    <subgraph methodname="testFor" style="pencolor: transparent; labeljust: &quot;l&quot;; ranksep: 0.5; gv-idFormat: &quot;cluster_m_${lineNumber}&quot;; gv-labelFormat: &quot;method ${methodName}&quot;">
+                        <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                        <node id label class="block" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                            <node id label=" start of method" class="comment" style="gv-idFormat: &quot;c_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled"></node>
+                            <edge class="cf"></edge>
+                            <node id label class="for" style="gv-idFormat: &quot;for_${lineNumber}&quot;; gv-labelFormat: &quot;for&quot;; fillcolor: white; style: filled; shape: diamond">
+                              <node id label type="int" class="initialiser variableDeclarationExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label variablename="i" type="int" class="variableDeclarationFragment" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${type} ${variableName}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label literalvalue="0" class="numberLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                              </node>
+                              <edge></edge>
+                              <node id label operatortoken="<" operatorname="InfixExpression$Operator" class="expression infixExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${operatorToken}&quot;; fillcolor: white; style: filled">
+                              <node id label name="i" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label literalvalue="12" class="numberLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge></edge>
+                              <node id label operatortoken="++" operatorname="PostfixExpression$Operator" class="postfixExpression updater" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;postfixOp ${operatorToken}&quot;; fillcolor: white; style: filled">
+                              <node id label name="i" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="for back" style="style: dashed; gv-labelFormat: &quot;for&quot;"></edge>
+                              <node id label class="block" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label=" in loop" class="expressionStatement" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label methodname="println" class="methodInvocation" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${methodName}()&quot;; fillcolor: white; style: filled">
+                              <node id label name="System.out" class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              </node>
+                              <edge class="cf invocationArgument"></edge>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label name="i" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge class="cf for true" style="gv-labelFormat: &quot;Y&quot;"></edge>
+                            <edge class="cf for false" style="gv-labelFormat: &quot;N&quot;"></edge>
+                            <node id label=" after loop" class="expressionStatement" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label methodname="println" class="methodInvocation" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${methodName}()&quot;; fillcolor: white; style: filled">
+                              <node id label name="System.out" class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              </node>
+                              <edge class="cf invocationArgument"></edge>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label literalvalue="&quot;twelve little ladybugs. at the ladybug picnic.&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge class="cf"></edge>
+                        </node>
+                        <edge class="cf"></edge>
+                        <node id label class="method end" style="gv-idFormat: &quot;m_${lineNumber}&quot;; gv-labelFormat: &quot;return&quot;; fillcolor: white; style: filled"></node>
+                    </subgraph>
+                </node>
+                <edge class="cf"></edge>
+                <node id label methodname="testEnhancedFor" class="methodDeclaration" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled; gv-newSubgraph: true">
+                    <subgraph methodname="testEnhancedFor" style="pencolor: transparent; labeljust: &quot;l&quot;; ranksep: 0.5; gv-idFormat: &quot;cluster_m_${lineNumber}&quot;; gv-labelFormat: &quot;method ${methodName}&quot;">
+                        <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                        <node id label class="block" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                            <node id label=" start of method" class="comment" style="gv-idFormat: &quot;c_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled"></node>
+                            <edge class="cf"></edge>
+                            <node id label type="List<String>" class="variableDeclaration" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label variablename="things" type="List<String>" class="variableDeclarationFragment" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${type} ${variableName}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label type="ArrayList<>" class="classInstanceCreation" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;new ${type}()&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              </node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge></edge>
+                            <node id label class="expressionStatement" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label methodname="add" class="methodInvocation" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${methodName}()&quot;; fillcolor: white; style: filled">
+                              <node id label name="things" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf invocationArgument"></edge>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label literalvalue="&quot;raindrops on roses and whiskers on kittens&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge class="cf"></edge>
+                            <node id label class="expressionStatement" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label methodname="add" class="methodInvocation" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${methodName}()&quot;; fillcolor: white; style: filled">
+                              <node id label name="things" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf invocationArgument"></edge>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label literalvalue="&quot;bright copper kettles and warm woolen mittens&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge class="cf"></edge>
+                            <node id label class="expressionStatement" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label methodname="add" class="methodInvocation" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${methodName}()&quot;; fillcolor: white; style: filled">
+                              <node id label name="things" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf invocationArgument"></edge>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label literalvalue="&quot;brown paper packages tied up with string&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge class="cf"></edge>
+                            <node id label type="int" class="variableDeclaration" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label variablename="thingCount" type="int" class="variableDeclarationFragment" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${type} ${variableName}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label literalvalue="0" class="numberLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge></edge>
+                            <node id label class="enhancedFor" style="gv-idFormat: &quot;for_${lineNumber}&quot;; gv-labelFormat: &quot;iterable for&quot;; fillcolor: white; style: filled; gv-wordwrap: 10; shape: diamond">
+                              <node id label variablename="t" type="String" class="initialiser singleVariableDeclaration" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${type} ${variableName}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              </node>
+                              <edge class="cf"></edge>
+                              <node id label name="things" class="expression simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              <node id label class="block" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label=" in loop" class="expressionStatement" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label operatortoken="++" operatorname="PostfixExpression$Operator" class="postfixExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;postfixOp ${operatorToken}&quot;; fillcolor: white; style: filled">
+                              <node id label name="thingCount" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge class="enhancedFor back" style="style: dashed; gv-labelFormat: &quot;for&quot;"></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge class="enhancedFor cf true" style="gv-labelFormat: &quot;next&quot;"></edge>
+                            <edge class="enhancedFor cf false" style="gv-labelFormat: &quot;end&quot;"></edge>
+                            <node id label=" after loop" class="comment" style="gv-idFormat: &quot;c_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled"></node>
+                            <edge class="cf"></edge>
+                            <node id label class="expressionStatement" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label methodname="println" class="methodInvocation" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${methodName}()&quot;; fillcolor: white; style: filled">
+                              <node id label name="System.out" class="qualifiedName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled">
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              </node>
+                              <edge class="cf invocationArgument"></edge>
+                              <node id label class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <node id label operatortoken="+" operatorname="InfixExpression$Operator" class="infixExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${operatorToken}&quot;; fillcolor: white; style: filled">
+                              <node id label literalvalue="&quot;these are &quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label class="parenthesizedExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label class="conditionalExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;?&quot;; fillcolor: white; style: filled; shape: diamond">
+                              <node id label operatortoken="==" operatorname="InfixExpression$Operator" class="infixExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${operatorToken}&quot;; fillcolor: white; style: filled">
+                              <node id label name="thingCount" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label literalvalue="1" class="numberLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge></edge>
+                              <node id label literalvalue="&quot;one of&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label class="parenthesizedExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label class="conditionalExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;?&quot;; fillcolor: white; style: filled; shape: diamond">
+                              <node id label operatortoken="==" operatorname="InfixExpression$Operator" class="infixExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${operatorToken}&quot;; fillcolor: white; style: filled">
+                              <node id label name="thingCount" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label literalvalue="2" class="numberLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge></edge>
+                              <node id label literalvalue="&quot;a couple of &quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label class="parenthesizedExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${nodeType}&quot;; fillcolor: white; style: filled">
+                              <node id label class="conditionalExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;?&quot;; fillcolor: white; style: filled; shape: diamond">
+                              <node id label operatortoken="==" operatorname="InfixExpression$Operator" class="infixExpression" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${operatorToken}&quot;; fillcolor: white; style: filled">
+                              <node id label name="thingCount" class="simpleName" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${name}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label literalvalue="3" class="numberLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge></edge>
+                              <node id label literalvalue="&quot;a few of&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              <node id label literalvalue="&quot;DOES NOT COMPUTE&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge class="cf"></edge>
+                              </node>
+                              <edge class="cf conditionalExpression true" style="gv-labelFormat: &quot;Y&quot;"></edge>
+                              <edge class="cf conditionalExpression false" style="gv-labelFormat: &quot;N&quot;"></edge>
+                              </node>
+                              </node>
+                              <edge class="cf conditionalExpression true" style="gv-labelFormat: &quot;Y&quot;"></edge>
+                              <edge class="cf conditionalExpression false" style="gv-labelFormat: &quot;N&quot;"></edge>
+                              </node>
+                              </node>
+                              <edge class="cf conditionalExpression true" style="gv-labelFormat: &quot;Y&quot;"></edge>
+                              <edge class="cf conditionalExpression false" style="gv-labelFormat: &quot;N&quot;"></edge>
+                              </node>
+                              <node id label literalvalue="&quot; my favourite things&quot;" class="stringLiteral literal" style="gv-idFormat: &quot;s_${lineNumber}&quot;; gv-labelFormat: &quot;${literalValue}&quot;; fillcolor: white; style: filled"></node>
+                              <edge></edge>
+                              </node>
+                              <edge></edge>
+                              </node>
+                              <edge class="cf"></edge>
+                            </node>
+                            <edge class="cf"></edge>
+                        </node>
+                        <edge class="cf"></edge>
+                        <node id label class="method end" style="gv-idFormat: &quot;m_${lineNumber}&quot;; gv-labelFormat: &quot;return&quot;; fillcolor: white; style: filled"></node>
+                    </subgraph>
+                </node>
+                <edge class="cf"></edge>
+            </node>
+        </graph>
+    </body>
+</html>

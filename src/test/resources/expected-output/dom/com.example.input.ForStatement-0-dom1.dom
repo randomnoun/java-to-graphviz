@@ -1,0 +1,254 @@
+<html>
+ <head></head>
+ <body>
+  <graph>
+   <graphNode></graphNode>
+   <graphEdge></graphEdge>
+   <node id label class="qualifiedName">
+    <node id label class="qualifiedName">
+     <node id label class="simpleName"></node>
+     <node id label class="simpleName"></node>
+    </node>
+    <node id label class="simpleName"></node>
+   </node>
+   <node id label class="qualifiedName">
+    <node id label class="qualifiedName">
+     <node id label class="simpleName"></node>
+     <node id label class="simpleName"></node>
+    </node>
+    <node id label class="simpleName"></node>
+   </node>
+   <node id label class="qualifiedName">
+    <node id label class="qualifiedName">
+     <node id label class="simpleName"></node>
+     <node id label class="simpleName"></node>
+    </node>
+    <node id label class="simpleName"></node>
+   </node>
+   <node id label classname="ForStatement" class="typeDeclaration class">
+    <node id label class="simpleName"></node>
+    <node id label methodname="testFor" class="methodDeclaration">
+     <node id label class="simpleName"></node>
+     <node id label class="block">
+      <node id label=" start of method" class="comment"></node>
+      <edge class="cf"></edge>
+      <node id label class="for">
+       <node id label type="int" class="initialiser variableDeclarationExpression">
+        <node id label variablename="i" type="int" class="variableDeclarationFragment">
+         <node id label class="simpleName"></node>
+         <node id label literalvalue="0" class="numberLiteral literal"></node>
+         <edge></edge>
+        </node>
+        <edge class="cf"></edge>
+       </node>
+       <edge></edge>
+       <node id label operatortoken="<" operatorname="InfixExpression$Operator" class="expression infixExpression">
+        <node id label name="i" class="simpleName"></node>
+        <edge class="cf"></edge>
+        <node id label literalvalue="12" class="numberLiteral literal"></node>
+        <edge></edge>
+       </node>
+       <edge></edge>
+       <node id label operatortoken="++" operatorname="PostfixExpression$Operator" class="postfixExpression updater">
+        <node id label name="i" class="simpleName"></node>
+        <edge></edge>
+       </node>
+       <edge class="for back"></edge>
+       <node id label class="block">
+        <node id label=" in loop" class="expressionStatement">
+         <node id label methodname="println" class="methodInvocation">
+          <node id label name="System.out" class="qualifiedName">
+           <node id label class="simpleName"></node>
+           <node id label class="simpleName"></node>
+          </node>
+          <edge class="cf invocationArgument"></edge>
+          <node id label class="simpleName"></node>
+          <node id label name="i" class="simpleName"></node>
+          <edge></edge>
+         </node>
+         <edge class="cf"></edge>
+        </node>
+        <edge class="cf"></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge class="cf for true"></edge>
+      <edge class="cf for false"></edge>
+      <node id label=" after loop" class="expressionStatement">
+       <node id label methodname="println" class="methodInvocation">
+        <node id label name="System.out" class="qualifiedName">
+         <node id label class="simpleName"></node>
+         <node id label class="simpleName"></node>
+        </node>
+        <edge class="cf invocationArgument"></edge>
+        <node id label class="simpleName"></node>
+        <node id label literalvalue="&quot;twelve little ladybugs. at the ladybug picnic.&quot;" class="stringLiteral literal"></node>
+        <edge></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge class="cf"></edge>
+     </node>
+     <edge class="cf"></edge>
+     <node id label class="method end"></node>
+    </node>
+    <edge class="cf"></edge>
+    <node id label methodname="testEnhancedFor" class="methodDeclaration">
+     <node id label class="simpleName"></node>
+     <node id label class="block">
+      <node id label=" start of method" class="comment"></node>
+      <edge class="cf"></edge>
+      <node id label type="List<String>" class="variableDeclaration">
+       <node id label class="simpleName"></node>
+       <node id label class="simpleName"></node>
+       <node id label variablename="things" type="List<String>" class="variableDeclarationFragment">
+        <node id label class="simpleName"></node>
+        <node id label type="ArrayList<>" class="classInstanceCreation">
+         <node id label class="simpleName"></node>
+        </node>
+        <edge></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge></edge>
+      <node id label class="expressionStatement">
+       <node id label methodname="add" class="methodInvocation">
+        <node id label name="things" class="simpleName"></node>
+        <edge class="cf invocationArgument"></edge>
+        <node id label class="simpleName"></node>
+        <node id label literalvalue="&quot;raindrops on roses and whiskers on kittens&quot;" class="stringLiteral literal"></node>
+        <edge></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge class="cf"></edge>
+      <node id label class="expressionStatement">
+       <node id label methodname="add" class="methodInvocation">
+        <node id label name="things" class="simpleName"></node>
+        <edge class="cf invocationArgument"></edge>
+        <node id label class="simpleName"></node>
+        <node id label literalvalue="&quot;bright copper kettles and warm woolen mittens&quot;" class="stringLiteral literal"></node>
+        <edge></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge class="cf"></edge>
+      <node id label class="expressionStatement">
+       <node id label methodname="add" class="methodInvocation">
+        <node id label name="things" class="simpleName"></node>
+        <edge class="cf invocationArgument"></edge>
+        <node id label class="simpleName"></node>
+        <node id label literalvalue="&quot;brown paper packages tied up with string&quot;" class="stringLiteral literal"></node>
+        <edge></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge class="cf"></edge>
+      <node id label type="int" class="variableDeclaration">
+       <node id label variablename="thingCount" type="int" class="variableDeclarationFragment">
+        <node id label class="simpleName"></node>
+        <node id label literalvalue="0" class="numberLiteral literal"></node>
+        <edge></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge></edge>
+      <node id label class="enhancedFor">
+       <node id label variablename="t" type="String" class="initialiser singleVariableDeclaration">
+        <node id label class="simpleName"></node>
+        <node id label class="simpleName"></node>
+       </node>
+       <edge class="cf"></edge>
+       <node id label name="things" class="expression simpleName"></node>
+       <edge></edge>
+       <node id label class="block">
+        <node id label=" in loop" class="expressionStatement">
+         <node id label operatortoken="++" operatorname="PostfixExpression$Operator" class="postfixExpression">
+          <node id label name="thingCount" class="simpleName"></node>
+          <edge></edge>
+         </node>
+         <edge class="enhancedFor back"></edge>
+        </node>
+        <edge class="cf"></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge class="enhancedFor cf true"></edge>
+      <edge class="enhancedFor cf false"></edge>
+      <node id label=" after loop" class="comment"></node>
+      <edge class="cf"></edge>
+      <node id label class="expressionStatement">
+       <node id label methodname="println" class="methodInvocation">
+        <node id label name="System.out" class="qualifiedName">
+         <node id label class="simpleName"></node>
+         <node id label class="simpleName"></node>
+        </node>
+        <edge class="cf invocationArgument"></edge>
+        <node id label class="simpleName"></node>
+        <node id label operatortoken="+" operatorname="InfixExpression$Operator" class="infixExpression">
+         <node id label literalvalue="&quot;these are &quot;" class="stringLiteral literal"></node>
+         <edge class="cf"></edge>
+         <node id label class="parenthesizedExpression">
+          <node id label class="conditionalExpression">
+           <node id label operatortoken="==" operatorname="InfixExpression$Operator" class="infixExpression">
+            <node id label name="thingCount" class="simpleName"></node>
+            <edge class="cf"></edge>
+            <node id label literalvalue="1" class="numberLiteral literal"></node>
+            <edge></edge>
+           </node>
+           <edge></edge>
+           <node id label literalvalue="&quot;one of&quot;" class="stringLiteral literal"></node>
+           <edge class="cf"></edge>
+           <node id label class="parenthesizedExpression">
+            <node id label class="conditionalExpression">
+             <node id label operatortoken="==" operatorname="InfixExpression$Operator" class="infixExpression">
+              <node id label name="thingCount" class="simpleName"></node>
+              <edge class="cf"></edge>
+              <node id label literalvalue="2" class="numberLiteral literal"></node>
+              <edge></edge>
+             </node>
+             <edge></edge>
+             <node id label literalvalue="&quot;a couple of &quot;" class="stringLiteral literal"></node>
+             <edge class="cf"></edge>
+             <node id label class="parenthesizedExpression">
+              <node id label class="conditionalExpression">
+               <node id label operatortoken="==" operatorname="InfixExpression$Operator" class="infixExpression">
+                <node id label name="thingCount" class="simpleName"></node>
+                <edge class="cf"></edge>
+                <node id label literalvalue="3" class="numberLiteral literal"></node>
+                <edge></edge>
+               </node>
+               <edge></edge>
+               <node id label literalvalue="&quot;a few of&quot;" class="stringLiteral literal"></node>
+               <edge class="cf"></edge>
+               <node id label literalvalue="&quot;DOES NOT COMPUTE&quot;" class="stringLiteral literal"></node>
+               <edge class="cf"></edge>
+              </node>
+              <edge class="cf conditionalExpression true"></edge>
+              <edge class="cf conditionalExpression false"></edge>
+             </node>
+            </node>
+            <edge class="cf conditionalExpression true"></edge>
+            <edge class="cf conditionalExpression false"></edge>
+           </node>
+          </node>
+          <edge class="cf conditionalExpression true"></edge>
+          <edge class="cf conditionalExpression false"></edge>
+         </node>
+         <node id label literalvalue="&quot; my favourite things&quot;" class="stringLiteral literal"></node>
+         <edge></edge>
+        </node>
+        <edge></edge>
+       </node>
+       <edge class="cf"></edge>
+      </node>
+      <edge class="cf"></edge>
+     </node>
+     <edge class="cf"></edge>
+     <node id label class="method end"></node>
+    </node>
+    <edge class="cf"></edge>
+   </node>
+  </graph>
+ </body>
+</html>
