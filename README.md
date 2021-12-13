@@ -469,6 +469,74 @@ there are multiple passes of the CSS.
 * [JavaToGraphviz-debug.css](src/main/resources/JavaToGraphviz-debug.css) - debugging CSS ; all node labels include lineNumber, nodeType and lastKeepNodeId
 * [JavaToGraphviz.css](src/main/resources/JavaToGraphviz.css) - default CSS ; uses most of the classes and attributes listed above
 
+## CLI
+
+The java-to-graphviz-cli.jar can be used to generate diagrams from a command line. There's a few options you can supply:
+
+<pre>C:\>java -jar java-to-graphviz-cli.jar
+Usage:
+  java -jar java-to-graphviz-cli.jar [options] filename filename ...
+
+where [options] are:
+ -h -?                       display this help text
+ --verbose  -v               increase verbosity ( info level )
+ --verbose2 -vv              increase verbosity a bit more ( debug level )
+ --format   -f dot|dom1|dom2 output format: DOT diagram (default), pre-styled DOM, post-styled DOM
+ --output   -o filename      send output to filename
+                             For multiple output files, use {f} for base filename, {i} for diagram index
+                             e.g. "{f}-{i}.dot" for dot output, "{f}.html" for dom output
+                             default is stdout
+ --source   -s version       set Java source language version ( 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,
+                               8, 9, 10, 11, 12, 13, 14, 15, 16 )
+
+ --base-css -b url           replace base css with url ( relative to classpath, then file://./ )
+                               default = JavaToGraphviz.css
+ --user-css -u url           add url to list of user css imports
+ --css      -c {rules}       add css rules
+
+ --option   -p key=value     set initial option; can be modified in source by 'gv-option' and 'gv-keepNode' directives
+
+Options keys and defaults:
+ edgerNamesCsv=control-flow  csv list of edger names
+                             possible edger names: control-flow, ast
+ enableKeepNodeFilter=false  if true, will perform node filtering
+ defaultKeepNode=true        if true, filter will keep nodes by default
+ keepNode=                   space-separated nodeTypes for fine-grained keepNode control
+                             prefix nodeType with '-' to exclude, '+' or no prefix to include
+                               e.g. "-expressionStatement -block -switchCase"
+                               to exclude those nodeTypes when defaultKeepNode=true
+                             NB: any node with a 'gv' comment will always be kept
+</pre>
+
+e.g. 
+
+<pre>C:\>java -jar java-to-graphviz-cli.jar --base-css https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/main/resources/JavaToGraphviz.css src\test\java\com\example\input\ForStatement.java
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_19 [
+    class = "methodDeclaration";
+    label = "MethodDeclaration";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_19_3 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+...
+</pre>
+
 # Features
 
 DONE
