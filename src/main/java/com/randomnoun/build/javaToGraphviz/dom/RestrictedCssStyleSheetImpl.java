@@ -1,11 +1,13 @@
 package com.randomnoun.build.javaToGraphviz.dom;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.Logger;
@@ -57,6 +59,13 @@ public class RestrictedCssStyleSheetImpl extends CSSStyleSheetImpl {
                     InputStream is = this.getClass().getResourceAsStream(href);
                     if (is == null && !href.startsWith("/")) {
                         is = this.getClass().getResourceAsStream("/" + href);
+                    }
+                    if (is == null) {
+                        // try relative to file:///
+                        // URL baseUrl = new URL("file:///./");
+                        URL baseUrl = new File(".").toURI().toURL();
+                        URL url = new URL(baseUrl, href);
+                        is = url.openStream();
                     }
                     if (is != null) {
                         URI cpUri = new URI("classpath", "href", null); // not a real protocol
