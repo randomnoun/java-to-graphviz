@@ -37,9 +37,9 @@ public class CommentExtractor {
 
     Logger logger = Logger.getLogger(CommentExtractor.class);
     
-    private static Pattern gvGraphClassPattern = Pattern.compile("^gv-graph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");        // gv-graph.some.class.names: -> .some
-    private static Pattern gvSubgraphClassPattern = Pattern.compile("^gv-subgraph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");  // gv-subgraph.some.class.names: -> .some
-    private static Pattern gvNodeClassPattern = Pattern.compile("^gv([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*(:-*[v^<>]-*)?:?"); // gv.some.class.names: -> .some
+    private static Pattern gvGraphClassPattern = Pattern.compile("^gv-graph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");        // gv-graph#someIds.and.class.names: -> #someIds
+    private static Pattern gvSubgraphClassPattern = Pattern.compile("^gv-subgraph([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*:?");  // gv-subgraph#someIds.and.class.names: -> #someIds
+    private static Pattern gvNodeClassPattern = Pattern.compile("^gv([#.][a-zA-Z0-9-_]+)?(\\.[a-zA-Z0-9-_]+)*(:-*[v^<>]-*)?:?"); // gv#someIds.and.class.names: -> #someIds
 
     private static Pattern gvNextClassPattern = Pattern.compile("(\\.[a-zA-Z0-9-_]+)");  // the rest of them
     private static Pattern curlyPattern = Pattern.compile("\\{(.*)\\}");  // @TODO quoting/escaping rules
@@ -250,7 +250,7 @@ public class CommentExtractor {
                 String[] ss = ((GvStyleComment) c).style.split("\n");
                 for (int i=0; i<ss.length; i++) {
                     String s = ss[i];
-                    if (s.contains("//")) {
+                    if (s.contains("//") && !s.contains("://")) { // double-slash can start a comment, but not if it might be a @import url(scheme://...) double-slash 
                         s = s.substring(0, s.indexOf("//"));
                     }
                     css += (i==0 ? "" : "\n") + s;
