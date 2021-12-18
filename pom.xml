@@ -9,7 +9,7 @@
 	
     <groupId>com.randomnoun.build</groupId>
     <artifactId>java-to-graphviz</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>Java to Graphviz</name>
     <description>Transforms java source code into graphviz diagrams</description>
   
