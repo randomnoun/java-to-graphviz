@@ -31,13 +31,24 @@ Here's the type of output it can produce:
 
 [//]: # (The markdown source for this table is an abomination. I blame github.)
 
-and this is what it looks like when you throw that all together:
+and this is what it looks like when you string that all together:
 
 ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/example-complicated.png)
 
 You obviously won't want that, so it suppresses nodes by default, to give you just the nodes you're interested in.
 
 ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/example-simple.png)
+
+# More examples
+
+Here's some more examples, if you're interested
+
+|  Java source | Graphviz | PNG |
+|--|--|:--:|
+| CommentAttribution.java | [graphviz](src/test/resources/expected-output/dot/com.example.input.CommentAttribution-0-compact.dot) | [PNG](src/test/resources/expected-output/png/com.example.input.CommentAttribution-0-compact.png) | 
+
+
+
 
 # Processing
 
