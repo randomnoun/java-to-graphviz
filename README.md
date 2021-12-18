@@ -39,17 +39,6 @@ You obviously won't want that, so it suppresses nodes by default, to give you ju
 
 ![](https://raw.githubusercontent.com/randomnoun/java-to-graphviz/master/src/site/readme/example-simple.png)
 
-# More examples
-
-Here's some more examples, if you're interested
-
-|  Java source | Graphviz | PNG |
-|--|--|:--:|
-| CommentAttribution.java | [graphviz](src/test/resources/expected-output/dot/com.example.input.CommentAttribution-0-compact.dot) | [PNG](src/test/resources/expected-output/png/com.example.input.CommentAttribution-0-compact.png) | 
-
-
-
-
 # Processing
 
 Theres' a few different stages in the pipeline.
@@ -581,6 +570,15 @@ So a few things that'd be nice to implement if I get around to it:
 * another plugin which adds in AOP nodes.
 * create a stylesheet with no labels and shaded nodes. Maybe use whatever colouring scratch uses.
 * and so on.
+
+# More examples
+
+Some example Java sourcecode, and the generated graphviz DOT and PNG output, from the unit tests:
+
+|  Java source | Graphviz | PNG |
+|--|--|:--:|
+| [CommentAttribution.java](src/test/java/com/example/input/CommentAttribution.java) | [graphviz](src/test/resources/expected-output/dot/com.example.input.CommentAttribution-0-compact.dot) | [PNG](src/test/resources/expected-output/png/com.example.input.CommentAttribution-0-compact.png) | 
+
 
 ## More reading
 
