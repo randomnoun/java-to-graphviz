@@ -1,0 +1,39 @@
+/* JavaToGraphviz-debug.css
+
+This CSS stylehseet is used for debugging JavaToGraphviz itself.
+It adds a few data structure internals into each graph node label so I can see what's going wrong a bit more clearly. 
+
+*/
+
+graph {
+	fontname: "Handlee";
+	bgcolor: transparent;
+	gv-idFormat: "G";
+    gv-labelFormat: unset;
+    compound: true;
+}
+graphNode {
+    fontname: "Handlee";
+    shape : rect; 
+}
+graphEdge {
+    fontname: "Handlee"
+}
+subgraph {
+    pencolor : black; 
+    labeljust : "l";
+}
+node {
+	gv-idFormat: "s_${lineNumber}";
+	gv-labelFormat: "${nodeType}";
+	fillcolor: white; 
+	style: filled; 
+}
+node.comment {
+    gv-idFormat: "c_${lineNumber}";
+    gv-labelFormat: "comment";
+}
+
+node.ast { color: green; }
+edge.ast { color: green; }
+

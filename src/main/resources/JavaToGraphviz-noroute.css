@@ -1,0 +1,403 @@
+/* JavaToGraphviz.css
+
+Righteo here's the default CSS.
+
+When we're generating the GV diagram, we create a completely separate DOM just for the purpose of styling the diagram.
+Because I'm using jsoup to do the CSS selectors, it's a HTML DOM, but ignore the outermost html/body elements.
+ 
+That DOM looks like this
+
+<html>
+  <body>
+    <!-- CSS properties are converted to graphviz attributes by applying the CSS rules, and then extracting the calculated styles.
+      In this DOM,
+      'id' is used for the node name, so we can refer to it as #id in the CSS rules
+      'label' is special HTML attribute for the 'label' graphviz attribute; use [label="xxxx"] in CSS rules
+      'class' contains classes created by the AST ( 'if', 'expression' ) + some others created by the DAG ( 'break', 'continue' edges )
+        will make a list of those somewhere.
+    -->
+    <graph>
+        
+        <!-- the calculated CSS properties for graphNode gets applied to the default graphviz node attributes -->
+        <graphNode style="shape: rect;"></graphNode>
+        <!-- same for graphEdge -->
+        <graphEdge style="shape: rect;"></graphEdge>
+        
+	    <subgraph>
+	        <!-- the calculated CSS properties for a node gets applied to that specific node in the graphviz diagram -->
+		    <node id="id" label="label" style="shape: rect;"></node> 
+		    
+		    <!-- same for edges -->
+		    <edge id="id" label="label" style="shape: rect;"></node>
+		</subgraph>
+    </graph>		    
+  </body>
+</body>
+
+To create even more complicated style selectors, you can enable some additional attributes by setting the domIdAttributes and domClassAttributes options
+
+  // gv-option: domIdAttributes=none         (default)
+  // gv-option: domIdAttributes=incoming     create inNodeId attribute
+  // gv-option: domIdAttributes=outgoing     create outNodeId attribute
+  // gv-option: domIdAttributes=both         create inNodeId and outNodeId attribute
+  // gv-option: domClassAttributes=incoming  create inNodeClass attribute
+  // gv-option: domClassAttributes=outgoing  create outNodeClass attribute
+  // gv-option: domClassAttributes=both      create inNodeClass outNodeClass attribute
+  
+ These attributes contain the space-separated IDs and classes if incoming and outgoing nodes; so you could use e.g. 
+    node[inNodeId~="abc"] to select all nodes that have 'abc' on an incoming edge, or
+    edge[inNodeId~="abc"] to select all edges that are sourced from 'abc'
+     
+
+ Graph defaults are from sketchviz.
+ The properties in these CSS rules are graphviz attribute names, not CSS property names.
+ There's also a handful of internal properties which are used during the diagram generation process; those are prefixed with "gv-"
+*/
+
+graph {
+	fontname: "Handlee";
+	bgcolor: transparent;
+	gv-idFormat: "G";
+    gv-labelFormat: unset;
+    compound: true; /* for lambda entry/exit edges */
+}
+/* the styles on graphNode and graphEdge are applied at the graph level, 
+   but styles on node and edge are (repeatedly) applied at the node and edges 
+*/   
+graphNode {
+    fontname: "Handlee";
+    shape : rect; 
+}
+graphEdge {
+    fontname: "Handlee"
+}
+subgraph {
+  pencolor : black; 
+  labeljust : "l";
+
+  /* the ranksep here is an attempt to remove whitespace in the subgraph. 
+     turns out this attribute is disregarded if there are any edge labels in the subgraph. which is a bit annoying. 
+     xlabels don't add extra ranking whitespace, but the labels look a bit crap. */ 
+  ranksep : 0.5;
+}
+
+
+node {
+	gv-idFormat: "s_${lineNumber}";
+	gv-labelFormat: "${nodeType}";
+	fillcolor: white; 
+	style: filled;
+}
+node.if {
+	gv-idFormat: "if_${lineNumber}";
+    gv-wordwrap: 20;
+    shape : diamond; 
+}
+node.for {
+	gv-idFormat: "for_${lineNumber}";
+    gv-labelFormat: "for";
+    shape : diamond; 
+}
+node.while {
+	gv-idFormat: "while_${lineNumber}";
+    gv-wordwrap: 20;
+    shape : diamond; 
+}
+node.do {
+	gv-idFormat: "do_${lineNumber}";
+    gv-wordwrap: 20;
+    shape : diamond; 
+}
+
+node.enhancedFor {
+	gv-idFormat: "for_${lineNumber}";
+    gv-wordwrap: 10;
+    gv-labelFormat: "iterable for";
+    shape : diamond; 
+}
+
+node.comment {
+    gv-idFormat: "c_${lineNumber}";
+}
+node.method.end {
+    gv-idFormat: "m_${lineNumber}";
+    gv-labelFormat: "return";
+}
+
+/* handy for finding things in the diagram */
+node.red { color: red; }
+
+/* expression labels */
+
+/* literal-ish */
+
+node.booleanLiteral,
+node.numberLiteral,
+node.characterLiteral,
+node.nullLiteral,
+node.typeLiteral,
+node.stringLiteral { gv-labelFormat: "${literalValue}"; }
+
+/* name-ish */
+
+node.simpleName { gv-labelFormat: "${name}"; }
+node.qualifiedName { gv-labelFormat: "${name}"; }
+node.thisExpression { gv-labelFormat: "${name}"; }
+
+node.creationReference,
+node.expressionMethodReference,
+node.superMethodReference,
+node.typeMethodReference { gv-labelFormat: "${name}"; }
+
+/* control-flow-ish */
+
+node.methodInvocation { gv-labelFormat: "${methodName}()"; } 
+node.superMethodInvocation { gv-labelFormat: "${methodName}()"; }
+node.conditionalExpression { gv-labelFormat: "?"; shape: diamond; }
+edge.conditionalExpression.true { gv-labelFormat: "Y"; }
+edge.conditionalExpression.false { gv-labelFormat: "N"; }
+
+/* control-flow-ish statements */
+
+node.constructorInvocation { gv-labelFormat: "${methodName}()"; } /* methodName is always "this" */
+node.superConstructorInvocation { gv-labelFormat: "${methodName}()"; } /* methodName is always "super" */
+
+/* evaluation-ish */
+
+node.infixExpression { gv-labelFormat: "${operatorToken}"; }
+node.infixExpression.infixConditional { shape : diamond; }
+edge.infixConditional.true { gv-labelFormat: "true"; }
+edge.infixConditional.false { gv-labelFormat: "false"; }
+
+node.prefixExpression { gv-labelFormat: "prefixOp ${operatorToken}"; }
+node.postfixExpression { gv-labelFormat: "postfixOp ${operatorToken}"; }
+/* ParenthesizedExpressions aren't included in the dag */
+node.castExpression { gv-labelFormat: "cast ${type}"; }
+node.instanceofExpression { gv-labelFormat: "instanceof ${type}"; }
+
+/* creation-ish */
+
+node.variableDeclarationFragment { gv-labelFormat: "${type} ${variableName}"; }
+node.singleVariableDeclaration { gv-labelFormat: "${type} ${variableName}"; }
+node.arrayInitializer { gv-labelFormat: "{ ... }"; }
+node.arrayCreation { gv-labelFormat: "new ${type}"; }
+node.classInstanceCreation { gv-labelFormat: "new ${type}()"; } /* also control-flow-ish */
+
+/* access-ish */
+
+node.fieldAccess { gv-labelFormat: "field ${fieldName}"; }
+node.superFieldAccess { gv-labelFormat: "field ${fieldName}"; }
+
+/* modification-ish */
+
+node.assignment { gv-labelFormat: "${operatorToken}"; } /* maybe put lhs in the label as well ? */ 
+
+
+edge.unknown { color: red; }
+
+/** create a user-defined subgraph element *above* this node, then move this node and all nodes to gv-endSubgraph into that subgraph */
+node.beginSubgraph { gv-beginOuterSubgraph: true; } 
+node.endSubgraph { gv-endOuterSubgraph: true; }
+
+/* hmm. subgraph:has(node.beginSubgraph) doesn't match here, but I think it should */
+subgraph:has(node) { gv-idFormat : "cluster_uds_${lineNumber}"; gv-labelFormat : ""; }
+
+
+/* this double-spaces everything inside the expression, but I don't think it should 
+node.expressionStatement { gv-newSubgraph: true; }  */
+
+/* both classes and interfaces are typeDeclarations.
+   just create subgraphs for inner classes, due to the double-spacing and quadruple-spacing that happens otherwise
+   TODO: fix that in graphviz. *in-joke*
+*/
+/* even with just inner classes it looks a bit too spaced out for me
+node.typeDeclaration node.typeDeclaration { gv-newSubgraph: true; } 
+node.typeDeclaration node.typeDeclaration.class > subgraph {
+  gv-idFormat : "cluster_c_${lineNumber}"; // subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph 
+  gv-labelFormat : "class ${className}";
+  pencolor : gray;
+}
+node.typeDeclaration node.typeDeclaration.interface > subgraph {
+  gv-idFormat : "cluster_i_${lineNumber}"; // subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph
+  gv-labelFormat : "interface ${interfaceName}";
+  pencolor : gray;
+}
+*/
+
+
+node.methodDeclaration { gv-newSubgraph: true; } /* create a subgraph element *under* this node, then move child nodes into that subgraph */
+
+/* through the magic of multiple CSS passes, the gv-newSubgraph rule above will construct a subgraph
+   element which can also be styled in CSS. This only happens once.
+*/
+node.methodDeclaration > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_m_${lineNumber}";
+  gv-labelFormat : "method ${methodName}";
+  pencolor : transparent;
+}
+
+
+/* in retrospect I reckon the methodDeclaration node should be *inside* the subgraph, which
+would make the CSS rule something like
+  subgraph:has(> .methodDeclaration) { ... }
+instead, assuming jsoup's selector impl supports that.
+maybe it should be a gv-newOuterSubgraph: true
+or something 
+*/
+
+/* each lambdaExpression has two nodes, one for the definition and an artifical one for the return value (with an extra .end class) */ 
+node.lambdaExpression:not(.end) { 
+	gv-newSubgraph: true; /* create a subgraph element *under* this node, then move child nodes into that subgraph */
+	gv-truncateEdges: both;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
+}
+node.lambdaExpression > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_lambda_${lineNumber}";  /* @TODO the greek symbol there */
+  gv-labelFormat : "lambda";
+  pencolor : black;
+}
+
+
+/* each anonymousClassDeclaration has two nodes, one for the definition and an artifical one for the exit edge */ 
+node.anonymousClassDeclaration:not(.end) { 
+	gv-newSubgraph: true; /* create a subgraph element *under* this node, then move child nodes into that subgraph */
+	gv-truncateEdges: both;  /* the edges going into out out of nodes in that subgraph now go into and out of the subgraph */
+	pencolor : black;
+}
+node.anonymousClassDeclaration > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_anon_${lineNumber}"; 
+  gv-labelFormat : "anonymous class";
+  pencolor : black;
+}
+edge.anonymousClassDeclarationBegin {
+	color: transparent; /* transparent edges leading into methods */
+}
+edge.anonymousClassDeclarationEnd {
+	color: transparent; /* transparent edges leading out of methods to the artifical transparent node at the bottom of the anonymous class declaration */
+}
+node.anonymousClassDeclaration.end {
+	color: transparent; /* transparent edges leading out of methods */
+	fontcolor: transparent;
+	gv-labelFormat : "hidden";
+}
+
+/*
+node.try { gv-newSubgraph: true; }
+node.try > subgraph {
+  gv-idFormat : "cluster_t_${lineNumber}";
+  gv-labelFormat : "try";
+  pencolor : black; 
+  labeljust : "l"; 
+  ranksep : 0.5;
+}
+*/
+
+node.tryResource { gv-newSubgraph: true; } 
+node.tryResource > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_resource_${lineNumber}";
+  gv-labelFormat : "resource";
+}
+
+
+node.tryBody { gv-newSubgraph: true; } 
+node.tryBody > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_body_${lineNumber}";
+  gv-labelFormat : "body";
+}
+
+node.catchClause { gv-newSubgraph: true; } 
+node.catchClause > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_catch_${lineNumber}";
+  gv-labelFormat : "catch ${exceptionSpec}";
+}
+
+node.finally { gv-newSubgraph: true; } 
+node.finally > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_t_finally_${lineNumber}";
+  gv-labelFormat : "finally";
+}
+
+node.synchronized > .block { gv-newSubgraph: true; } 
+node.synchronized > .block > subgraph {
+  /* subgraph ids must being with the text "cluster_" for graphviz to draw it as a subgraph */
+  gv-idFormat : "cluster_sync_${lineNumber}";
+  gv-labelFormat : "synchronized";
+}
+
+
+/* edge styles */
+
+edge.break { color: red; gv-labelFormat: "break ${breakLabel}"; }  /* maybe not breaks in switches though ? */ 
+edge.continue { color: red; gv-labelFormat: "continue ${continueLabel}"; }
+edge.return { color: blue; gv-labelFormat: "return"; }
+
+/* 'gv-xlabelFormat' here as labelling the throws really throws out the cluster layout. */ 
+edge.throw { color: maroon;  gv-xlabelFormat: "throw"; } /* go the broncos */
+
+edge.back { style: dashed; }
+edge.back.for { gv-labelFormat: "for"; }
+edge.back.enhancedFor { gv-labelFormat: "for"; }
+edge.back.while { gv-labelFormat: "while"; }
+edge.back.do { gv-labelFormat: "do"; }
+
+edge.if.true { gv-labelFormat: "Y"; }
+edge.if.false { gv-labelFormat: "N"; }
+
+edge.for.true { gv-labelFormat: "Y"; }
+edge.for.false { gv-labelFormat: "N"; }
+
+edge.enhancedFor.true { gv-labelFormat: "next"; }
+edge.enhancedFor.false { gv-labelFormat: "end"; }
+
+edge.while.true { gv-labelFormat: "Y"; }
+edge.while.false { gv-labelFormat: "N"; }
+
+edge.do.true { gv-labelFormat: "do"; }
+edge.do.false{ gv-labelFormat: "N"; }  
+
+node.switchCase:not(.centralSwitch) { 
+	gv-idFormat: "case_${lineNumber}";
+	gv-labelFormat: "case ?";
+    gv-wordwrap: 20;
+    shape : diamond; 
+}
+edge.switchCase { gv-labelFormat: "case"; }
+edge.switchCase.default { gv-labelFormat: "default"; }
+
+edge.switchCase.true { gv-labelFormat: "Y"; }
+edge.switchCase.false { gv-labelFormat: "N"; } 
+
+
+edge.switch.fallthrough { color: red; gv-labelFormat: "fallthrough"; } /* fall through from case block to next case */
+edge.switch.false { } /* no case conditions match, and no default present */
+
+/** If edges are in a subcluster, use xlabel rather than label otherwise graphviz double-spaces and triple-spaces the nodes */
+/*
+subgraph subgraph edge.break { gv-labelFormat: unset; gv-xlabelFormat: "break ${breakLabel}"; }
+subgraph subgraph edge.continue { gv-labelFormat: unset; gv-xlabelFormat: "continue ${continueLabel}"; }
+subgraph subgraph edge.return { gv-labelFormat: unset; gv-xlabelFormat: "return"; }
+subgraph subgraph edge.back.for { gv-labelFormat: unset;  gv-xlabelFormat: "for"; }
+subgraph subgraph edge.back.enhancedFor { gv-labelFormat: unset; gv-xlabelFormat: "for"; }
+subgraph subgraph edge.back.while { gv-labelFormat: unset; gv-xlabelFormat: "while"; }
+subgraph subgraph edge.back.do { gv-labelFormat: unset; gv-xlabelFormat: "do"; }
+subgraph subgraph edge.if.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
+subgraph subgraph edge.if.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
+subgraph subgraph edge.while.true { gv-labelFormat: unset; gv-xlabelFormat: "Y"; }
+subgraph subgraph edge.while.false { gv-labelFormat: unset; gv-xlabelFormat: "N"; }
+subgraph subgraph edge.case { gv-labelFormat: unset; gv-xlabelFormat: "case"; }
+subgraph subgraph edge.case.default { gv-labelFormat: unset; gv-xlabelFormat: "default"; }
+*/
+
+
+/* node and edges marked 'ast' are temporary until I've written all 20 or so expression node edgers */
+edge { color: blue; }
+edge.cf { constraint: false }; 
+node.ast { color: green; }
+edge.ast { color: green; }
+
