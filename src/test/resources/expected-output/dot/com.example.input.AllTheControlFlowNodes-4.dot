@@ -9,92 +9,57 @@ digraph G_5 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_77 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_78 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_78_2 [
+  s_89_2 [
     class = "methodInvocation";
     label = "before()";
     fillcolor = white;
     style = filled;
   ];
-  while_79 [
+  while_90 [
     class = "while";
     label = " While";
     fillcolor = white;
     shape = diamond;
     style = filled;
   ];
-  s_79 [
+  s_90 [
     class = "simpleName";
     label = "condition";
     fillcolor = white;
     style = filled;
   ];
-  s_79_2 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_80 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_80_2 [
+  s_91_2 [
     class = "methodInvocation";
     label = "println()";
     fillcolor = white;
     style = filled;
   ];
-  s_80_4 [
+  s_91_4 [
     class = "simpleName";
     label = "i";
     fillcolor = white;
     style = filled;
   ];
-  s_82 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_82_2 [
+  s_93_2 [
     class = "methodInvocation";
     label = "after()";
     fillcolor = white;
     style = filled;
   ];
-  s_77 -> s_78;
-  s_78 -> s_78_2;
-  s_78_2 -> s_79;
-  s_79 -> while_79;
-  while_79 -> s_79_2 [
-    label="Y";
-  ];
-  s_79_2 -> s_80;
-  s_80 -> s_80_4;
-  s_80_4 -> s_80_2;
-  s_80_2 -> s_79 [
+  s_89_2 -> s_90;
+  s_90 -> while_90;
+  s_91_4 -> s_91_2;
+  s_91_2 -> s_90 [
     label="while";
     style = dashed;
   ];
-  s_80_2 -> s_82;
-  while_79 -> s_82 [
+  s_91_2 -> s_93_2;
+  while_90 -> s_93_2 [
     label="N";
   ];
-  s_82 -> s_82_2;
+  while_90 -> s_91_4 [
+    label="Y";
+  ];
 
 }
 

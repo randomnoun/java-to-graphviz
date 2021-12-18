@@ -40,12 +40,6 @@ digraph G_2 {
     fillcolor = white;
     style = filled;
   ];
-  s_51_2 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
   s_52 [
     class = "expressionStatement";
     label = "option 1";
@@ -55,12 +49,6 @@ digraph G_2 {
   s_52_2 [
     class = "methodInvocation";
     label = "truePath()";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_53 [
-    class = "block";
-    label = "Block";
     fillcolor = white;
     style = filled;
   ];
@@ -92,19 +80,17 @@ digraph G_2 {
   s_50 -> s_50_2;
   s_50_2 -> s_51;
   s_51 -> if_51;
-  if_51 -> s_51_2 [
-    label="Y";
-  ];
-  if_51 -> s_53 [
-    label="N";
-  ];
-  s_51_2 -> s_52;
   s_52 -> s_52_2;
-  s_53 -> s_54;
   s_54 -> s_54_2;
   s_52_2 -> s_56;
   s_54_2 -> s_56;
   s_56 -> s_56_2;
+  if_51 -> s_52 [
+    label="Y";
+  ];
+  if_51 -> s_54 [
+    label="N";
+  ];
 
 }
 

@@ -9,107 +9,100 @@ digraph G_14 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_161 [
-    class = "methodDeclaration";
-    label = "MethodDeclaration";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_161_3 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
   s_162 [
-    class = "expressionStatement";
-    label = "the beginning";
-    fillcolor = grey;
-    style = filled;
-  ];
-  s_162_2 [
-    class = "methodInvocation";
-    label = "before()";
+    class = "variableDeclaration";
+    label = "VariableDeclaration";
     fillcolor = white;
     style = filled;
   ];
-  s_163 [
-    class = "expressionStatement something";
-    label = "well hello there";
+  s_162_4 [
+    class = "variableDeclarationFragment";
+    label = "Predicate<Integer> isEven";
     fillcolor = white;
-    color = red;
+    style = filled;
+  ];
+  s_162_6 [
+    class = "lambdaExpression";
+    label = "LambdaExpression";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_162_10 [
+    class = "infixExpression";
+    label = "==";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_162_11 [
+    class = "infixExpression";
+    label = "%";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_162_12 [
+    class = "simpleName";
+    label = "n";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_162_13 [
+    class = "numberLiteral literal";
+    label = "2";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_162_14 [
+    class = "numberLiteral literal";
+    label = "0";
+    fillcolor = white;
     style = filled;
   ];
   s_163_2 [
     class = "methodInvocation";
-    label = "someCode()";
+    label = "println()";
     fillcolor = white;
     style = filled;
   ];
-  s_164 [
-    class = "special expressionStatement something";
-    label = "well hello there again";
-    fillcolor = white;
-    color = green;
-    style = filled;
-  ];
-  s_164_2 [
+  s_163_4 [
     class = "methodInvocation";
-    label = "someOtherCode()";
+    label = "test()";
     fillcolor = white;
     style = filled;
   ];
-  s_164_4 [
-    class = "booleanLiteral literal";
-    label = "true";
+  s_163_5 [
+    class = "simpleName";
+    label = "isEven";
     fillcolor = white;
     style = filled;
   ];
-  unique [
-    class = "expressionStatement something";
-    label = "righteo then";
-    fillcolor = white;
-    color = red;
-    shape = hexagon;
-    style = filled;
-  ];
-  s_165 [
-    class = "methodInvocation";
-    label = "someOtherCode()";
+  s_163_7 [
+    class = "numberLiteral literal";
+    label = "99";
     fillcolor = white;
     style = filled;
   ];
-  s_165_3 [
-    class = "booleanLiteral literal";
-    label = "false";
-    fillcolor = white;
-    style = filled;
+  s_162 -> s_162_6 [
+    lhead = cluster_lambda_162;
   ];
-  m_166 [
-    class = "method end";
-    label = "return";
-    fillcolor = white;
-    style = filled;
+  s_162_6 -> s_162_12;
+  s_162_12 -> s_162_13;
+  s_162_13 -> s_162_11;
+  s_162_11 -> s_162_14;
+  s_162_14 -> s_162_10;
+  s_163_5 -> s_163_7;
+  s_163_7 -> s_163_4;
+  s_163_4 -> s_163_2;
+  s_162_10 -> s_162_4 [
+    ltail = cluster_lambda_162;
   ];
-  s_161 -> s_161_3;
-  s_161_3 -> s_162;
-  s_162 -> s_162_2;
-  s_162_2 -> s_163;
-  s_163 -> s_163_2;
-  s_163_2 -> s_164;
-  s_164 -> s_164_4;
-  s_164_4 -> s_164_2;
-  s_164_2 -> unique;
-  unique -> s_165_3;
-  s_165_3 -> s_165;
-  s_165 -> m_166;
+  s_162_4 -> s_163_5;
 
-  subgraph cluster_m_161 {
-    label="method example3";
+  subgraph cluster_lambda_162 {
+    label="lambda";
     labeljust = "l";
     ranksep = 0.5;
-    pencolor = transparent;
-    s_161; s_161_3; s_162; s_162_2; s_163; s_163_2; s_164; s_164_2; s_164_4; unique; s_165; s_165_3; m_166;
+    pencolor = black;
+    s_162_6; s_162_10; s_162_11; s_162_12; s_162_13; s_162_14;
   }
 }
 

@@ -9,6 +9,26 @@ digraph G {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
+  s_53_2 [
+    class = "methodInvocation";
+    label = "a()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_54_2 [
+    class = "methodInvocation";
+    label = "b()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_55_2 [
+    class = "methodInvocation";
+    label = "c()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_53_2 -> s_54_2;
+  s_54_2 -> s_55_2;
 
 }
 

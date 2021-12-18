@@ -9,54 +9,26 @@ digraph G {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_41 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_42 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_42_2 [
+  s_53_2 [
     class = "methodInvocation";
     label = "a()";
     fillcolor = white;
     style = filled;
   ];
-  s_43 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_43_2 [
+  s_54_2 [
     class = "methodInvocation";
     label = "b()";
     fillcolor = white;
     style = filled;
   ];
-  s_44 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_44_2 [
+  s_55_2 [
     class = "methodInvocation";
     label = "c()";
     fillcolor = white;
     style = filled;
   ];
-  s_41 -> s_42;
-  s_42 -> s_42_2;
-  s_42_2 -> s_43;
-  s_43 -> s_43_2;
-  s_43_2 -> s_44;
-  s_44 -> s_44_2;
+  s_53_2 -> s_54_2;
+  s_54_2 -> s_55_2;
 
 }
 

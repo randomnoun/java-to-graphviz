@@ -9,16 +9,39 @@ digraph G_6 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  do_88 [
+  s_98_2 [
+    class = "methodInvocation";
+    label = "before()";
+    fillcolor = white;
+    style = filled;
+  ];
+  do_99 [
     class = "do";
     label = " Do";
     fillcolor = white;
     shape = diamond;
     style = filled;
   ];
-  do_88 -> do_88 [
+  s_100_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_102_2 [
+    class = "methodInvocation";
+    label = "after()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_98_2 -> s_100_2;
+  do_99 -> s_100_2 [
     label="do";
     style = dashed;
+  ];
+  s_100_2 -> do_99;
+  do_99 -> s_102_2 [
+    label="N";
   ];
 
 }

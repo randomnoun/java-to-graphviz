@@ -9,79 +9,59 @@ digraph G_12 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_142 [
-    class = "methodDeclaration";
-    label = "MethodDeclaration";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_142_3 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_143 [
-    class = "expressionStatement";
-    label = "";
-    fillcolor = white;
-    color = transparent;
-    fontcolor = transparent;
-    style = unset;
-  ];
-  s_143_2 [
+  s_146_2 [
     class = "methodInvocation";
-    label = "before()";
+    label = "println()";
     fillcolor = white;
     style = filled;
   ];
-  s_144 [
-    class = "expressionStatement";
-    label = "order some donuts";
+  s_146_4 [
+    class = "infixExpression infixConditional";
+    label = "||";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_146_5 [
+    class = "simpleName";
+    label = "a";
     fillcolor = white;
     style = filled;
   ];
-  s_144_2 [
-    class = "methodInvocation";
-    label = "orderDonuts()";
+  s_146_7 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_146_8 [
+    class = "simpleName";
+    label = "b";
     fillcolor = white;
     style = filled;
   ];
-  s_145 [
-    class = "expressionStatement";
-    label = "";
-    fillcolor = white;
-    color = transparent;
-    fontcolor = transparent;
-    style = unset;
-  ];
-  s_145_2 [
-    class = "methodInvocation";
-    label = "after()";
+  s_146_9 [
+    class = "simpleName";
+    label = "c";
     fillcolor = white;
     style = filled;
   ];
-  m_146 [
-    class = "method end";
-    label = "return";
-    fillcolor = white;
-    style = filled;
+  s_146_5 -> s_146_4;
+  s_146_4 -> s_146_8 [
+    label="false";
   ];
-  s_142 -> s_142_3;
-  s_142_3 -> s_143;
-  s_143 -> s_143_2;
-  s_143_2 -> s_144;
-  s_144 -> s_144_2;
-  s_144_2 -> s_145;
-  s_145 -> s_145_2;
-  s_145_2 -> m_146;
+  s_146_8 -> s_146_7;
+  s_146_7 -> s_146_9 [
+    label="true";
+  ];
+  s_146_4 -> s_146_2 [
+    label="true";
+  ];
+  s_146_7 -> s_146_2 [
+    label="false";
+  ];
+  s_146_9 -> s_146_2;
 
-  subgraph cluster_m_142 {
-    label="method example";
-    labeljust = "l";
-    ranksep = 0.5;
-    pencolor = transparent;
-    s_142; s_142_3; s_143; s_143_2; s_144; s_144_2; s_145; s_145_2; m_146;
-  }
 }
 

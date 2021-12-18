@@ -9,37 +9,35 @@ digraph G_12 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_143 [
-    class = "expressionStatement";
-    label = "";
-    fillcolor = white;
-    color = transparent;
-    fontcolor = transparent;
-    style = unset;
-  ];
-  s_144 [
-    class = "expressionStatement";
-    label = "order some donuts";
+  s_146_2 [
+    class = "methodInvocation";
+    label = "println()";
     fillcolor = white;
     style = filled;
   ];
-  s_145 [
-    class = "expressionStatement";
-    label = "";
+  s_146_4 [
+    class = "infixExpression infixConditional";
+    label = "||";
     fillcolor = white;
-    color = transparent;
-    fontcolor = transparent;
-    style = unset;
+    shape = diamond;
+    style = filled;
   ];
-  s_143 -> s_144;
-  s_144 -> s_145;
+  s_146_7 [
+    class = "infixExpression infixConditional";
+    label = "&&";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_146_4 -> s_146_2 [
+    label="true";
+  ];
+  s_146_7 -> s_146_2 [
+    label="false";
+  ];
+  s_146_4 -> s_146_7 [
+    label="false";
+  ];
 
-  subgraph cluster_m_142 {
-    label="method example";
-    labeljust = "l";
-    ranksep = 0.5;
-    pencolor = transparent;
-    s_143; s_144; s_145;
-  }
 }
 

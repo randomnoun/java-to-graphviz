@@ -89,13 +89,16 @@ public class JavaToGraphvizTest {
             
             JavaToGraphviz javaToGraphviz = new JavaToGraphviz();
             javaToGraphviz.setBaseCssUrl("JavaToGraphviz.css"); // defaults to JavaToGraphviz-base.css, which is a bit minimalistic
-            if (i == 1) {
-                Map<String, String> options = new HashMap<>();
+            Map<String, String> options = new HashMap<>();
+            if (i == 0) {
+                options.put("enableKeepNodeFilter", "true");
+                options.put("defaultKeepNode", "true");
+            } else if (i == 1) {
                 options.put("enableKeepNodeFilter", "true");
                 options.put("defaultKeepNode", "false");
-                javaToGraphviz.setOptions(options);
                 suffix = "-compact";
             }
+            javaToGraphviz.setOptions(options);
             javaToGraphviz.parse(fis, "UTF-8");
             fis.close();
             

@@ -9,40 +9,33 @@ digraph G_13 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_153 [
-    class = "expressionStatement";
-    label = "";
+  s_151_2 [
+    class = "methodInvocation";
+    label = "println()";
     fillcolor = white;
-    color = transparent;
-    fontcolor = transparent;
-    style = unset;
-  ];
-  s_154 [
-    class = "expressionStatement";
-    label = "order some donuts";
-    fillcolor = white;
-    shape = oval;
-    color = blue;
-    fontcolor = blue;
     style = filled;
   ];
-  s_155 [
-    class = "expressionStatement";
-    label = "";
+  s_151_4 [
+    class = "methodInvocation";
+    label = "test()";
     fillcolor = white;
-    color = transparent;
-    fontcolor = transparent;
-    style = unset;
+    style = filled;
   ];
-  s_153 -> s_154;
-  s_154 -> s_155;
+  s_151_4 -> s_151_2;
 
-  subgraph cluster_m_152 {
-    label="method example2";
+  subgraph cluster_anon_151 {
+    label="anonymous class";
     labeljust = "l";
     ranksep = 0.5;
-    pencolor = transparent;
-    s_153; s_154; s_155;
+    pencolor = black;
+   
+    subgraph cluster_m_152 {
+      label="method test";
+      labeljust = "l";
+      ranksep = 0.5;
+      pencolor = transparent;
+     
+    }
   }
 }
 

@@ -9,6 +9,42 @@ digraph G_4 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
+  s_80_2 [
+    class = "methodInvocation";
+    label = "before()";
+    fillcolor = white;
+    style = filled;
+  ];
+  for_81 [
+    class = "enhancedFor";
+    label = " iterable\nfor";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_82_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_84_2 [
+    class = "methodInvocation";
+    label = "after()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_82_2 -> for_81 [
+    label="for";
+    style = dashed;
+  ];
+  s_80_2 -> for_81;
+  for_81 -> s_84_2 [
+    label="end";
+  ];
+  for_81 -> s_82_2 [
+    label="next";
+  ];
 
 }
 

@@ -1,0 +1,83 @@
+digraph G_16 {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  s_183 [
+    class = "catchClause catch";
+    label = "CatchClause";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_183_5 [
+    class = "block";
+    label = "Block";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_184 [
+    class = "expressionStatement";
+    label = "ExpressionStatement";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_184_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_184_4 [
+    class = "stringLiteral literal";
+    label = "\"ioexception\"";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_186_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_183 -> s_183_5;
+  s_183_5 -> s_184;
+  s_184 -> s_184_4;
+  s_184_4 -> s_184_2;
+  s_184_2 -> s_186_2;
+
+  subgraph cluster_t_resource_181 {
+    label="resource";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = black;
+   
+  }
+  subgraph cluster_t_body_181 {
+    label="body";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = black;
+   
+  }
+  subgraph cluster_t_catch_183 {
+    label="catch IOException ioe";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = black;
+    s_183; s_183_5; s_184; s_184_2; s_184_4;
+  }
+  subgraph cluster_t_finally_185 {
+    label="finally";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = black;
+    s_186_2;
+  }
+}
+

@@ -9,6 +9,46 @@ digraph G_2 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
+  s_60_2 [
+    class = "methodInvocation";
+    label = "before()";
+    fillcolor = white;
+    style = filled;
+  ];
+  if_61 [
+    class = "if";
+    label = " If";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_62_2 [
+    class = "methodInvocation";
+    label = "truePath()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_64_2 [
+    class = "methodInvocation";
+    label = "falsePath()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_66_2 [
+    class = "methodInvocation";
+    label = "after()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_60_2 -> if_61;
+  if_61 -> s_62_2 [
+    label="Y";
+  ];
+  if_61 -> s_64_2 [
+    label="N";
+  ];
+  s_62_2 -> s_66_2;
+  s_64_2 -> s_66_2;
 
 }
 

@@ -9,34 +9,41 @@ digraph G_5 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  while_79 [
+  s_89_2 [
+    class = "methodInvocation";
+    label = "before()";
+    fillcolor = white;
+    style = filled;
+  ];
+  while_90 [
     class = "while";
     label = " While";
     fillcolor = white;
     shape = diamond;
     style = filled;
   ];
-  s_80_2 [
+  s_91_2 [
     class = "methodInvocation";
     label = "println()";
     fillcolor = white;
     style = filled;
   ];
-  s_82_2 [
+  s_93_2 [
     class = "methodInvocation";
     label = "after()";
     fillcolor = white;
     style = filled;
   ];
-  s_80_2 -> while_79 [
+  s_89_2 -> while_90;
+  s_91_2 -> while_90 [
     label="while";
     style = dashed;
   ];
-  s_80_2 -> s_82_2;
-  while_79 -> s_82_2 [
+  s_91_2 -> s_93_2;
+  while_90 -> s_93_2 [
     label="N";
   ];
-  while_79 -> s_80_2 [
+  while_90 -> s_91_2 [
     label="Y";
   ];
 

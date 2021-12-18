@@ -9,6 +9,22 @@ digraph G_11 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
+  s_141_2 [
+    class = "methodInvocation";
+    label = "println()";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_141_4 [
+    class = "conditionalExpression";
+    label = "?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  s_141_4 -> s_141_2 [
+    label="Y";
+  ];
 
 }
 

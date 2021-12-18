@@ -9,61 +9,47 @@ digraph G_9 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_119 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_120 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_120_2 [
+  s_131_2 [
     class = "methodInvocation";
     label = "println()";
     fillcolor = white;
     style = filled;
   ];
-  s_120_4 [
+  s_131_4 [
     class = "infixExpression";
     label = "+";
     fillcolor = white;
     style = filled;
   ];
-  s_120_5 [
+  s_131_5 [
     class = "numberLiteral literal";
     label = "1";
     fillcolor = white;
     style = filled;
   ];
-  s_120_6 [
+  s_131_6 [
     class = "infixExpression";
     label = "/";
     fillcolor = white;
     style = filled;
   ];
-  s_120_7 [
+  s_131_7 [
     class = "numberLiteral literal";
     label = "2";
     fillcolor = white;
     style = filled;
   ];
-  s_120_8 [
+  s_131_8 [
     class = "numberLiteral literal";
     label = "3";
     fillcolor = white;
     style = filled;
   ];
-  s_119 -> s_120;
-  s_120 -> s_120_5;
-  s_120_5 -> s_120_7;
-  s_120_7 -> s_120_8;
-  s_120_8 -> s_120_6;
-  s_120_6 -> s_120_4;
-  s_120_4 -> s_120_2;
+  s_131_5 -> s_131_7;
+  s_131_7 -> s_131_8;
+  s_131_8 -> s_131_6;
+  s_131_6 -> s_131_4;
+  s_131_4 -> s_131_2;
 
 }
 

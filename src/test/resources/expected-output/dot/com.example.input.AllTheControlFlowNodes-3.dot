@@ -9,98 +9,63 @@ digraph G_4 {
   bgcolor = transparent;
   fontname = "Handlee";
   compound = true;
-  s_68 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_69 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_69_2 [
+  s_80_2 [
     class = "methodInvocation";
     label = "before()";
     fillcolor = white;
     style = filled;
   ];
-  for_70 [
+  for_81 [
     class = "enhancedFor";
     label = " iterable\nfor";
     fillcolor = white;
     shape = diamond;
     style = filled;
   ];
-  s_70 [
+  s_81 [
     class = "initialiser singleVariableDeclaration";
     label = "int e";
     fillcolor = white;
     style = filled;
   ];
-  s_70_3 [
+  s_81_3 [
     class = "expression simpleName";
     label = "elements";
     fillcolor = white;
     style = filled;
   ];
-  s_70_4 [
-    class = "block";
-    label = "Block";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_71 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_71_2 [
+  s_82_2 [
     class = "methodInvocation";
     label = "println()";
     fillcolor = white;
     style = filled;
   ];
-  s_71_4 [
+  s_82_4 [
     class = "simpleName";
     label = "e";
     fillcolor = white;
     style = filled;
   ];
-  s_73 [
-    class = "expressionStatement";
-    label = "ExpressionStatement";
-    fillcolor = white;
-    style = filled;
-  ];
-  s_73_2 [
+  s_84_2 [
     class = "methodInvocation";
     label = "after()";
     fillcolor = white;
     style = filled;
   ];
-  s_68 -> s_69;
-  s_69 -> s_69_2;
-  s_69_2 -> s_70;
-  s_70 -> s_70_3;
-  s_70_3 -> for_70;
-  for_70 -> s_70_4 [
-    label="next";
-  ];
-  s_70_4 -> s_71;
-  s_71 -> s_71_4;
-  s_71_4 -> s_71_2;
-  s_71_2 -> s_70_3 [
+  s_80_2 -> s_81;
+  s_81 -> s_81_3;
+  s_81_3 -> for_81;
+  s_82_4 -> s_82_2;
+  s_82_2 -> s_81_3 [
     label="for";
     style = dashed;
   ];
-  for_70 -> s_73 [
+  for_81 -> s_84_2 [
     label="end";
   ];
-  s_73 -> s_73_2;
+  for_81 -> s_82_4 [
+    label="next";
+  ];
 
 }
 
