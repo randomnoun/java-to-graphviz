@@ -9,7 +9,7 @@
 	
     <groupId>com.randomnoun.build</groupId>
     <artifactId>java-to-graphviz</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Java to Graphviz</name>
     <description>Transforms java source code into graphviz diagrams</description>
   
@@ -74,8 +74,6 @@
 	      <version>1.15.0</version>
 	    </dependency>
        
-
-
 		<dependency>
 		  <groupId>net.sourceforge.cssparser</groupId>
 		  <artifactId>cssparser</artifactId>
