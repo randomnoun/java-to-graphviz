@@ -575,9 +575,11 @@ So a few things that'd be nice to implement if I get around to it:
 
 Some example Java sourcecode, and the generated graphviz DOT and PNG output, from the unit tests:
 
-|  Java source | Graphviz | PNG |
+The compact graphviz and PNG outputs are generated from the same source file, with the `defaultKeepNode` option set to `false`.
+
+|  Java source | Graphviz | PNG | Compact<br/>Graphviz | Compact<br/>PNG |
 |--|--|:--:|
-| [CommentAttribution.java](src/test/java/com/example/input/CommentAttribution.java) | [graphviz](src/test/resources/expected-output/dot/com.example.input.CommentAttribution-0-compact.dot) | [PNG](src/test/resources/expected-output/png/com.example.input.CommentAttribution-0-compact.png) | 
+| [CommentAttribution.java](src/test/java/com/example/input/CommentAttribution.java) | [graphviz](src/test/resources/expected-output/dot/com.example.input.CommentAttribution-0.dot) | [PNG](src/test/resources/expected-output/png/com.example.input.CommentAttribution-0.png) | [graphviz](src/test/resources/expected-output/dot/com.example.input.CommentAttribution-0-compact.dot) | [PNG](src/test/resources/expected-output/png/com.example.input.CommentAttribution-0-compact.png) | 
 
 
 ## More reading
