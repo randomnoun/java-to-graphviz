@@ -39,13 +39,15 @@ public class JavaToGraphvizCli {
           " --verbose2 -vv              increase verbosity a bit more ( debug level )\n" +
           " --format   -f dot|dom1|dom2 output format: DOT diagram (default), pre-styled DOM, post-styled DOM\n" +
           " --output   -o filename      send output to filename\n" +
-          "                             For multiple output files, use {f} for base filename, {i} for diagram index\n" +
-          "                             e.g. \"{f}-{i}.dot\" for dot output, \"{f}.html\" for dom output\n" +
+          "                             For multiple output files, filename can contain\n" +
+          "                               {basename} for base filename, {index} for diagram index\n" +
+          "                             e.g. \"{basename}-{index}.dot\" for dot output,\n" +
+          "                                  \"{basename}.html\" for dom output\n" +
           "                             default is stdout\n" +
           " --source   -s version       set Java source language version ( 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7,\n" +
           "                               8, 9, 10, 11, 12, 13, 14, 15, 16 )\n" +
           "\n" +
-          " --base-css -b url           replace base css with url ( relative to classpath, then file://./ )\n" +
+          " --base-css -b url           replace base css with url ( relative to classpath, then file:///./ )\n" +
           "                               default = JavaToGraphviz.css\n" +
           " --user-css -u url           add url to list of user css imports\n" +
           " --css      -c {rules}       add css rules\n" +
@@ -193,7 +195,7 @@ public class JavaToGraphvizCli {
             javaToGraphviz.parse(is, "UTF-8");
             is.close();
             String n = f.getName();
-            if (n.indexOf(".") != -1) { n = n.substring(0, n.indexOf(".")); }
+            if (n.indexOf(".") != -1) { n = n.substring(0, n.lastIndexOf(".")); }
             
             int diagramIndex = 0;
             boolean hasNext;
@@ -205,8 +207,8 @@ public class JavaToGraphvizCli {
                     System.out.println(sw.toString());
                     if (hasNext) { System.out.println("==========================="); }
                 } else {
-                    on = Text.replaceString(on,  "{f}", n);
-                    on = Text.replaceString(on,  "{i}", String.valueOf(diagramIndex));
+                    on = Text.replaceString(on, "{basename}", n);
+                    on = Text.replaceString(on, "{index}", String.valueOf(diagramIndex));
                     logger.debug("Writing " + on);   
                     FileOutputStream fos = new FileOutputStream(on);
                     PrintWriter pw = new PrintWriter(fos);
