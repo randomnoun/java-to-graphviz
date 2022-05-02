@@ -23,8 +23,8 @@ import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 public class JavaToGraphvizTest {
 
-    private static boolean WRITE_EXPECTED_OUTPUT = false;
-    private static boolean WRITE_EXPECTED_OUTPUT_PNG = false;
+    private static boolean WRITE_EXPECTED_OUTPUT = true;
+    private static boolean WRITE_EXPECTED_OUTPUT_PNG = true;
     
     @BeforeClass 
     public static void beforeAllTestMethods() {
@@ -36,7 +36,6 @@ public class JavaToGraphvizTest {
     
     @Test
     public void testControlFlowStatements() throws IOException {
-
         testStatement("com.example.input.AllTheControlFlowNodes");
         testStatement("com.example.input.BlogDiagrams");
         testStatement("com.example.input.MultipleGraphs");
@@ -79,7 +78,8 @@ public class JavaToGraphvizTest {
         
         // create 2 diagrams, one with removeNode = true
         int configCombinations = 2;
-        String dotExe = "C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot.exe";
+        // String dotExe = "C:\\Program Files (x86)\\Graphviz2.38\\bin\\dot.exe";
+        String dotExe = "C:\\Program Files\\Graphviz\\bin\\dot.exe";
         
         for (int i = 0; i < configCombinations; i++) {
             
