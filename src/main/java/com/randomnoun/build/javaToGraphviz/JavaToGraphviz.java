@@ -195,7 +195,7 @@ public class JavaToGraphviz {
         for (DagNode rootNode : dag.rootNodes) {
             c++;
             if (rootGraph.nodes.contains(rootNode)) {
-                logger.info("including rootNode " + c);
+                // logger.info("including rootNode " + c);
                 
                 String edgerNamesCsv = rootNode.options.get("edgerNamesCsv");
                 if (Text.isBlank(edgerNamesCsv)) { edgerNamesCsv = "control-flow"; }

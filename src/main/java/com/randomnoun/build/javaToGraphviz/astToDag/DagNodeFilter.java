@@ -158,7 +158,7 @@ public class DagNodeFilter {
                         DagNode inEdge2KeepNode = inEdge2.n1.lastKeepNode;
                         // if inEdge1KeepNode == null for both, then could remove diagram above this node ?
                         if (inEdge1KeepNode == inEdge2KeepNode && inEdge1KeepNode != null) {
-                            logger.info("on node " + node.name + ", merged edges back to " + inEdge1KeepNode.name + ", i=" + i + ", j=" + j);
+                            logger.debug("on node " + node.name + ", merged edges back to " + inEdge1KeepNode.name + ", i=" + i + ", j=" + j);
                             DagEdge newEdge = new DagEdge();
                             newEdge.n1 = inEdge1KeepNode;
                             newEdge.n2 = node;
@@ -197,7 +197,7 @@ public class DagNodeFilter {
                 DagNode nextNode = outEdge.n2;
                 dag.removeEdge(outEdge);
                 
-                logger.info("removed start node " + node.type + ", " + node.lineNumber + ", " + node.name);
+                logger.debug("removed start node " + node.type + ", " + node.lineNumber + ", " + node.name);
                 dag.nodes.remove(node);
                 redoNodes.add(nextNode);
     
@@ -206,7 +206,7 @@ public class DagNodeFilter {
                 DagEdge inEdge = inEdges.get(0);
                 dag.removeEdge(inEdge);
                 
-                logger.info("removed terminal node " + node.type + ", " + node.lineNumber + ", " + node.name);
+                logger.debug("removed terminal node " + node.type + ", " + node.lineNumber + ", " + node.name);
                 dag.nodes.remove(node);
     
             } else if (inEdges.size() >= 1 && outEdges.size() == 1 && !node.keepNode) {
@@ -245,7 +245,7 @@ public class DagNodeFilter {
                 DagNode nextNode = outEdge.n2;
                 dag.removeEdge(outEdge);
                 
-                logger.info("removed node " + node.type + ", " + node.lineNumber + ", " + node.name);
+                logger.debug("removed node " + node.type + ", " + node.lineNumber + ", " + node.name);
                 dag.nodes.remove(node);
                 // start from n1 again as removing this node may make it possible to remove the parent node
                 redoNodes.add(nextNode);

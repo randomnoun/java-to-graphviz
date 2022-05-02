@@ -173,14 +173,16 @@ public class ControlFlowEdger {
             
         } else if (node.type.equals("Assert") ||
           node.type.equals("Empty") ||
-          node.type.equals("comment")) { // lower-case c for nodes created from gv comments
+          node.type.equals("comment") || // lower-case c for nodes created from gv comments 
+          node.type.equals("QualifiedName") ||
+          node.type.equals("SimpleName") // names in the package declaration trigger this
+          ) {  
             // non-control flow statement
             ExitEdge e = new ExitEdge();
             e.n1 = node;
             return Collections.singletonList(e);
             
 	    } else {
-	        // names in the package declaration trigger this
 	        logger.warn("non-implemented control flow statement " + node.type);
 	        ExitEdge e = new ExitEdge();
 	        e.n1 = node;
