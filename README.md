@@ -58,7 +58,7 @@ Note it's not strictly a DAG, as we can get loops due to for/while/do constructs
 
 6. **Create DOM**. The filtered DAG is converted into a HTML-like document object model (DOM). This represents the DAG structure in terms of "graph", "node" and "edge" elements, with attributes for user-supplied styles and labels, also supplied using special "gv" comments.
 
-7. **Apply styles**. The DOM has a CSS stylesheet applied to it. JavaToGraphviz comes with a few builtin stylesheets, but you can replace or override these in a number of ways. During this step,
+7. **Apply styles**. The DOM has a CSS stylesheet applied to it. **JavaToGraphviz** comes with a few builtin stylesheets, but you can replace or override these in a number of ways. During this step,
 final node and edge IDs, labels, and formatting are determined. Additionally, extra subgraphs can be added into the diagram, which restructures the DOM and adds subgraphs into the DAG.
 
 8. **Extract styles**. The applied styles in the DOM are copied back into the DAG.
@@ -79,8 +79,8 @@ The gv directives can be one of the following:
 | // gv: | <pre>// gv: open box</pre> | override the label for a node.<br/>If on it's own line can add additional nodes to the diagram |
 | // gv: { css } | <pre>// gv: open box { color: green; shape: oval; }</pre> | override the label for a node, and supply additional formatting.<br/>The formatting is expressed as a CSS rule, but uses [graphviz attribute names](https://graphviz.org/doc/info/attrs.html) rather than the usual CSS property names |
 | // gv#id: | <pre>// gv#openBox: open box </pre> | override the ID for a node.<br/>This can be used to make the graphviz output more understandable, or to apply styles in a separate stylesheet |
-| // gv.class: | <pre>// gv#openBox.green.oval: open box </pre> | add CSS classes to a node.<br/>This can be used to make the graphviz output more understandable, or to apply styles in a separate stylesheet. Many classes may be assigned to a node, but only a single ID. Additional classes may be added by other parts of the JavaToGraphviz (e.g. a class representing the node type is added when the DAG is constructed, so that all "if" nodes can later be shaped as diamonds ) |
-| // gv-style: { rules } | <pre>/* gv-style: {<br/>  // CSS properties applied to all 'if' nodes<br/>  node.if {<br/>    gv-idFormat: "if_${lineNumber}";<br/>    gv-wordwrap: 20;<br/>    shape : diamond; <br/>  }<br/>  edge.if.true { label: "Y"; }<br/>  edge.if.false { label: "N"; }<br/>} */</pre> | defines CSS style rules.<br/>Most CSS property names correspond to graphviz attribute names, but those beginning with "gv-" are processed within JavaToGraphviz instead. |
+| // gv.class: | <pre>// gv#openBox.green.oval: open box </pre> | add CSS classes to a node.<br/>This can be used to make the graphviz output more understandable, or to apply styles in a separate stylesheet. Many classes may be assigned to a node, but only a single ID. Additional classes may be added by other parts of **JavaToGraphviz** (e.g. a class representing the node type is added when the DAG is constructed, so that all "if" nodes can later be shaped as diamonds ) |
+| // gv-style: { rules } | <pre>/* gv-style: {<br/>  // CSS properties applied to all 'if' nodes<br/>  node.if {<br/>    gv-idFormat: "if_${lineNumber}";<br/>    gv-wordwrap: 20;<br/>    shape : diamond; <br/>  }<br/>  edge.if.true { label: "Y"; }<br/>  edge.if.false { label: "N"; }<br/>} */</pre> | defines CSS style rules.<br/>Most CSS property names correspond to graphviz attribute names, but those beginning with "gv-" are processed within **JavaToGraphviz** instead. |
 | // gv-style: { @import } | <pre>// gv-style: { @import "JavaToGraphviz.css"; }</pre> | import a CSS stylesheet.<br/>To find the stylesheet, the classpath is searched first, then the local filesystem |
 | // gv-keepNode: spec | <pre>// gv-keepNode: expressionStatement block</pre> | Changes the 'keepNode' flags when creating DAG nodes.<br/>If the default keepNode value is true, then individual nodes can be excluded by prefixing them with a minus sign; e.g. <pre>// gv-keepNode: -expressionStatement</pre> Also note that any node that has a <pre>// gv: comment</pre> will be kept, regardless of the keepNode flags. |
 | // gv-literal: dot | <pre>// gv-literal: { rank = same; case1; case2; }</pre> | Adds graphviz 'dot' code directly into the final graphviz diagram |
@@ -88,7 +88,7 @@ The gv directives can be one of the following:
 | // gv-endSubgraph | <pre>// gv-endSubgraph</pre> | Closes a subgraph<br/>You probably want to do this at the same depth in the AST tree; e.g. in the same block that opened the subgraph. |
 | // gv-graph | <pre>// gv-graph: something separate</pre> | Starts a new graphviz diagram.<br/>The first time this is encountered, everything before this line is discarded, and this line marks the beginning of a new diagram.<br/>If omitted, the entire class/interface is drawn. |
 | // gv-endGraph | <pre>// gv-endGraph</pre> | Closes a graph.<br/>Nodes will not be processed until a new graph is created with gv-graph. |
-| // gv-option key=value | <pre>// gv-option: centralSwitch=true</pre> | Options can be used to change how JavaToGraphviz creates nodes and edges |
+| // gv-option key=value | <pre>// gv-option: centralSwitch=true</pre> | Options can be used to change how **JavaToGraphviz** creates nodes and edges |
 
 Here's all that again in a bit more detail.
 
@@ -399,7 +399,7 @@ Users can create CSS rules based on the values of these elements, attributes and
 
 Most properties correspond to graphviz attributes; see the [Graphviz documentation](https://graphviz.org/doc/info/attrs.html) for a complete list of these.
 
-Some additional properties are handled by JavaToGraphviz itself, these are all namespaced with a "gv-" prefix.
+Some additional properties are handled by **JavaToGraphviz** itself, these are all namespaced with a "gv-" prefix.
 
 Prefixed properties include:
 
