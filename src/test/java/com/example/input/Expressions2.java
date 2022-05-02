@@ -12,6 +12,7 @@ public class Expressions2 {
        char ch = 'a' + 'b';
        int i = 123;
        String s = "123";
+       String s2 = "\"";
        Class c = String.class;
        
     }
