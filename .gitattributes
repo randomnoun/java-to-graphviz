@@ -1,3 +1,0 @@
-# need LFs here for tests to pass
-*.dom text eol=lf
-*.dot text eol=lf
