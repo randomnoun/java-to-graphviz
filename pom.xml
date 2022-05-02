@@ -9,7 +9,7 @@
 	
     <groupId>com.randomnoun.build</groupId>
     <artifactId>java-to-graphviz</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <name>Java to Graphviz</name>
     <description>Transforms java source code into graphviz diagrams</description>
   
@@ -99,7 +99,7 @@
 		<connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</connection>
 		<developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</developerConnection>
 		<url>http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz</url>
-  	    <tag>java-to-graphviz-1.0.0</tag>
+  	    <tag>java-to-graphviz-1.0.2</tag>
     </scm>
 	
 	<build>
