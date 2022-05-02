@@ -4,5 +4,6 @@
 /.settings/
 /src/test/resources/expected-output-2021-10/
 /src/test/resources/expected-output-2021-11/
+/src/test/resources/expected-output-2022-05/
 /src/test/resources/expected-output-recurse/
 **.nocompile
