@@ -123,7 +123,7 @@ public class JavaToGraphvizTest {
                     fis = new FileInputStream(tf);
                     String expected = new String(StreamUtil.getByteArray(fis));
                     fis.close();
-                    assertEquals("difference in " + className + "-" + idx + suffix + ".dot", expected, sw.toString());
+                    assertEquals("difference in " + className + "-" + idx + suffix + ".dot", expected.trim(), sw.toString().trim());
                     idx++;
                 }
                 if (WRITE_EXPECTED_OUTPUT_PNG) {
@@ -202,7 +202,7 @@ public class JavaToGraphvizTest {
                     fis = new FileInputStream(tf);
                     String expected = new String(StreamUtil.getByteArray(fis));
                     fis.close();
-                    assertEquals("difference in " + className + "-" + idx + suffix + ".dom", expected, sw.toString());
+                    assertEquals("difference in " + className + "-" + idx + suffix + ".dom", expected.trim(), sw.toString().trim());
                     idx++;
                 }
                 if (hasNext) { logger.info("==========================="); }
