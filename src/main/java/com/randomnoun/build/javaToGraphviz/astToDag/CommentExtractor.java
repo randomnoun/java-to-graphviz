@@ -90,6 +90,9 @@ public class CommentExtractor {
             // hrm
             text = null; 
         }
+
+        // convert "\n" in comments to newlines (they'll get converted back later)
+        text = Text.replaceString(text, "\\n",  "\n");
         
         return "gv".equals(type) ? new GvComment(c, lineNumber, column, eolComment, id, classes, dir, text, inlineStyleString) :
             "gv-graph".equals(type) ? new GvGraphComment(c, lineNumber, column, eolComment, id, classes, text, inlineStyleString) :

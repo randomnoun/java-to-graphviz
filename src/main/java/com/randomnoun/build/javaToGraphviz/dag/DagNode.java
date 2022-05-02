@@ -61,6 +61,9 @@ public class DagNode {
         String wordwrapString = gvStyles.get("gv-wordwrap");
         String result = "";
         if (label == null) { label = "NOLABEL"; } // should never happen
+        label = Text.replaceString(label, "\\",  "\\\\");
+        label = Text.replaceString(label, "\"",  "\\\"");
+        label = Text.replaceString(label, "\n",  "\\n");
         if (wordwrapString == null) {
             result = label.trim();
         } else {
@@ -82,7 +85,7 @@ public class DagNode {
                 firstWord = false;
             }
         }
-        return Text.replaceString(result, "\"",  "\\\"");
+        return result;
     }
     
     public String toGraphviz(boolean isDebugLabel) {
