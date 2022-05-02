@@ -13,7 +13,7 @@
     <name>Java to Graphviz</name>
     <description>Transforms java source code into graphviz diagrams</description>
   
-    <url>https://randomnoun.github.io/java-to-graphviz/</url>
+    <url>https://github.com/randomnoun/java-to-graphviz</url>
 	<inceptionYear>MMXXI</inceptionYear>
 	
 	<dependencies>
