@@ -1,3 +1,4 @@
+[![Maven Central](https://img.shields.io/maven-central/v/com.randomnoun.build/java-to-graphviz.svg)](https://search.maven.org/artifact/com.randomnoun.build/java-to-graphviz)
 
 # java-to-graphviz
 
