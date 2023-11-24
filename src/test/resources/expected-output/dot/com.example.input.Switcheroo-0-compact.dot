@@ -1,0 +1,116 @@
+digraph G {
+  node [
+    shape = rect;
+    fontname = "Handlee";
+  ]
+  edge [
+    fontname = "Handlee";
+  ]
+  bgcolor = transparent;
+  fontname = "Handlee";
+  compound = true;
+  c_11 [
+    class = "comment";
+    label = "start of method";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13 [
+    class = "switch";
+    label = "Switch";
+    fillcolor = white;
+    style = filled;
+  ];
+  case_14 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_17 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_20 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  case_23 [
+    class = "switchCase";
+    label = " case ?";
+    fillcolor = white;
+    shape = diamond;
+    style = filled;
+  ];
+  m_29 [
+    class = "method end";
+    label = "return";
+    fillcolor = white;
+    style = filled;
+  ];
+  s_13 -> m_29;
+  c_11 -> s_13;
+  s_13 -> case_14;
+  case_14 -> case_17 [
+    label="N";
+  ];
+  case_17 -> case_20 [
+    label="N";
+  ];
+  case_14 -> m_29 [
+    label="Y";
+    color = red;
+  ];
+  case_20 -> case_23 [
+    label="N";
+  ];
+  case_17 -> m_29 [
+    label="Y";
+    color = red;
+  ];
+  case_20 -> m_29 [
+    label="Y";
+    color = red;
+  ];
+  case_23 -> m_29 [
+    label="Y";
+    color = red;
+  ];
+
+  subgraph cluster_m_10 {
+    label="method testStringSwitch";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+    c_11; s_13; case_14; case_17; case_20; case_23; m_29;
+  }
+  subgraph cluster_m_31 {
+    label="method testStringExpression";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_49 {
+    label="method testStringExpressionArrow";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+  subgraph cluster_m_62 {
+    label="method testMultipleStringExpressionArrow";
+    labeljust = "l";
+    ranksep = 0.5;
+    pencolor = transparent;
+   
+  }
+}
+

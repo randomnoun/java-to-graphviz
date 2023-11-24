@@ -2,11 +2,11 @@
   <modelVersion>4.0.0</modelVersion>
   
     <parent>
-		<artifactId>parent-pom</artifactId>
-		<groupId>com.randomnoun.build</groupId>
-		<version>1.23</version>
-	</parent>
-	
+        <artifactId>parent-pom</artifactId>
+        <groupId>com.randomnoun.build</groupId>
+        <version>1.23</version>
+    </parent>
+    
     <groupId>com.randomnoun.build</groupId>
     <artifactId>java-to-graphviz</artifactId>
     <version>1.0.4-SNAPSHOT</version>
@@ -14,15 +14,15 @@
     <description>Transforms java source code into graphviz diagrams</description>
   
     <url>https://github.com/randomnoun/java-to-graphviz</url>
-	<inceptionYear>MMXXI</inceptionYear>
-	
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- 
+    <inceptionYear>MMXXI</inceptionYear>
+    
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-1.2-api</artifactId>
@@ -30,164 +30,172 @@
          -->
 
         <dependency>
-			<groupId>com.randomnoun.common</groupId>
-			<artifactId>common-public</artifactId>
-			<version>1.0.6</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-1.2-api</artifactId>
-				</exclusion>
-			</exclusions>
+            <groupId>com.randomnoun.common</groupId>
+            <artifactId>common-public</artifactId>
+            <version>1.0.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-1.2-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-			<groupId>com.randomnoun.common</groupId>
-			<artifactId>log4j-one</artifactId>
-			<version>0.0.4</version>
+            <groupId>com.randomnoun.common</groupId>
+            <artifactId>log4j-one</artifactId>
+            <version>0.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.17.0</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>com.randomnoun.common</groupId>
             <artifactId>log4j-one-bridge</artifactId>
             <version>0.0.1</version>
         </dependency>
 
-		<!--  think this is pretty old these days 
+        <!--  think this is pretty old these days 
         <dependency>
-	      <groupId>org.eclipse.jdt</groupId>
-	      <artifactId>org.eclipse.jdt.core</artifactId>
-	      <version>3.20.0</version>
-	    </dependency>
-	    -->
-	    <!--  for ASTResolving -->
+          <groupId>org.eclipse.jdt</groupId>
+          <artifactId>org.eclipse.jdt.core</artifactId>
+          <version>3.20.0</version>
+        </dependency>
+        -->
+        <!--  for ASTResolving -->
         <dependency>
-	      <groupId>org.eclipse.jdt</groupId>
-	      <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
-	      <version>1.15.0</version>
-	    </dependency>
+          <groupId>org.eclipse.jdt</groupId>
+          <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
+          <version>1.15.0</version>
+        </dependency>
        
-		<dependency>
-		  <groupId>net.sourceforge.cssparser</groupId>
-		  <artifactId>cssparser</artifactId>
-		  <version>0.9.29</version>
-		</dependency>
-	
-		<dependency>
-		  <!-- jsoup HTML parser library @ https://jsoup.org/ -->
-		  <groupId>org.jsoup</groupId>
-		  <artifactId>jsoup</artifactId>
-		  <version>1.14.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.google.guava</groupId>
-		    <artifactId>guava</artifactId>
-		    <version>31.0.1-jre</version>
-		</dependency>
+        <dependency>
+          <groupId>net.sourceforge.cssparser</groupId>
+          <artifactId>cssparser</artifactId>
+          <version>0.9.29</version>
+        </dependency>
+    
+        <dependency>
+          <!-- jsoup HTML parser library @ https://jsoup.org/ -->
+          <groupId>org.jsoup</groupId>
+          <artifactId>jsoup</artifactId>
+          <version>1.14.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
+        </dependency>
 
-	</dependencies>
+        <!-- not needed for java 17         
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <optional>true</optional>
+        </dependency> -->
 
-	<!--  these are on github now. except for the bits on gitlab. -->
-	<scm>
-		<connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</connection>
-		<developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</developerConnection>
-		<url>http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz</url>
-  	    <tag>java-to-graphviz-1.0.2</tag>
+
+    </dependencies>
+
+    <!--  these are on github now. except for the bits on gitlab. -->
+    <scm>
+        <connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</connection>
+        <developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git</developerConnection>
+        <url>http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz</url>
+        <tag>java-to-graphviz-1.0.2</tag>
     </scm>
-	
-	<build>
-		<finalName>java-to-graphviz</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.randomnoun.build.javaToGraphviz.JavaToGraphvizCli</mainClass>
-								</transformer>
-							</transformers>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
-							<shadedClassifierName>cli</shadedClassifierName>
-							<filters>
-								<!-- see http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar -->
-								<filter>
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.DSA</exclude>
-										<exclude>META-INF/*.RSA</exclude>
-									</excludes>
-								</filter>
-							</filters>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+    
+    <build>
+        <finalName>java-to-graphviz</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.randomnoun.build.javaToGraphviz.JavaToGraphvizCli</mainClass>
+                                </transformer>
+                            </transformers>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>cli</shadedClassifierName>
+                            <filters>
+                                <!-- see http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar -->
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<!-- <failOnError>false</failOnError> -->
-					<source>8</source>
-				</configuration>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.3</version>
-					<configuration>
-						<source>${jdk.version}</source>
-						<target>${jdk.version}</target>
-						<encoding>UTF-8</encoding>
-					</configuration>
-				</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- <failOnError>false</failOnError> -->
+                    <source>8</source>
+                </configuration>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.3</version>
+                    <configuration>
+                        <source>${jdk.version}</source>
+                        <target>${jdk.version}</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
 
-			</plugins>
-		</pluginManagement>
-	</build>
-	
-	<distributionManagement>
-		<site>
-        	<id>gh-pages</id>
-        	<name>java-to-graphviz Website</name>
-	        <url>git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git?gh-pages#</url>
-    	</site>
-	</distributionManagement>
-	
-	
-	<properties>
-		<jdk.version>11</jdk.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<graalvm.version>20.3.0</graalvm.version>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
+    <distributionManagement>
+        <site>
+            <id>gh-pages</id>
+            <name>java-to-graphviz Website</name>
+            <url>git:http://gitlab.dev.randomnoun/randomnoun/java-to-graphviz.git?gh-pages#</url>
+        </site>
+    </distributionManagement>
+    
+    
+    <properties>
+        <jdk.version>17</jdk.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <graalvm.version>20.3.0</graalvm.version>
         <compiler.dir>${project.build.directory}/compiler</compiler.dir>
-	</properties>
+    </properties>
   
 </project>
