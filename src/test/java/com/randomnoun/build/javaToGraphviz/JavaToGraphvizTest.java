@@ -54,6 +54,7 @@ public class JavaToGraphvizTest {
         testStatement("com.example.input.IfStatement");
         testStatement("com.example.input.IfStatementExternalCss");
         testStatement("com.example.input.SwitchStatement");
+        testStatement("com.example.input.Switcheroo");
         testStatement("com.example.input.WhileStatement");
         testStatement("com.example.input.SynchronizeStatement");
         testStatement("com.example.input.TryCatchStatement");
